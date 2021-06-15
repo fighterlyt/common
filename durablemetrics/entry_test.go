@@ -1,13 +1,14 @@
 package durablemetrics
 
 import (
+	"os"
+	"testing"
+
 	"github.com/fighterlyt/log"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gitlab.com/nova_dubai/common/helpers"
-	"os"
-	"testing"
 )
 
 var (

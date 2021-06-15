@@ -2,9 +2,9 @@ package durablemetrics
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
 
 	"github.com/fighterlyt/log"
+	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
