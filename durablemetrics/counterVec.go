@@ -43,10 +43,14 @@ const (
 )
 
 func (c CounterVec) WithLabelValuesInc(lvs ...string) {
+	c.WithLabelValuesAdd(1, lvs...)
+}
+
+func (c CounterVec) WithLabelValuesAdd(value float64, lvs ...string) {
 	ctx, cancel := context.WithTimeout(context.Background(), redisTimeout)
 	defer cancel()
 
-	c.counterVec.WithLabelValues(lvs...).Inc()
+	c.counterVec.WithLabelValues(lvs...).Add(value)
 
 	var keys []string
 	for i := range lvs {
@@ -56,6 +60,6 @@ func (c CounterVec) WithLabelValuesInc(lvs ...string) {
 	helpers.IgnoreError(c.logger, "redis操作失败", func() error {
 		key := strings.Join(keys, ";")
 
-		return metricsRedisClient.HIncrBy(ctx, generateRedisKey(c.name), key, 1).Err()
+		return metricsRedisClient.HIncrByFloat(ctx, generateRedisKey(c.name), key, value).Err()
 	})
 }

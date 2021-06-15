@@ -21,7 +21,7 @@ var (
 func TestMain(m *testing.M) {
 	metricsRedisClient = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379",
 		Password: "123",
-		DB:       2})
+		DB:       3})
 
 	logger, err := log.NewEasyLogger(true, false, "", "test_metrics")
 	if err != nil {
@@ -47,7 +47,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	counterVec, err = NewCounterVec("test_counter_vec", "测试counter_vec", []string{"opera"}, logger)
+	counterVec, err = NewCounterVec("test_counter_vec", "测试counter_vec", []string{`url`, `method`, `sendOK`, `statusCode`, `local`}, logger)
 	if err != nil {
 		panic(err)
 	}
