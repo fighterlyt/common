@@ -42,3 +42,13 @@ func (w *walletBalance) get(currencies ...string) map[string]decimal.Decimal {
 
 	return result
 }
+
+type WalletBalanceInfo struct {
+	CollectWalletInfo  WalletInfo `json:"collect_wallet_info"`  // 归集钱包信息
+	WithdrawWalletInfo WalletInfo `json:"withdraw_wallet_info"` // 提款钱包信息
+}
+
+type WalletInfo struct {
+	Address  string                     `json:"address"`  // 地址
+	Balances map[string]decimal.Decimal `json:"balances"` // 账户余额信息
+}
