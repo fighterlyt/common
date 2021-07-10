@@ -26,18 +26,33 @@ type Service struct {
 	withdrawWalletBalance *walletBalance                                             // 提款钱包余额
 	collectAddress        string                                                     // 归集钱包地址
 	withdrawAddress       string                                                     // 提现钱包地址
+	walletMetrics         *metrics                                                   // 监控信息
 }
 
-func NewService(db *gorm.DB, checkBalanceInterval time.Duration, logger log.Logger, getBalanceFunc func() (collectAddress, withdrawAddress string, err error)) *Service {
-	service := &Service{db: db, checkBalanceInterval: checkBalanceInterval, logger: logger, getBalanceFunc: getBalanceFunc}
+func NewService(db *gorm.DB, checkBalanceInterval time.Duration, logger log.Logger, getBalanceFunc func() (collectAddress, withdrawAddress string, err error)) (*Service, error) {
+	walletMetrics, err := newMetrics(logger)
+	if err != nil {
+		return nil, errors.Wrap(err, "启动监控失败")
+	}
+
+	service := &Service{
+		db:                   db,
+		checkBalanceInterval: checkBalanceInterval,
+		logger:               logger,
+		getBalanceFunc:       getBalanceFunc,
+		walletMetrics:        walletMetrics,
+	}
 
 	service.start()
 
-	return service
+	return service, nil
 }
 
 func (s *Service) start() {
-	var err error
+	var (
+		err                               error
+		collectBalances, withdrawBalances map[string]decimal.Decimal
+	)
 
 	for ; ; time.Sleep(s.checkBalanceInterval) {
 		s.collectAddress, s.withdrawAddress, err = s.getBalanceFunc()
@@ -47,24 +62,38 @@ func (s *Service) start() {
 			continue
 		}
 
-		collectBalances, err := s.checkTrxAndUsdt(s.collectAddress)
+		collectBalances, err = s.checkTrxAndUsdt(s.collectAddress)
 		if err != nil {
 			s.logger.Error("查询归集钱包余额失败", zap.String("错误", err.Error()))
 
 			continue
 		}
 
+		// 保存监控数据
+		s.walletMetrics.collectWalletBalance.WithLabelValuesSet(s.getBalanceByCurrency(collectBalances, model.TRX), model.TRX)
+		s.walletMetrics.collectWalletBalance.WithLabelValuesSet(s.getBalanceByCurrency(collectBalances, model.USDT), model.USDT)
+
 		s.collectWalletBalance.reset(collectBalances)
 
-		withdrawBalances, err := s.checkTrxAndUsdt(s.withdrawAddress)
+		withdrawBalances, err = s.checkTrxAndUsdt(s.withdrawAddress)
 		if err != nil {
 			s.logger.Error("查询提款钱包余额失败", zap.String("错误", err.Error()))
 
 			continue
 		}
 
+		// 保存监控数据
+		s.walletMetrics.withdrawWalletBalance.WithLabelValuesSet(s.getBalanceByCurrency(withdrawBalances, model.TRX), model.TRX)
+		s.walletMetrics.withdrawWalletBalance.WithLabelValuesSet(s.getBalanceByCurrency(withdrawBalances, model.USDT), model.USDT)
+
 		s.withdrawWalletBalance.reset(withdrawBalances)
 	}
+}
+
+func (s Service) getBalanceByCurrency(balances map[string]decimal.Decimal, currency string) float64 {
+	balance, _ := balances[currency].Float64()
+
+	return balance
 }
 
 func (s *Service) GetWalletBalance() *WalletBalanceInfo {
