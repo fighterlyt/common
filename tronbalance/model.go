@@ -1,4 +1,4 @@
-package balance
+package tronbalance
 
 import (
 	"sync"
