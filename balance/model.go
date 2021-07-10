@@ -1,8 +1,9 @@
 package balance
 
 import (
-	"github.com/shopspring/decimal"
 	"sync"
+
+	"github.com/shopspring/decimal"
 )
 
 // 钱包地址

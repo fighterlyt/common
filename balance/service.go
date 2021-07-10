@@ -2,6 +2,8 @@ package balance
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/fighterlyt/gotron-sdk/pkg/client"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
@@ -10,7 +12,6 @@ import (
 	"gitlab.com/nova_dubai/common/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"time"
 )
 
 // ErrAccountNotFound tron账户不存在的异常
@@ -31,7 +32,7 @@ type Service struct {
 	currency              string                                                     // 查询的币种
 }
 
-func NewService(db *gorm.DB, tronClient *client.GrpcClient, currency string, checkBalanceInterval time.Duration, logger log.Logger, getBalanceFunc func() (collectAddress, withdrawAddress string, err error)) (*Service, error) {
+func NewService(db *gorm.DB, tronClient *client.GrpcClient, currency string, checkBalanceInterval time.Duration, logger log.Logger, getBalanceFunc func() (collectAddress, withdrawAddress string, err error)) (*Service, error) { // nolint:golint,lll
 	walletMetrics, err := newMetrics(logger)
 	if err != nil {
 		return nil, errors.Wrap(err, "启动监控失败")
@@ -136,7 +137,7 @@ func (s *Service) checkTrxAndUsdt(address string) (map[string]decimal.Decimal, e
 
 	return map[string]decimal.Decimal{
 		model.TRX:  trxBalance,
-		model.USDT: usdtBalance,
+		s.currency: usdtBalance,
 	}, err
 }
 
@@ -144,38 +145,48 @@ func (s *Service) checkTrxAndUsdt(address string) (map[string]decimal.Decimal, e
 func (s *Service) checkBalance(address, currency string) (decimal.Decimal, error) {
 	switch currency {
 	case model.TRX:
-		account, err := s.tronClient.GetAccount(address)
-		if err != nil {
-			// 这个异常是tron账户未激活
-			if errors.As(err, &ErrAccountNotFound) {
-				return decimal.Zero, nil
-			}
-
-			return decimal.Zero, errors.Wrap(err, "获取tron余额失败")
-		}
-
-		return decimal.NewFromInt(account.Balance).Mul(decimal.New(1, -6)), nil
+		return s.checkTrxBalance(address)
 	default:
-		contract, err := model.Trc20.ContractLocator().GetContract(currency)
-		if err != nil {
-			return decimal.Zero, errors.Wrapf(err, "获取合约[%s]地址失败", currency)
-		}
-
-		if contract == nil {
-			return decimal.Zero, fmt.Errorf("不支持的代币[%s]", currency)
-		}
-
-		balance, err := s.tronClient.TRC20ContractBalance(address, contract.Address())
-		if err != nil {
-			return decimal.Zero, errors.Wrap(err, "获取代币余额失败")
-		}
-
-		// 小数点位数
-		decimals, err := s.tronClient.TRC20GetDecimals(contract.Address())
-		if err != nil {
-			return decimal.Zero, errors.Wrap(err, "获取代币余额失败")
-		}
-
-		return decimal.NewFromBigInt(balance, -int32(decimals.Int64())), nil
+		return s.checkContractBalance(address, currency)
 	}
+}
+
+// 查询trx余额
+func (s Service) checkTrxBalance(address string) (decimal.Decimal, error) {
+	account, err := s.tronClient.GetAccount(address)
+	if err != nil {
+		// 这个异常是tron账户未激活
+		if errors.As(err, &ErrAccountNotFound) {
+			return decimal.Zero, nil
+		}
+
+		return decimal.Zero, errors.Wrap(err, "获取tron余额失败")
+	}
+
+	return decimal.NewFromInt(account.Balance).Mul(decimal.New(1, -6)), nil
+}
+
+// 查询合约币种余额
+func (s Service) checkContractBalance(address, currency string) (decimal.Decimal, error) {
+	contract, err := model.Trc20.ContractLocator().GetContract(currency)
+	if err != nil {
+		return decimal.Zero, errors.Wrapf(err, "获取合约[%s]地址失败", currency)
+	}
+
+	if contract == nil {
+		return decimal.Zero, fmt.Errorf("不支持的代币[%s]", currency)
+	}
+
+	balance, err := s.tronClient.TRC20ContractBalance(address, contract.Address())
+	if err != nil {
+		return decimal.Zero, errors.Wrap(err, "获取代币余额失败")
+	}
+
+	// 小数点位数
+	decimals, err := s.tronClient.TRC20GetDecimals(contract.Address())
+	if err != nil {
+		return decimal.Zero, errors.Wrap(err, "获取代币余额失败")
+	}
+
+	return decimal.NewFromBigInt(balance, -int32(decimals.Int64())), nil
 }
