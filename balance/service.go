@@ -6,6 +6,7 @@ import (
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
+	"gitlab.com/nova_dubai/common/helpers"
 	"gitlab.com/nova_dubai/common/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -27,23 +28,30 @@ type Service struct {
 	collectAddress        string                                                     // 归集钱包地址
 	withdrawAddress       string                                                     // 提现钱包地址
 	walletMetrics         *metrics                                                   // 监控信息
+	currency              string                                                     // 查询的币种
 }
 
-func NewService(db *gorm.DB, checkBalanceInterval time.Duration, logger log.Logger, getBalanceFunc func() (collectAddress, withdrawAddress string, err error)) (*Service, error) {
+func NewService(db *gorm.DB, tronClient *client.GrpcClient, currency string, checkBalanceInterval time.Duration, logger log.Logger, getBalanceFunc func() (collectAddress, withdrawAddress string, err error)) (*Service, error) {
 	walletMetrics, err := newMetrics(logger)
 	if err != nil {
 		return nil, errors.Wrap(err, "启动监控失败")
 	}
 
 	service := &Service{
-		db:                   db,
-		checkBalanceInterval: checkBalanceInterval,
-		logger:               logger,
-		getBalanceFunc:       getBalanceFunc,
-		walletMetrics:        walletMetrics,
+		db:                    db,
+		tronClient:            tronClient,
+		checkBalanceInterval:  checkBalanceInterval,
+		logger:                logger,
+		getBalanceFunc:        getBalanceFunc,
+		walletMetrics:         walletMetrics,
+		currency:              currency,
+		collectWalletBalance:  newWalletBalance(),
+		withdrawWalletBalance: newWalletBalance(),
 	}
 
-	service.start()
+	helpers.EnsureGo(logger, func() {
+		service.start()
+	})
 
 	return service, nil
 }
@@ -121,7 +129,7 @@ func (s *Service) checkTrxAndUsdt(address string) (map[string]decimal.Decimal, e
 		return nil, err
 	}
 
-	usdtBalance, err = s.checkBalance(address, model.USDT)
+	usdtBalance, err = s.checkBalance(address, s.currency)
 	if err != nil {
 		return nil, err
 	}
