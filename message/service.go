@@ -52,7 +52,7 @@ func (s service) start() error {
 *	err    	error   	返回值2
 */
 func (s service) Get(key string) (message []string, err error) {
-	if err = s.db.Where(`elemKey = ?`, key).Pluck(`value`, &message).Error; err != nil {
+	if err = s.db.WithContext(context.Background()).Where(`elemKey = ?`, key).Pluck(`value`, &message).Error; err != nil {
 		return nil, errors.Wrap(err, `数据库操作失败`)
 	}
 
