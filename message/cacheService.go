@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"gitlab.com/nova_dubai/cache"
@@ -82,6 +83,8 @@ func (c cacheService) Get(key string) (message []string, err error) {
 	if result, err = c.client.Get(key); err != nil {
 		return nil, errors.Wrap(err, `从缓存获取`)
 	}
+
+	spew.Dump(result)
 
 	if _, ok := result.(messages); ok {
 		return result.(messages), nil
