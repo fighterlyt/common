@@ -3,9 +3,13 @@ package message
 import (
 	"context"
 	"testing"
+	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/require"
 	"gitlab.com/nova_dubai/cache"
+	"gitlab.com/nova_dubai/common/helpers"
+	"go.uber.org/zap/zapcore"
 )
 
 var (
@@ -15,7 +19,14 @@ var (
 )
 
 func TestCache(t *testing.T) {
-	manager, err = cache.NewService(testLogger, `localhost:9736`, `dubaihell`, 6)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     `localhost:9736`,
+		Password: `dubaihell`,
+		DB:       6,
+	})
+
+	redisClient.AddHook(helpers.NewRedisLogger(testLogger.Derive(`redis`).SetLevel(zapcore.DebugLevel).AddCallerSkip(1)))
+	manager, err = cache.NewServiceByRedisClient(testLogger, redisClient)
 	require.NoError(t, err, `构建缓存服务`)
 }
 
@@ -32,6 +43,7 @@ func TestCacheService_Get(t *testing.T) {
 	result, err = testCacheService.Get(`a`)
 	require.NoError(t, err, `get`)
 	t.Log(result)
+	time.Sleep(time.Second)
 }
 
 func TestCacheService_AddAndGet(t *testing.T) {

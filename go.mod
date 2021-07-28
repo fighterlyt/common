@@ -12,7 +12,7 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/shopspring/decimal v1.2.0
 	github.com/stretchr/testify v1.7.0
-	gitlab.com/nova_dubai/cache v0.0.0-20210728111327-b6e4ac22e45d
+	gitlab.com/nova_dubai/cache v0.0.0-20210728164322-1dfe5211f3ef
 	go.uber.org/zap v1.18.1
 	gopkg.in/tucnak/telebot.v2 v2.3.5
 	gorm.io/driver/mysql v1.1.1

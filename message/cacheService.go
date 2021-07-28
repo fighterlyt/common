@@ -39,7 +39,16 @@ func NewCacheService(db *gorm.DB, logger log.Logger, manager cache.Manager) (res
 
 		str = strings.TrimPrefix(str, Record{}.TableName()+cache.Delimiter)
 
-		return service.Get(str)
+		var (
+			result []string
+			err    error
+		)
+
+		if result, err = service.Get(str); err != nil {
+			return nil, errors.Wrap(err, `db记载`)
+		}
+
+		return messages(result), nil
 	}
 
 	if typ, err = cache.NewTypeTmpl(Record{}.TableName(), load, func() interface{} {
@@ -74,8 +83,8 @@ func (c cacheService) Get(key string) (message []string, err error) {
 		return nil, errors.Wrap(err, `从缓存获取`)
 	}
 
-	if _, ok := result.([]string); ok {
-		return result.([]string), nil
+	if _, ok := result.(messages); ok {
+		return result.(messages), nil
 	}
 
 	return nil, fmt.Errorf(`数据类型为[%s]`, reflect.TypeOf(result).Kind().String())
