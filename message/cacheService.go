@@ -83,15 +83,16 @@ func (c cacheService) Get(key string) (message []string, err error) {
 		return nil, errors.Wrap(err, `从缓存获取`)
 	}
 
-	if _, ok := result.(*messages); ok {
-		return *result.(*messages), nil
+	switch x := result.(type) {
+	case *messages:
+		return *x, nil
+	case messages:
+		return x, nil
+	case []string:
+		return x, nil
+	default:
+		return nil, fmt.Errorf(`数据类型为[%s]`, reflect.TypeOf(result).String())
 	}
-
-	if _, ok := result.([]string); ok {
-		return result.([]string), nil
-	}
-
-	return nil, fmt.Errorf(`数据类型为[%s]`, reflect.TypeOf(result).String())
 }
 
 func (c cacheService) Exist(key, message string) (exists bool, err error) {
