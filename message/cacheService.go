@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"gitlab.com/nova_dubai/cache"
@@ -42,11 +41,11 @@ func NewCacheService(db *gorm.DB, logger log.Logger, manager cache.Manager) (res
 
 		var (
 			result []string
-			err    error
+			getErr error
 		)
 
-		if result, err = service.Get(str); err != nil {
-			return nil, errors.Wrap(err, `db记载`)
+		if result, getErr = service.Get(str); getErr != nil {
+			return nil, errors.Wrap(getErr, `db记载`)
 		}
 
 		return messages(result), nil
@@ -84,10 +83,8 @@ func (c cacheService) Get(key string) (message []string, err error) {
 		return nil, errors.Wrap(err, `从缓存获取`)
 	}
 
-	spew.Dump(result)
-
-	if _, ok := result.(messages); ok {
-		return result.(messages), nil
+	if _, ok := result.(*messages); ok {
+		return *result.(*messages), nil
 	}
 
 	return nil, fmt.Errorf(`数据类型为[%s]`, reflect.TypeOf(result).Kind().String())
