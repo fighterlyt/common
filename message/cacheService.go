@@ -91,7 +91,7 @@ func (c cacheService) Get(key string) (message []string, err error) {
 		return result.([]string), nil
 	}
 
-	return nil, fmt.Errorf(`数据类型为[%s],%v`, reflect.TypeOf(result).Kind().String(), result)
+	return nil, fmt.Errorf(`数据类型为[%s]`, reflect.TypeOf(result).String())
 }
 
 func (c cacheService) Exist(key, message string) (exists bool, err error) {
