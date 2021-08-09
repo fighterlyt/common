@@ -7,6 +7,7 @@ require (
 	github.com/fighterlyt/gormlogger v0.0.0-20210710051925-f770fcffc740
 	github.com/fighterlyt/gotron-sdk v0.0.0-20210601180208-1664ed9b1195
 	github.com/fighterlyt/log v0.0.0-20210607120019-54cae88916e3
+	github.com/fighterlyt/redislock v0.0.0-20210520112328-c517c4f54b7f // indirect
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/pkg/errors v0.9.1
