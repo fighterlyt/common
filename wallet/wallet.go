@@ -57,12 +57,7 @@ func checkAndSaveSingleSymbolBalance(protocol model.Protocol, address string, cu
 	var balance decimal.Decimal
 
 	// 查余额
-	switch protocol {
-	case model.Trc20:
-		balance, err = getBalanceFunc(address, currency)
-	default:
-		return fmt.Errorf("不支持的协议[%s]", protocol)
-	}
+	balance, err = getBalanceFunc(address, currency)
 
 	if err != nil {
 		return errors.Wrap(err, "更新余额失败")
