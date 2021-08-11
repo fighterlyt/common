@@ -63,3 +63,9 @@ func TestCacheService_AddAndGet(t *testing.T) {
 var (
 	bg = context.Background()
 )
+
+func Test_cacheService_Delete(t *testing.T) {
+	TestNewCacheService(t)
+
+	require.NoError(t, testCacheService.Delete("a"))
+}

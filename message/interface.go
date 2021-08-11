@@ -10,4 +10,6 @@ type Service interface {
 	Exist(key, message string) (exists bool, err error)
 	// Add 添加记录
 	Add(ctx context.Context, key, message string) error
+	// Delete 删除
+	Delete(key string, messages ...string) error
 }
