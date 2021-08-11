@@ -10,6 +10,7 @@ require (
 	github.com/fighterlyt/redislock v0.0.0-20210520112328-c517c4f54b7f // indirect
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-redis/redis/v8 v8.11.0
+	github.com/go-redsync/redsync/v4 v4.1.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/shopspring/decimal v1.2.0

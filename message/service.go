@@ -87,3 +87,17 @@ func (s service) clearAll() error {
 
 	return nil
 }
+
+func (s service) Delete(key string, messages ...string) error {
+	var sql = s.db.Where("elemKey=?", key)
+
+	if len(messages) > 0 {
+		sql = sql.Where("value in (?)", messages)
+	}
+
+	if err := sql.Delete(&Record{}).Error; err != nil {
+		return errors.Wrap(err, "删除失败")
+	}
+
+	return nil
+}

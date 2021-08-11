@@ -109,6 +109,14 @@ func (c cacheService) Add(ctx context.Context, key, message string) error {
 	return nil
 }
 
+func (c cacheService) Delete(key string, messages ...string) error {
+	if err := c.service.Delete(key, messages...); err != nil {
+		return errors.Wrap(err, `数据库新增失败`)
+	}
+
+	return c.client.Invalidate(key)
+}
+
 type messages []string
 
 func (m *messages) UnmarshalBinary(data []byte) error {
