@@ -114,9 +114,7 @@ func (c cacheService) Delete(key string, messages ...string) error {
 		return errors.Wrap(err, `数据库新增失败`)
 	}
 
-	_ = c.client.Invalidate(key)
-
-	return nil
+	return c.client.Invalidate(key)
 }
 
 type messages []string
