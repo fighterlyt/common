@@ -57,7 +57,7 @@ func NewCacheService(db *gorm.DB, logger log.Logger, manager cache.Manager) (res
 		return nil, errors.Wrap(err, `构建类型`)
 	}
 
-	if client, err = manager.Register(typ, time.Minute*5, cache.OnlyRedis); err != nil {
+	if client, err = manager.Register(typ, time.Minute*5, cache.RedisAndMem); err != nil {
 		return nil, errors.Wrap(err, `注册到缓存服务`)
 	}
 
