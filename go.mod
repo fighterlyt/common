@@ -3,6 +3,7 @@ module gitlab.com/nova_dubai/common
 go 1.16
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fighterlyt/gormlogger v0.0.0-20210729161641-ae2b6a621523
 	github.com/fighterlyt/gotron-sdk v0.0.0-20210601180208-1664ed9b1195
