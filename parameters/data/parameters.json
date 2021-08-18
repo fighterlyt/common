@@ -1,0 +1,317 @@
+[
+  {
+    "key": "tron:chargeCheckInterval",
+    "purpose": "查询充值结果间隔时间",
+    "value": "30s",
+    "description": "整数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "tron:chargeTimeOut",
+    "purpose": "充值订单超时时间",
+    "value": "10m",
+    "description": "整数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "tron:collectCheckInterval",
+    "purpose": "查询汇集交易间隔时间",
+    "value": "5s",
+    "description": "整数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "tron:payCheckInterval",
+    "purpose": "查询支付交易间隔时间",
+    "value": "5s",
+    "description": "整数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "user:sessionExpire",
+    "purpose": "session有效时间",
+    "value": "1h",
+    "description": "整数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "user:prohibitWithdrawExpiration",
+    "purpose": "更改密码(登录密码/资金密码)后拒绝提款时间",
+    "value": "24h",
+    "description": "整数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "user:smsCodeExpire",
+    "purpose": "短信验证码有效期",
+    "value": "5m",
+    "description": "整数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "wallet:charge",
+    "purpose": "充值回调地址",
+    "value": "http://localhost:1236/hello2",
+    "description": "合法URL地址",
+    "validKey": "url"
+  },
+  {
+    "key": "wallet:withdraw",
+    "purpose": "提现回调地址",
+    "value": "http://localhost:1236/hello2",
+    "description": "合法URL地址",
+    "validKey": "url"
+  },
+  {
+    "key": "collect:LowerLimit",
+    "purpose": "归集阈值",
+    "value": "100",
+    "description": "正数，最多6位小数",
+    "validKey": "usdtPositiveValue"
+  },
+  {
+    "key": "collect:address",
+    "purpose": "归集地址",
+    "value": "TYjBaCYBgngDA3nMpBD76Qk7qBx8twvDqY",
+    "description": "逗号分隔的多个合法波场钱包地址",
+    "validKey": "tronAddresses"
+  },
+  {
+    "key": "collect:ignoreLimit",
+    "purpose": "最小被认可的充值金额",
+    "value": "1",
+    "description": "正数,最多6位小数",
+    "validKey": "usdtPositiveValue"
+  },
+  {
+    "key": "wallet:trxWallet",
+    "purpose": "用于trx(激活钱包,转账手续费)的钱包",
+    "value": "TYjBaCYBgngDA3nMpBD76Qk7qBx8twvDqY",
+    "description": "合法的tron钱包地址",
+    "validKey": "tronAddress"
+  },
+  {
+    "key": "wallet:trxWalletPrivateKey",
+    "purpose": "用于trx(激活钱包,转账手续费)的钱包密钥",
+    "value": "46a630a7169cd0f1a739f8ca6fb14ddf95717a82a97044c6c71773bcb898507f",
+    "description": "合法的tron钱包密钥",
+    "validKey": "alphanum"
+  },
+  {
+    "key": "policy:httpTimeout",
+    "purpose": "http请求超时时间",
+    "value": "5s",
+    "description": "整数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "policy:warnTime",
+    "purpose": "告警时间阈值",
+    "value": "1s",
+    "description": "小数+单位,单位可以是s(秒),m(分钟),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "policy:maxPlatformTimeDiff",
+    "purpose": "允许和平台的最大时间差",
+    "value": "2s",
+    "description": "小数+单位,单位是s(秒)",
+    "validKey": "duration"
+  },
+  {
+    "key": "policy:getSymbolInterval",
+    "purpose": "查询交易对间隔时间",
+    "value": "1m",
+    "description": "小数+单位,单位是s(秒),m(分)",
+    "validKey": "duration"
+  },
+  {
+    "key": "policy:getTickersInterval",
+    "purpose": "查询行情间隔时间",
+    "value": "1s",
+    "description": "小数+单位,单位是s",
+    "validKey": "duration"
+  },
+  {
+    "key": "policy:feeRate",
+    "purpose": "手续费比例",
+    "value": "20",
+    "description": "合法的数字,有效范围为(0,100]",
+    "validKey": "rate"
+  },
+  {
+    "key": "ledger:toReceive:expire",
+    "purpose": "待领取金额的有效期",
+    "value": "72h",
+    "description": "小数+单位,单位是s(秒),m(分),h(小时)",
+    "validKey": "duration"
+  },
+  {
+    "key": "vip:join:fee",
+    "purpose": "加盟VIP费用",
+    "value": "150",
+    "description": "浮点数整数都可以",
+    "validKey": "usdtPositiveValue"
+  },
+  {
+    "key": "user:inviteURL",
+    "purpose": "邀请链接url",
+    "value": "http://c.hkeji.top/#/?code=",
+    "description": "合法的url",
+    "validKey": "url"
+  },
+  {
+    "key": "withdraw:min",
+    "purpose": "最小提币金额",
+    "value": "50",
+    "description": "浮点数整数都可以",
+    "validKey": "usdtPositiveValue"
+  },
+  {
+    "key": "user:user:default:avatar",
+    "purpose": "用户默认头像id",
+    "value": "122",
+    "description": "正整数",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:bian:api:import",
+    "purpose": "币安API导入教程",
+    "value": "28",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:huobi:api:import",
+    "purpose": "火币API导入教程",
+    "value": "25",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:okex:api:import",
+    "purpose": "okex API导入教程",
+    "value": "6",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:on:transaction",
+    "purpose": "关于交易",
+    "value": "24",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:option",
+    "purpose": "期权导入教程",
+    "value": "6",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:partner:join",
+    "purpose": "加盟协议",
+    "value": "6",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:privacy:protocol",
+    "purpose": "隐私协议",
+    "value": "23",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:recharge",
+    "purpose": "充币提示信息",
+    "value": "7",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:internalTransfer",
+    "purpose": "内部划转提示信息",
+    "value": "30",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:register:protocol",
+    "purpose": "注册协议富文本",
+    "value": "26",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:withdraw",
+    "purpose": "提币提示信息",
+    "value": "8",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "news:content:user:protocol",
+    "purpose": "用户协议",
+    "value": "22",
+    "description": "news表ID",
+    "validKey": "positiveInteger"
+  },
+  {
+    "key": "common:site:is:open",
+    "purpose": "APP是否维护",
+    "value": "0",
+    "description": "1 维护 0 未维护",
+    "validKey": "isBool"
+  },
+  {
+    "key": "common:site:maintain:txt",
+    "purpose": "维护提示文字",
+    "value": "维护中...",
+    "description": "任意字符串",
+    "validKey": "isString"
+  },
+  {
+    "key": "common:withdraw:is:open",
+    "purpose": "是否开放充值",
+    "value": "1",
+    "description": "1开放 0未开放",
+    "validKey": "isBool"
+  },
+  {
+    "key": "user:active:min",
+    "purpose": "划转燃料累计最小金额",
+    "value": "100",
+    "description": "单位为U,用户累计划转燃料大于等于这个值后,被当做有效用户",
+    "validKey": "usdtPositiveValue"
+  },
+  {
+    "key": "active:everyDay:releasePercent",
+    "purpose": "acw认筹每天自动释放百分比",
+    "value": "1",
+    "description": "合法的数字,有效范围为(0,100]",
+    "validKey": "rate"
+  },
+  {
+    "key": "user:myTeam:option:timeout",
+    "purpose": "用户模块我的团队获取期权数据redis超时时间",
+    "value": "5s",
+    "description": "整数+单位,单位是s(秒)",
+    "validKey": "duration"
+  },
+  {
+    "key": "user:vip1:min",
+    "purpose": "划转燃料升级V1累计最小金额",
+    "value": "5000",
+    "description": "单位为U,用户累计划转燃料大于等于这个值后,被当做有效用户",
+    "validKey": "usdtPositiveValue"
+  },
+  {
+    "key": "ledger:openGasTransfer",
+    "purpose": "是否开通燃料互转",
+    "value": "1",
+    "description": "1开启 0关闭",
+    "validKey": "isBool"
+  }
+]
