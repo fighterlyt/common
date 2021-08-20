@@ -11,7 +11,6 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	"gitlab.com/nova_dubai/common/helpers"
-
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -28,6 +27,27 @@ type service struct {
 	history   HistoryService   // 变更历史服务
 	logger    log.Logger       // 日志器
 	router    gin.IRouter      // http router
+	shutdown  helpers.Shutdown // 关闭
+}
+
+func (s *service) Close() {
+	s.shutdown.Close()
+}
+
+func (s *service) Add(count int64) {
+	s.shutdown.Add(count)
+}
+
+func (s *service) IsClosed() bool {
+	return s.shutdown.IsClosed()
+}
+
+func (s *service) Key() string {
+	return key
+}
+
+func (s *service) Name() string {
+	return name
 }
 
 /*NewService 新建服务
@@ -54,6 +74,7 @@ func NewService(db *gorm.DB, client *redis.Client, logger log.Logger, iRouter gi
 		parameter: parameter,
 		logger:    logger,
 		router:    iRouter,
+		shutdown:  helpers.NewShutdown(),
 	}
 
 	moduleLogger = logger
@@ -63,14 +84,6 @@ func NewService(db *gorm.DB, client *redis.Client, logger log.Logger, iRouter gi
 	}
 
 	return targetService, nil
-}
-
-func (s *service) Key() string {
-	return key
-}
-
-func (s *service) Name() string {
-	return name
 }
 
 func (s service) GetParameters(keys ...string) (parameters map[string]*Parameter, err error) {
