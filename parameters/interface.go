@@ -2,6 +2,8 @@ package parameters
 
 import (
 	"context"
+
+	"gitlab.com/nova_dubai/common/model"
 )
 
 var (
@@ -15,7 +17,7 @@ type Service interface {
 	Modify(keyValue map[string]string, userID int64) error
 	GetHistory(key string, startTime, endTime int64, start, limit int) (allCount int64, histories []History, err error)
 	GetString(key string) (value string, err error)
-	Close()
+	model.Module
 }
 
 // ParameterService 参数服务
