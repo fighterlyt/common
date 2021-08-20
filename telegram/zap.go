@@ -17,10 +17,10 @@ type Core struct {
 	ch       chan string
 	lock     *sync.RWMutex
 	sender   *telegram
-	ignores  []string
+	get      func() ([]string, error)
 }
 
-func NewCore(minLevel zapcore.Level, sender *telegram, ignores ...string) *Core {
+func NewCore(minLevel zapcore.Level, sender *telegram, get func() ([]string, error)) *Core {
 	return &Core{
 		minLevel: minLevel,
 		sender:   sender,
@@ -40,7 +40,7 @@ func NewCore(minLevel zapcore.Level, sender *telegram, ignores ...string) *Core 
 			EncodeDuration: zapcore.StringDurationEncoder,
 			EncodeCaller:   zapcore.ShortCallerEncoder,
 		}),
-		ignores: ignores,
+		get: get,
 	}
 }
 
@@ -87,7 +87,17 @@ func (c *Core) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	msg := restart.String()
 
-	if Contains(msg, c.ignores...) {
+	var (
+		ignores []string
+	)
+
+	if c.get != nil {
+		if ignores, err = c.get(); err != nil {
+			c.ch <- err.Error()
+		}
+	}
+
+	if Contains(msg, ignores...) {
 		return nil
 	}
 
