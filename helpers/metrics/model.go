@@ -13,6 +13,7 @@ import (
 	"github.com/shirou/gopsutil/net"
 	"github.com/shirou/gopsutil/process"
 	"gitlab.com/nova_dubai/common/helpers"
+	"gitlab.com/nova_dubai/common/model"
 )
 
 var (
@@ -30,7 +31,7 @@ type System struct {
 	exit     chan struct{}
 	ticker   *time.Ticker
 	interval time.Duration
-	shutdown helpers.Shutdown
+	shutdown model.Shutdown
 	logger   log.Logger
 }
 
@@ -61,7 +62,7 @@ func NewSystem(interval time.Duration, logger log.Logger) *System {
 		ticker:   time.NewTicker(interval),
 		exit:     make(chan struct{}, 0),
 		interval: interval,
-		shutdown: helpers.NewShutdown(),
+		shutdown: model.NewShutdown(),
 		logger:   logger,
 	}
 }

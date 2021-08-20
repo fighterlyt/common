@@ -11,6 +11,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	"gitlab.com/nova_dubai/common/helpers"
+	"gitlab.com/nova_dubai/common/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -27,7 +28,7 @@ type service struct {
 	history   HistoryService   // 变更历史服务
 	logger    log.Logger       // 日志器
 	router    gin.IRouter      // http router
-	shutdown  helpers.Shutdown // 关闭
+	shutdown  model.Shutdown   // 关闭
 }
 
 func (s *service) Close() {
@@ -74,7 +75,7 @@ func NewService(db *gorm.DB, client *redis.Client, logger log.Logger, iRouter gi
 		parameter: parameter,
 		logger:    logger,
 		router:    iRouter,
-		shutdown:  helpers.NewShutdown(),
+		shutdown:  model.NewShutdown(),
 	}
 
 	moduleLogger = logger

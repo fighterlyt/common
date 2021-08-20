@@ -1,10 +1,10 @@
-package helpers
+package model
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.com/nova_dubai/common/helpers/invoke"
+	"gitlab.com/nova_dubai/common/model/invoke"
 	"go.uber.org/atomic"
 )
 

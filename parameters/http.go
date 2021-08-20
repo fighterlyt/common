@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/helpers/invoke"
+	invoke2 "gitlab.com/nova_dubai/common/model/invoke"
 	"gorm.io/gorm"
 )
 
@@ -34,18 +34,18 @@ func (s service) setParameters(ctx *gin.Context) {
 		}
 	}()
 
-	if returned, err = invoke.ProcessArgument(ctx, argument); err != nil || returned {
+	if returned, err = invoke2.ProcessArgument(ctx, argument); err != nil || returned {
 		return
 	}
 
 	if err = s.Modify(argument.Parameters, argument.UserID); err != nil {
 		err = errors.Wrap(err, `修改参数`)
-		invoke.ReturnFail(ctx, invoke.Fail, err, err.Error())
+		invoke2.ReturnFail(ctx, invoke2.Fail, err, err.Error())
 
 		return
 	}
 
-	invoke.ReturnSuccess(ctx, nil)
+	invoke2.ReturnSuccess(ctx, nil)
 }
 
 type setParametersArgument struct {
@@ -80,18 +80,18 @@ func (s service) getParameters(ctx *gin.Context) {
 		}
 	}()
 
-	if returned, err = invoke.ProcessArgument(ctx, argument); err != nil || returned {
+	if returned, err = invoke2.ProcessArgument(ctx, argument); err != nil || returned {
 		return
 	}
 
 	if parameters, err = s.GetParameters(argument.Keys...); err != nil {
 		err = errors.Wrap(err, `获取参数`)
-		invoke.ReturnFail(ctx, invoke.Fail, err, err.Error())
+		invoke2.ReturnFail(ctx, invoke2.Fail, err, err.Error())
 
 		return
 	}
 
-	invoke.ReturnSuccess(ctx, parameters)
+	invoke2.ReturnSuccess(ctx, parameters)
 }
 
 type getParametersArgument struct {
@@ -108,42 +108,42 @@ func (s getParametersArgument) Validate() error {
 
 func (s service) getHistory(ctx *gin.Context) {
 	query := &historyQuery{}
-	argument, err := invoke.NewListArgument(query)
+	argument, err := invoke2.NewListArgument(query)
 
 	if err != nil {
 		err = errors.Wrap(err, `构建列表参数错误`)
-		invoke.ReturnFail(ctx, invoke.Fail, err, err.Error())
+		invoke2.ReturnFail(ctx, invoke2.Fail, err, err.Error())
 
 		return
 	}
 
 	var returned bool
 
-	if returned, err = invoke.ProcessArgument(ctx, argument); err != nil || returned {
+	if returned, err = invoke2.ProcessArgument(ctx, argument); err != nil || returned {
 		return
 	}
 
 	var (
 		result     []History
 		allCount   int64
-		listResult *invoke.ListResult
+		listResult *invoke2.ListResult
 	)
 
 	if allCount, result, err = s.GetHistory(query.Key, query.Start, query.End, argument.Start, argument.Limit); err != nil {
 		err = errors.Wrap(err, `操作失败`)
-		invoke.ReturnFail(ctx, invoke.Fail, err, err.Error())
+		invoke2.ReturnFail(ctx, invoke2.Fail, err, err.Error())
 
 		return
 	}
 
-	if listResult, err = invoke.NewListResult(allCount, result); err != nil {
+	if listResult, err = invoke2.NewListResult(allCount, result); err != nil {
 		err = errors.Wrap(err, `构建列表返回值`)
-		invoke.ReturnFail(ctx, invoke.Fail, err, err.Error())
+		invoke2.ReturnFail(ctx, invoke2.Fail, err, err.Error())
 
 		return
 	}
 
-	invoke.ReturnSuccess(ctx, listResult)
+	invoke2.ReturnSuccess(ctx, listResult)
 }
 
 type historyQuery struct {

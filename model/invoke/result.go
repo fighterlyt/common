@@ -1,6 +1,7 @@
 package invoke
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
 
@@ -40,7 +41,7 @@ type ListResult struct {
 *	err    	error      	错误
 */
 func NewListResult(count int64, records interface{}) (result *ListResult, err error) {
-	if err = helpers.IsSlice(records, true); err != nil {
+	if err = IsSlice(records, true); err != nil {
 		return nil, errors.Wrap(err, `参数必须是slice或者nil`)
 	}
 	if records == nil {
@@ -126,4 +127,20 @@ type HttpListSwagger struct {
 	Msg    string     `json:"msg"`
 	Detail string     `json:"detail"`
 	Data   ListResult `json:"data"`
+}
+
+func IsSlice(data interface{}, allowNil bool) error {
+	if data == nil {
+		if !allowNil {
+			return errors.New(`data 不能为nil`)
+		}
+
+		return nil
+	}
+
+	if kind := reflect.TypeOf(data).Kind(); kind != reflect.Slice {
+		return fmt.Errorf(`类型不是slice,而是[%s]`, kind.String())
+	}
+
+	return nil
 }

@@ -2,24 +2,14 @@ package invoke
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 )
-
-type AdminLedgerSummaryReq struct {
-	From int64 `json:"from"` // 起始时间
-	To   int64 `json:"to"`   // 结束时间
-}
-
-func (a AdminLedgerSummaryReq) Validate() error {
-	return nil
-}
 
 /*ProcessArgument 处理gin 句柄的公共逻辑，包括JSON反序列化和验证
 参数:
@@ -121,37 +111,36 @@ func (a ListArgument) OffSetAndLimit(db *gorm.DB) *gorm.DB {
 }
 
 func NewListArgument(query Query) (argument *ListArgument, err error) {
-	if err = helpers.IsPointer(query, false); err != nil {
+	if err = IsPointer(query, false); err != nil {
 		return nil, errors.Wrap(err, `query不满足要求`)
 	}
 
 	return &ListArgument{Query: query}, nil
 }
 
-func CheckFromTo(dbTimeField string, from int64, to int64) []helpers.Scope {
-	var scopes []helpers.Scope
-
-	switch {
-	case from == 0 && to == 0:
-		now := helpers.NowInBeiJin()
-		from = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, helpers.GetBeiJin()).Unix()
-
-		fallthrough
-	case from != 0 && to == 0:
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where(dbTimeField+" >= ?", from)
-		})
-	case from == 0 && to != 0:
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where(dbTimeField+" <= ?", to)
-		})
-	default:
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where(dbTimeField+" BETWEEN ? AND ?", from, to)
-		})
+/*IsPointer 判断是否为指针
+参数:
+*	data    	interface{}	数据
+*	allowNil	bool       	是否允许为空指针
+返回值:
+*	error   	error      	错误
+*/
+func IsPointer(data interface{}, allowNil bool) error {
+	if data == nil {
+		return errors.New(`data不能为nil`)
 	}
 
-	return scopes
+	if kind := reflect.TypeOf(data).Kind(); kind != reflect.Ptr {
+		return fmt.Errorf(`参数类型不是指针，而是[%s]`, kind.String())
+	}
+
+	if !allowNil {
+		if reflect.ValueOf(data).IsNil() {
+			return errors.New(`data 不能是nil指针`)
+		}
+	}
+
+	return nil
 }
 
 type Sorts string
