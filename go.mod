@@ -19,7 +19,7 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/shopspring/decimal v1.2.0
 	github.com/stretchr/testify v1.7.0
-	gitlab.com/nova_dubai/cache v0.0.0-20210816181739-07238d24b004
+	gitlab.com/nova_dubai/cache v0.0.0-20210824010034-1c70f17b8fe4
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/zap v1.19.0
 	gopkg.in/tucnak/telebot.v2 v2.3.5

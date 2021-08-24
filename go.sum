@@ -771,6 +771,8 @@ gitlab.com/nova_dubai/cache v0.0.0-20210728204705-21c5aaa6cded h1:aQPZhBwpMZSvg4
 gitlab.com/nova_dubai/cache v0.0.0-20210728204705-21c5aaa6cded/go.mod h1:HYo99PkJ99Fzqjd0bAOA/6yIkXUiu4e0iN43Bk1b3kE=
 gitlab.com/nova_dubai/cache v0.0.0-20210816181739-07238d24b004 h1:FdUZN8tuTzepbWjNdtMqF6Q71pDpCo9kRteMvw8h6nk=
 gitlab.com/nova_dubai/cache v0.0.0-20210816181739-07238d24b004/go.mod h1:YXQKR9sgL4A7FI93tV7m7tcNFwkcQRFZMQYskgWT2zI=
+gitlab.com/nova_dubai/cache v0.0.0-20210824010034-1c70f17b8fe4 h1:8FiMvHgfgT4rGiJ/qI3zB9Q8TQSLocQGNAwZpIsT3aI=
+gitlab.com/nova_dubai/cache v0.0.0-20210824010034-1c70f17b8fe4/go.mod h1:YXQKR9sgL4A7FI93tV7m7tcNFwkcQRFZMQYskgWT2zI=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738/go.mod h1:dnLIgRNXwCJa5e+c6mIZCrds/GIG4ncV9HhK5PX7jPg=
