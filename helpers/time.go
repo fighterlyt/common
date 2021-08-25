@@ -132,6 +132,9 @@ func GetDatesByRange(from, to int64) []int {
 
 type Time int64
 
+func Now() Time {
+	return Time(time.Now().Unix())
+}
 func (t Time) MarshalText() ([]byte, error) {
 	if t == 0 {
 		return nil, nil
