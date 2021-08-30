@@ -26,4 +26,6 @@ func Init(path string, validators map[string]govalidator.CustomTypeValidator) {
 	govalidator.CustomTypeTagMap.Set(`isBool`, isBool)
 	govalidator.CustomTypeTagMap.Set(`isString`, isString)
 	govalidator.CustomTypeTagMap.Set(`isAttr`, isAttr)
+	govalidator.CustomTypeTagMap.Set(`notifyExpressionRate`, notifyExpressionRate)
+
 }

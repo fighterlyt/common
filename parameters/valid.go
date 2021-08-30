@@ -123,6 +123,32 @@ var (
 		}
 		return false
 	}
+
+	notifyExpressionRate = func(i interface{}, o interface{}) bool {
+		if helpers.IsTest() {
+			return true
+		}
+		data, ok := i.(string)
+		if !ok {
+			return false
+		}
+		var temp time.Duration
+		for index, field := range strings.Split(data, ",") {
+			duration, err := time.ParseDuration(field)
+			if err != nil {
+				return false
+			}
+			if index == 0 {
+				temp = duration
+				continue
+			}
+			if temp > duration {
+				return false
+			}
+		}
+		// 字符串为空是不通知
+		return true
+	}
 )
 
 /*regex 使用正则表达式验证
