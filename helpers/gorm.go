@@ -47,3 +47,70 @@ func CountAll(db *gorm.DB, models map[string]interface{}) (counts map[string]int
 
 	return counts, nil
 }
+
+const (
+	minNotZero = 2 << iota
+	minIsZero
+
+	maxNotZero
+	maxIsZero
+)
+
+type interval interface {
+	IsZero() bool
+}
+
+func IntervalScope(dbField string, min interval, max interval) []Scope {
+	var scopes []Scope
+
+	b := bitmapper{
+		bit: 0,
+		min: min,
+		max: max,
+	}
+	switch {
+	case b.bitmapIs(minNotZero | maxIsZero):
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where(dbField+" >= ?", min)
+		})
+	case b.bitmapIs(minIsZero | maxNotZero):
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where(dbField+" <= ?", max)
+		})
+	case b.bitmapIs(minNotZero | maxNotZero):
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where(dbField+" BETWEEN ? AND ?", min, max)
+		})
+	default:
+	}
+	return scopes
+}
+
+type bitmapper struct {
+	bit int
+	min interval
+	max interval
+}
+
+// bitmap 初始化位图
+func (b *bitmapper) bitmap() int {
+	if b.bit == 0 {
+		if b.min.IsZero() {
+			b.bit = b.bit | minIsZero
+		} else {
+			b.bit = b.bit | minNotZero
+		}
+
+		if b.max.IsZero() {
+			b.bit = b.bit | maxIsZero
+		} else {
+			b.bit = b.bit | maxNotZero
+		}
+	}
+	return b.bit
+}
+
+// bitmapIs 位图判断
+func (b *bitmapper) bitmapIs(bit int) bool {
+	return b.bitmap()&bit == bit
+}

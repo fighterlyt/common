@@ -132,6 +132,10 @@ func GetDatesByRange(from, to int64) []int {
 
 type Time int64
 
+func (t Time) IsZero() bool {
+	return t <= 0
+}
+
 func Now() Time {
 	return Time(time.Now().Unix())
 }
