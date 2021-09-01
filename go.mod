@@ -4,9 +4,11 @@ go 1.16
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
+	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dgryski/dgoogauth v0.0.0-20190221195224-5a805980a5f3 // indirect
 	github.com/ethereum/go-ethereum v1.10.7
 	github.com/fighterlyt/gormlogger v0.0.0-20210729161641-ae2b6a621523
 	github.com/fighterlyt/gotron-sdk v0.0.0-20210726202906-8b77a73e46fb
