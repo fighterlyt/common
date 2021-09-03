@@ -12,7 +12,7 @@ var (
 )
 
 func TestNewConfig(t *testing.T) {
-	c, err = NewAuth(`12345678901234567890155`)
+	c, err = NewAuth(`32NQWNZFS566WFQHW7HVZ2XI2ODEGETZ`)
 	require.NoError(t, err)
 }
 
