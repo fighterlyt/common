@@ -14,19 +14,19 @@ require (
 	github.com/fighterlyt/gotron-sdk v0.0.0-20210726202906-8b77a73e46fb
 	github.com/fighterlyt/log v0.0.0-20210607120019-54cae88916e3
 	github.com/fighterlyt/redislock v0.0.0-20210520112328-c517c4f54b7f
-	github.com/gin-gonic/gin v1.7.2
+	github.com/gin-gonic/gin v1.7.4
 	github.com/go-redis/redis/v8 v8.11.3
-	github.com/go-redsync/redsync/v4 v4.1.0
-	github.com/opentracing/opentracing-go v1.1.0
+	github.com/go-redsync/redsync/v4 v4.4.1
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
-	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible
+	github.com/shirou/gopsutil v3.21.8+incompatible
 	github.com/shopspring/decimal v1.2.0
 	github.com/stretchr/testify v1.7.0
 	gitlab.com/nova_dubai/cache v0.0.0-20210824010034-1c70f17b8fe4
 	go.uber.org/atomic v1.9.0
 	go.uber.org/zap v1.19.0
-	gopkg.in/tucnak/telebot.v2 v2.3.5
+	gopkg.in/tucnak/telebot.v2 v2.4.0
 	gorm.io/driver/mysql v1.1.2
-	gorm.io/gorm v1.21.13
+	gorm.io/gorm v1.21.14
 )
