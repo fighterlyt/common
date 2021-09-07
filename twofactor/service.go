@@ -36,13 +36,13 @@ func NewService(auth Auth, audit Audit, notify Notify) *service {
 *	need         	bool           	是否需要动态验证，true表示需要且发出通知
 *	err          	error          	错误
 */
-func (s service) Process(id string, userID, notifyUserID int64, protocol, symbol, notifyMessage string, amount decimal.Decimal) (need bool, err error) { //nolint:lll
+func (s service) Process(id string, userID int64, notifyUserIDs []int64, protocol, symbol, notifyMessage string, amount decimal.Decimal) (need bool, err error) { //nolint:lll
 	if need, err = s.audit.Audit(userID, protocol, symbol, amount); err != nil {
 		return false, errors.Wrap(err, `审核`)
 	}
 
 	if need {
-		if err = s.notify.SendTo(notifyUserID, id, notifyMessage); err != nil {
+		if err = s.notify.SendTo(notifyUserIDs, id, notifyMessage); err != nil {
 			return false, errors.Wrap(err, `通知`)
 		}
 	}
