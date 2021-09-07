@@ -22,4 +22,6 @@ type Service interface {
 	Process(id string, userID, notifyUserID int64, protocol, symbol, notifyMessage string, amount decimal.Decimal) (need bool, err error)
 	// Auth 校验
 	Auth(password string) (ok bool, err error)
+	// QR 获取二维码
+	QR(name string) (qrcode string, err error)
 }
