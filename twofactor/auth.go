@@ -69,7 +69,7 @@ func (c auth) QR(name string) (qrcode, data string, err error) {
 		buffer  = &bytes.Buffer{}
 	)
 
-	data = c.config.ProvisionURI(name)
+	data = strings.TrimRight(c.config.ProvisionURI(name), `%3D`)
 
 	if barCode, err = qr.Encode(data, qr.M, qr.Auto); err != nil {
 		return qrcode, data, errors.Wrap(err, `编码二维码失败`)
@@ -83,7 +83,7 @@ func (c auth) QR(name string) (qrcode, data string, err error) {
 		return qrcode, data, errors.Wrap(err, `png编码`)
 	}
 
-	return base64.StdEncoding.EncodeToString(buffer.Bytes()), data, nil
+	return strings.TrimRight(base64.StdEncoding.EncodeToString(buffer.Bytes()), `=`), data, nil
 }
 
 func (c auth) Validate(password string) (ok bool, err error) {

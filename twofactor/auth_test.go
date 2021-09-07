@@ -27,7 +27,7 @@ func TestConfig_QR(t *testing.T) {
 func TestConfig_Validate(t *testing.T) {
 	TestNewConfig(t)
 
-	ok, err := c.Validate(`530492`)
+	ok, err := c.Validate(`675052`)
 	require.NoError(t, err)
 
 	require.True(t, ok)
