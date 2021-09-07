@@ -2,6 +2,7 @@ package ktexclient
 
 import (
 	"bytes"
+	"crypto"
 	"encoding/base64"
 	"io"
 	"net"
@@ -17,6 +18,7 @@ type Client struct {
 	crypto Crypto
 	iv     []byte
 	key    []byte
+	hash   crypto.Hash
 }
 
 func NewClient(client *http.Client, key, iv []byte) (*Client, error) {
@@ -43,7 +45,7 @@ func NewClient(client *http.Client, key, iv []byte) (*Client, error) {
 		return nil, err
 	}
 
-	return &Client{Client: client, iv: iv, key: key, crypto: aesCryptoGCM}, nil
+	return &Client{Client: client, iv: iv, key: key, crypto: aesCryptoGCM, hash: crypto.SHA256}, nil
 }
 
 func drainBody(b io.ReadCloser) (r1, r2 io.ReadCloser, err error) {
@@ -114,7 +116,15 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 		return nil, err
 	}
 
-	verificationString, err := BuildVerificationString(unixStr, str, body)
+	h := c.hash.New()
+
+	if _, err = h.Write(body); err != nil {
+		return nil, err
+	}
+
+	hashed := h.Sum(nil)
+
+	verificationString, err := BuildVerificationString(unixStr, str, hashed)
 	if err != nil {
 		return nil, err
 	}
