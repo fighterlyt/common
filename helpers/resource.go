@@ -13,14 +13,14 @@ type BaseResource struct {
 	IRoutes     gin.IRoutes   // gin
 	RedisClient *redis.Client // redis 客户端
 	Logger      log.Logger    // 日志器
-	testIRoutes gin.IRoutes   // 用于测试或者模拟的gin
+	TestIRoutes gin.IRoutes   // 用于测试或者模拟的gin
 }
 
 /*NewBaseResource 新建基础服务
 参数:
 *	db           	*gorm.DB     	数据库
 *	iRoutes      	gin.IRoutes  	gin
-*   testIRoutes     gin.IRoutes     测试gin
+*   TestIRoutes     gin.IRoutes     测试gin
 *	redisClient  	*redis.Client   redis客户端
 *	logger       	log.Logger      日志器
 返回值:
@@ -32,6 +32,6 @@ func NewBaseResource(db *gorm.DB, iRoutes, testIRoutes gin.IRoutes, redisClient 
 		IRoutes:     iRoutes,
 		RedisClient: redisClient,
 		Logger:      logger,
-		testIRoutes: testIRoutes,
+		TestIRoutes: testIRoutes,
 	}
 }
