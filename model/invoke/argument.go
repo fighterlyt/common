@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 )
 
@@ -158,4 +160,30 @@ func (s Sorts) Order() string {
 		}
 	}
 	return strings.Join(to, ",")
+}
+
+func CheckFromTo(dbTimeField string, from int64, to int64) []helpers.Scope {
+	var scopes []helpers.Scope
+
+	switch {
+	case from == 0 && to == 0:
+		now := helpers.NowInBeiJin()
+		from = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, helpers.GetBeiJin()).Unix()
+
+		fallthrough
+	case from != 0 && to == 0:
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where(dbTimeField+" >= ?", from)
+		})
+	case from == 0 && to != 0:
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where(dbTimeField+" <= ?", to)
+		})
+	default:
+		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
+			return db.Where(dbTimeField+" BETWEEN ? AND ?", from, to)
+		})
+	}
+
+	return scopes
 }
