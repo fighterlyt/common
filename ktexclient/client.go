@@ -40,12 +40,12 @@ func NewClient(client *http.Client, key, iv []byte) (*Client, error) {
 		}
 	}
 
-	aesCryptoGCM, err := NewAESCryptoGCM(key)
+	aesCryptoCBC, err := NewAESCryptoCBC(key)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{Client: client, iv: iv, key: key, crypto: aesCryptoGCM, hash: crypto.SHA256}, nil
+	return &Client{Client: client, iv: iv, key: key, crypto: aesCryptoCBC, hash: crypto.SHA256}, nil
 }
 
 func drainBody(b io.ReadCloser) (r1, r2 io.ReadCloser, err error) {
