@@ -25,8 +25,9 @@ require (
 	github.com/stretchr/testify v1.7.0
 	gitlab.com/nova_dubai/cache v0.0.0-20210824010034-1c70f17b8fe4
 	go.uber.org/atomic v1.9.0
-	go.uber.org/zap v1.19.0
+	go.uber.org/multierr v1.7.0
+	go.uber.org/zap v1.19.1
 	gopkg.in/tucnak/telebot.v2 v2.4.0
 	gorm.io/driver/mysql v1.1.2
-	gorm.io/gorm v1.21.14
+	gorm.io/gorm v1.21.15
 )
