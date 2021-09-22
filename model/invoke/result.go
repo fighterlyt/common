@@ -97,9 +97,16 @@ func ReturnFail(ctx *gin.Context, code StatCode, err error, detail string) {
 		return
 	}
 
+	var msg = err.Error()
+
+	if code == Unauthorized {
+		msg = "登陆失效"
+		detail = "需要重新登录"
+	}
+
 	helpers.CtxError(ctx, err)
 
-	result := NewResult(code, err.Error(), nil, detail)
+	result := NewResult(code, msg, nil, detail)
 	ctx.JSON(http.StatusOK, result)
 }
 
