@@ -105,7 +105,10 @@ func (t telegram) getMessage(msg string) string {
 }
 
 func (t telegram) SendMarkdown(msg string) error {
-	_, err := t.bot.Send(t.group, msg, telebot.ModeMarkdownV2)
+	msg = fmt.Sprintf("服务[%s]", t.serviceName) + msg
+
+	_, err := t.bot.Send(t.group, msg, telebot.ModeMarkdown)
+
 	return err
 }
 
