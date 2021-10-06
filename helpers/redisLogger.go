@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// RedisLogger  实现了redis.Hook
 type RedisLogger struct {
 	logger log.Logger
 }

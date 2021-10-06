@@ -1,7 +1,7 @@
 package wallet
 
 import (
-	`github.com/shopspring/decimal`
+	"github.com/shopspring/decimal"
 )
 
 // UserBalance 用户钱包余额

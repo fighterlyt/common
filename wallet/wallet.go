@@ -1,27 +1,29 @@
 package wallet
 
 import (
-	`context`
-	`fmt`
-	`gitlab.com/nova_dubai/common/helpers`
-	`time`
+	"context"
+	"fmt"
+	"time"
 
-	`github.com/fighterlyt/gormlogger`
+	"gitlab.com/nova_dubai/common/helpers"
+
+	"github.com/fighterlyt/gormlogger"
 	"github.com/fighterlyt/redislock"
-	`github.com/pkg/errors`
-	`github.com/shopspring/decimal`
-	`gitlab.com/nova_dubai/common/model`
-	`gorm.io/gorm`
+	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
+	"gitlab.com/nova_dubai/common/model"
+	"gorm.io/gorm"
 )
 
 // SyncWalletBalance 同步钱包信息
-func SyncWalletBalance(protocol model.Protocol, address string, locker redislock.Locker, currency string, db *gorm.DB, getUserID func(address string) (int64, error), getBalanceFunc func(address, currency string) (decimal.Decimal, error)) error {
+func SyncWalletBalance(protocol model.Protocol, address string, locker redislock.Locker, currency string, db *gorm.DB, getUserID func(address string) (int64, error), getBalanceFunc func(address, currency string) (decimal.Decimal, error)) error { //nolint:lll
 	userID, err := getUserID(address)
 	if err != nil {
 		return errors.Wrap(err, "查询用户ID失败")
 	}
 
 	var currencies = []string{currency}
+
 	switch protocol {
 	case model.Trc20:
 		currencies = append(currencies, model.TRX)
@@ -42,7 +44,7 @@ func SyncWalletBalance(protocol model.Protocol, address string, locker redislock
 }
 
 // 查询单个币种的余额
-func checkAndSaveSingleSymbolBalance(protocol model.Protocol, address string, currency string, userID int64, locker redislock.Locker, db *gorm.DB, getBalanceFunc func(address, currency string) (decimal.Decimal, error)) error {
+func checkAndSaveSingleSymbolBalance(protocol model.Protocol, address, currency string, userID int64, locker redislock.Locker, db *gorm.DB, getBalanceFunc func(address, currency string) (decimal.Decimal, error)) error { //nolint:lll
 	mutex, err := locker.GetMutex(fmt.Sprintf("balance_%s_%d_%s", protocol, userID, currency), 2*time.Second)
 	if err != nil {
 		return errors.Wrap(err, "加锁失败")
@@ -52,7 +54,12 @@ func checkAndSaveSingleSymbolBalance(protocol model.Protocol, address string, cu
 	helpers.EnsureRedisLock(mutex)
 
 	// 解锁
-	defer mutex.UnLock()
+	defer func(mutex redislock.Mutex) {
+		er := mutex.UnLock()
+		if er != nil {
+			fmt.Printf("unlock err : %v", er)
+		}
+	}(mutex)
 
 	var balance decimal.Decimal
 
@@ -68,7 +75,11 @@ func checkAndSaveSingleSymbolBalance(protocol model.Protocol, address string, cu
 		userBalance UserBalance
 		ctx         = context.WithValue(context.Background(), gormlogger.IgnoreErrorKey, gorm.ErrRecordNotFound)
 	)
-	if err = db.WithContext(ctx).Where("userID=?", userID).Where("protocol=?", protocol).Where("symbol=?", currency).First(&userBalance).Error; err != nil {
+
+	if err = db.WithContext(ctx).
+		Where("userID=?", userID).
+		Where("protocol=?", protocol).
+		Where("symbol=?", currency).First(&userBalance).Error; err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.Wrap(err, "查询用户余额失败")
 		}

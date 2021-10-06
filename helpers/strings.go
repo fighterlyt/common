@@ -2,6 +2,13 @@ package helpers
 
 import "strings"
 
+/*ContainsSub 是否包含任意一个子集
+参数:
+*	data      	string   	全集
+*	candidates	...string	子集
+返回值:
+*	bool      	bool     	是否包含
+*/
 func ContainsSub(data string, candidates ...string) bool {
 	for _, candidate := range candidates {
 		if strings.Contains(candidate, data) {

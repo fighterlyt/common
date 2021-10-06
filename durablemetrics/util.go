@@ -77,7 +77,7 @@ func parse(key, value string) (*vecValue, error) {
 		datas = append(datas, data[1])
 	}
 
-	f, err := strconv.ParseFloat(value, 10)
+	f, err := strconv.ParseFloat(value, 64)
 	if err != nil {
 		return nil, errors.Wrap(err, "监控数据格式转换错误")
 	}

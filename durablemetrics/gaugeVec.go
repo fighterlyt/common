@@ -44,14 +44,21 @@ func (g GaugeVec) WithLabelValuesAdd(f float64, lvs ...string) {
 
 	g.gaugeVec.WithLabelValues(lvs...).Add(f)
 
-	var keys []string
-	for i := range lvs {
-		keys = append(keys, strings.Join([]string{g.labelNames[i], lvs[i]}, connector))
-	}
+	keys := g.lvsToKeys(lvs...)
 
 	helpers.IgnoreError(g.logger, "redis操作失败", func() error {
 		return metricsRedisClient.HIncrByFloat(ctx, generateRedisKey(g.name), strings.Join(keys, ";"), f).Err()
 	})
+}
+
+func (g GaugeVec) lvsToKeys(lvs ...string) []string {
+	var keys []string
+
+	for i := range lvs {
+		keys = append(keys, strings.Join([]string{g.labelNames[i], lvs[i]}, connector))
+	}
+
+	return keys
 }
 
 func (g GaugeVec) WithLabelValuesSet(f float64, lvs ...string) {
@@ -60,10 +67,7 @@ func (g GaugeVec) WithLabelValuesSet(f float64, lvs ...string) {
 
 	g.gaugeVec.WithLabelValues(lvs...).Set(f)
 
-	var keys []string
-	for i := range lvs {
-		keys = append(keys, strings.Join([]string{g.labelNames[i], lvs[i]}, connector))
-	}
+	keys := g.lvsToKeys(lvs...)
 
 	helpers.IgnoreError(g.logger, "redis操作失败", func() error {
 		return metricsRedisClient.HSet(ctx, generateRedisKey(g.name), strings.Join(keys, ";"), f).Err()

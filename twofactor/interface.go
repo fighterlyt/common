@@ -19,7 +19,7 @@ type Audit interface {
 // Service 服务
 type Service interface {
 	// Process 处理，参数分别为 记录id、提现用户id、通知用户ID、协议、币种、通知信息、金额,返回need==true 表示已经需要动态校验发出通知
-	Process(id string, userID int64, notifyUserIDs []int64, protocol, symbol, notifyMessage string, amount decimal.Decimal) (need bool, err error)
+	Process(id string, userID int64, notifyUserIDs []int64, protocol, symbol, notifyMessage string, amount decimal.Decimal) (need bool, err error) //nolint:lll
 	// Auth 校验
 	Auth(password string) (ok bool, err error)
 	// QR 获取二维码
