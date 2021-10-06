@@ -37,7 +37,23 @@ func EnsureGo(logger log.Logger, functions ...func()) {
 	wg.Wait()
 }
 
+/*recoverRun 恢复panic 协程 并打印日志
+参数:
+*	logger  	log.Logger     	日志器
+*	wg      	*sync.WaitGroup	 并发等待
+*	function	func()         	待运行的函数
+返回值:
+*/
 func recoverRun(logger log.Logger, wg *sync.WaitGroup, function func()) {
+	fn := func(err interface{}) func() error {
+		return func() error {
+			msgInfo := fmt.Sprintf("发生panic,发生时间[%s],错误信息[%v],堆栈信息[%s]",
+				time.Now().UTC().Format("2006-01-02 15:04:05"), err, string(debug.Stack()))
+
+			return telegramClient.SendMsg(msgInfo)
+		}
+	}
+
 	defer func() {
 		if err := recover(); err != nil {
 			if logger != nil {
@@ -47,12 +63,7 @@ func recoverRun(logger log.Logger, wg *sync.WaitGroup, function func()) {
 			}
 
 			// 发送告警
-			IgnoreError(logger, "发送告警", func() error {
-				msgInfo := fmt.Sprintf("发生panic,发生时间[%s],错误信息[%v],堆栈信息[%s]",
-					time.Now().UTC().Format("2006-01-02 15:04:05"), err, string(debug.Stack()))
-
-				return telegramClient.SendMsg(msgInfo)
-			})
+			IgnoreError(logger, "发送告警", fn(err))
 		}
 	}()
 	wg.Done()

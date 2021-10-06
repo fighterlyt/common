@@ -41,13 +41,14 @@ func GetUserID(ctx *gin.Context) (int64, error) {
 	return clamis.UserID, nil
 }
 
-func GetClaims(ctx context.Context) (*JwtCustomClaims, error) {
+func Getclaims(ctx context.Context) (*JwtCustomClaims, error) {
 	claims := ctx.Value(ClaimsKey)
 	if claims != nil {
 		if c, ok := claims.(*JwtCustomClaims); ok {
 			return c, nil
 		}
 	}
+
 	return nil, errors.New("未获取到claims")
 }
 
@@ -79,29 +80,42 @@ func (j *JWT) CreateToken(claims JwtCustomClaims) (string, error) {
 
 // 定义错误信息
 var (
-	TokenExpired     = errors.New("Token 已经过期")
-	TokenNotValidYet = errors.New("Token 未激活")
-	TokenMalformed   = errors.New("Token 错误")
-	TokenInvalid     = errors.New("Token 无效")
+	TokenExpired        = ErrTokenExpired
+	TokenNotValidYet    = ErrTokenNotValidYet
+	TokenMalformed      = ErrTokenMalformed
+	TokenInvalid        = ErrTokenInvalid
+	ErrTokenExpired     = errors.New("Token 已经过期")
+	ErrTokenNotValidYet = errors.New("Token 未激活")
+	ErrTokenMalformed   = errors.New("Token 错误")
+	ErrTokenInvalid     = errors.New("Token 无效")
 )
+
+func convertErr(err error) error {
+	if ve, ok := err.(*jwt.ValidationError); ok {
+		if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+			return TokenMalformed
+		} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
+			return TokenExpired
+		} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
+			return TokenNotValidYet
+		} else {
+			return TokenInvalid
+		}
+	}
+
+	return nil
+}
 
 func (j *JWT) ParseToken(tokenString string) (*JwtCustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
-		if ve, ok := err.(*jwt.ValidationError); ok {
-			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				return nil, TokenMalformed
-			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
-				return nil, TokenExpired
-			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				return nil, TokenNotValidYet
-			} else {
-				return nil, TokenInvalid
-			}
+		if convertedErr := convertErr(err); convertedErr != nil {
+			return nil, convertedErr
 		}
 	}
+
 	if token == nil {
 		return nil, TokenInvalid
 	}
@@ -125,10 +139,12 @@ func (j *JWT) RefreshToken(tokenString string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	if c, ok := token.Claims.(*JwtCustomClaims); ok && token.Valid {
 		jwt.TimeFunc = time.Now
 
 		c.StandardClaims.ExpiresAt = time.Now().Add(1 * time.Hour).Unix()
+
 		return j.CreateToken(*c)
 	}
 

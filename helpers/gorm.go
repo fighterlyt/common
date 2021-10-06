@@ -49,18 +49,26 @@ func CountAll(db *gorm.DB, models map[string]interface{}) (counts map[string]int
 }
 
 const (
-	minNotZero = 2 << iota
-	minIsZero
+	minNotZero = 2 << iota // 最小值不是空
+	minIsZero              // 最小值为空
 
-	maxNotZero
-	maxIsZero
+	maxNotZero // 最大值不是空
+	maxIsZero  // 最大值为空
 )
 
 type interval interface {
 	IsZero() bool
 }
 
-func IntervalScope(dbField string, min interval, max interval) []Scope {
+/*IntervalScope 设置对应db字段在数据库中的范围
+参数:
+*	dbField	string  	db字段
+*	min    	interval	区间左值
+*	max    	interval	区间右值
+返回值:
+*	[]Scope	[]Scope 	数据库条件
+*/
+func IntervalScope(dbField string, min, max interval) []Scope {
 	var scopes []Scope
 
 	b := bitmapper{
@@ -68,6 +76,7 @@ func IntervalScope(dbField string, min interval, max interval) []Scope {
 		min: min,
 		max: max,
 	}
+
 	switch {
 	case b.bitmapIs(minNotZero | maxIsZero):
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
@@ -83,6 +92,7 @@ func IntervalScope(dbField string, min interval, max interval) []Scope {
 		})
 	default:
 	}
+
 	return scopes
 }
 
@@ -96,17 +106,18 @@ type bitmapper struct {
 func (b *bitmapper) bitmap() int {
 	if b.bit == 0 {
 		if b.min.IsZero() {
-			b.bit = b.bit | minIsZero
+			b.bit |= minIsZero
 		} else {
-			b.bit = b.bit | minNotZero
+			b.bit |= minNotZero
 		}
 
 		if b.max.IsZero() {
-			b.bit = b.bit | maxIsZero
+			b.bit |= maxIsZero
 		} else {
-			b.bit = b.bit | maxNotZero
+			b.bit |= maxNotZero
 		}
 	}
+
 	return b.bit
 }
 

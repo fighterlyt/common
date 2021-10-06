@@ -70,7 +70,7 @@ func (s service) Auth(password string) (ok bool, err error) {
 */
 func (s service) QR(user string) (qrCode string, err error) {
 	qrCode, _, err = s.auth.QR(user)
-	return qrCode, nil
+	return qrCode, err
 }
 
 // auditBySingleAmount 基于单笔金额审核

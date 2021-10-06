@@ -32,6 +32,13 @@ func IsPointer(data interface{}, allowNil bool) error {
 	return nil
 }
 
+/*IsSlice 判断是否为切片
+参数:
+*	data    	interface{}	待验证数据
+*	allowNil	bool       	是否允许空切片
+返回值:
+*	error   	error      	错误
+*/
 func IsSlice(data interface{}, allowNil bool) error {
 	if data == nil {
 		if !allowNil {

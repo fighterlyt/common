@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/fighterlyt/log"
-	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -23,12 +22,9 @@ func NewGauge(name, help string, logger log.Logger) (*Gauge, error) {
 		Help: help,
 	}), name: name, logger: logger}
 
-	ctx, cancel := context.WithTimeout(context.Background(), redisTimeout)
-	defer cancel()
-
-	value, err := metricsRedisClient.Get(ctx, generateRedisKey(name)).Float64()
+	value, err := getValueFromRedis(name)
 	if err != nil {
-		if err != redis.Nil {
+		if !errors.Is(err, errNotFound) {
 			return nil, errors.Wrap(err, "redis操作失败")
 		}
 
