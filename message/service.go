@@ -59,6 +59,14 @@ func (s service) Get(key string) (message []string, err error) {
 	return message, nil
 }
 
+/*Exist 判断消息是否存在于指定分类中
+参数:
+*	key    	string	分类key
+*	message	string  消息
+返回值:
+*	exists 	bool  	存在
+*	err    	error 	错误
+*/
 func (s service) Exist(key, message string) (exists bool, err error) {
 	var (
 		count = new(int64)
@@ -71,6 +79,14 @@ func (s service) Exist(key, message string) (exists bool, err error) {
 	return *count != 0, nil
 }
 
+/*Add 添加一条记录
+参数:
+*	ctx    	context.Context	上下文
+*	key    	string         	分类key
+*	message	string         	消息
+返回值:
+*	error  	error          	错误
+*/
 func (s service) Add(ctx context.Context, key, message string) error {
 	record := NewRecord(key, message)
 
@@ -80,6 +96,11 @@ func (s service) Add(ctx context.Context, key, message string) error {
 	}).Create(&record).Error
 }
 
+/*clearAll 清理全部消息
+参数:
+返回值:
+*	error	error	错误
+*/
 func (s service) clearAll() error {
 	if err := s.db.Exec(fmt.Sprintf(`DELETE FROM %s`, Record{}.TableName())).Error; err != nil {
 		return errors.Wrapf(err, `清理失败`)
@@ -88,6 +109,13 @@ func (s service) clearAll() error {
 	return nil
 }
 
+/*Delete 删除指定分类的多条信息
+参数:
+*	key     	string   	分类key
+*	messages	...string	消息
+返回值:
+*	error   	error    	错误
+*/
 func (s service) Delete(key string, messages ...string) error {
 	var sql = s.db.Where("elemKey=?", key)
 

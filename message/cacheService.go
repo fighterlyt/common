@@ -14,12 +14,25 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	cacheTimeout = time.Minute * 5
+)
+
 type cacheService struct {
 	service *service
 	client  cache.Client
 }
 
-func NewCacheService(db *gorm.DB, logger log.Logger, manager cache.Manager) (result *cacheService, err error) {
+/*NewCacheService 新建缓存服务
+参数:
+*	db     	*gorm.DB        db
+*	logger 	log.Logger   	日志器
+*	manager	cache.Manager	缓存管理器
+返回值:
+*	result 	Service	        支持缓存的服务
+*	err    	error        	错误
+*/
+func NewCacheService(db *gorm.DB, logger log.Logger, manager cache.Manager) (result Service, err error) {
 	var (
 		service *service
 		typ     cache.Type
@@ -57,7 +70,7 @@ func NewCacheService(db *gorm.DB, logger log.Logger, manager cache.Manager) (res
 		return nil, errors.Wrap(err, `构建类型`)
 	}
 
-	if client, err = manager.Register(typ, time.Minute*5, cache.RedisAndMem); err != nil {
+	if client, err = manager.Register(typ, cacheTimeout, cache.RedisAndMem); err != nil {
 		return nil, errors.Wrap(err, `注册到缓存服务`)
 	}
 
