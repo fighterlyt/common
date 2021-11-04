@@ -132,6 +132,6 @@ var (
 	ContractTRC20SGMT = newContract(TronSGMTContractAddress, "test", SGMT, 6)
 	ContractTRC20USDT = newContract(TronUSDTContractAddress, "production", USDT, 6)
 
-	ContractERC20Fly  = newContract(FLYContractAddress, "test", SGMT, 6)
-	ContractERC20USDT = newContract(USDTContractAddress, "production", USDT, 6)
+	ContractERC20Fly  = newContract(FLYContractAddress, "test", SGMT, 8)
+	ContractERC20USDT = newContract(USDTContractAddress, "production", USDT, 8)
 )
