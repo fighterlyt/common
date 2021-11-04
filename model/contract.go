@@ -7,9 +7,8 @@ import (
 // 定义了和协议相同的一些数据
 // 以太坊合约地址
 const (
-	USDTContractAddress   = "0xdac17f958d2ee523a2206206994597c13d831ec7"
-	FLYContractAddress    = "0x2ef608F472ef48313c89dEea39d2e779617beE73"
-	SoGameContractAddress = "0x8018aB08510feF2668C6DB002627226d366f6c03"
+	USDTContractAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+	FLYContractAddress  = "0x4E7491942F165262cc329C37f7e587A305b18292"
 )
 
 //  波场合约地址
@@ -65,6 +64,7 @@ type mapContractLocator struct {
 var (
 	// tron合约实例
 	tronContractLocator ContractLocator
+	ethContractLocator  ContractLocator
 )
 
 /*InitContractLocator 初始化合约
@@ -75,6 +75,7 @@ var (
 */
 func InitContractLocator(ethSupports, tronSupports []string) {
 	tronContractLocator = newTronContractLocator(tronSupports)
+	ethContractLocator = newEthContractLocator(ethSupports)
 }
 
 /*GetContractAddress 获取合约地址,如果合约不存在或者未定义，返回空字符串
@@ -110,7 +111,27 @@ func newTronContractLocator(supports []string) ContractLocator {
 	return locator
 }
 
+func newEthContractLocator(supports []string) ContractLocator {
+	locator := &mapContractLocator{
+		contracts: make(map[string]Contract),
+	}
+
+	for _, support := range supports {
+		switch support {
+		case USDT:
+			locator.contracts[USDT] = ContractERC20USDT
+		case FLY:
+			locator.contracts[FLY] = ContractERC20Fly
+		}
+	}
+
+	return locator
+}
+
 var (
 	ContractTRC20SGMT = newContract(TronSGMTContractAddress, "test", SGMT, 6)
 	ContractTRC20USDT = newContract(TronUSDTContractAddress, "production", USDT, 6)
+
+	ContractERC20Fly  = newContract(FLYContractAddress, "test", SGMT, 6)
+	ContractERC20USDT = newContract(USDTContractAddress, "production", USDT, 6)
 )
