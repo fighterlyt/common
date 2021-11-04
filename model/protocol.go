@@ -9,6 +9,7 @@ const (
 	USDT = "USDT"
 	//  ETH
 	ETH = "ETH"
+	FLY = "FLY"
 )
 
 // Protocol 协议
@@ -30,6 +31,8 @@ func (p Protocol) ContractLocator() ContractLocator {
 	switch p {
 	case Trc20:
 		return tronContractLocator
+	case Erc20:
+		return ethContractLocator
 	default:
 		return nil
 	}
