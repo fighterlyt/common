@@ -31,9 +31,9 @@ func ProcessArgument(ctx *gin.Context, argument Argument) (returned bool, err er
 	}
 
 	if err = argument.Validate(); err != nil {
-		err = errors.Wrap(err, `参数校验失败`)
+		// err = errors.Wrap(err, `参数校验失败`)
 
-		ReturnFail(ctx, Fail, err, `参数校验错误`)
+		ReturnFail(ctx, Fail, ErrFail, err.Error())
 
 		return true, err
 	}
