@@ -111,7 +111,13 @@ func ReturnFail(ctx *gin.Context, code StatCode, err error, detail string) {
 }
 
 func ReturnSuccess(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusOK, NewSuccessResult(``, data))
+	JSON(ctx, data)
+	// ctx.translateJSON(http.StatusOK, NewSuccessResult(``, data))
+}
+
+func JSON(ctx *gin.Context, data interface{}) {
+	ctx.Render(http.StatusAccepted, translateJSON{Data: NewSuccessResult(``, data), lang: ctx.GetHeader(`lang`)})
+
 }
 
 type Dictionary struct {

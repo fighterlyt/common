@@ -1,0 +1,8 @@
+{
+  "待审核":"toAudit",
+  "已到账": "finished",
+  "已提交到链上": "committed to blockchain",
+  "审核拒绝":"refused",
+  "提现失败": "failed",
+  "未知":"unknown"
+}
