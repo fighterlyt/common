@@ -93,24 +93,13 @@ func translate(langs map[string]map[string]string, lang string, data []byte) []b
 			return data
 		}
 
-		var (
-			result []byte
-			chosen = ``
-		)
 		for candidate, translate := range dict {
 			if bytes.Contains(data, []byte(candidate)) {
-				if len(candidate) > len(chosen) {
-					chosen = candidate
-					result = bytes.ReplaceAll(data, []byte(candidate), []byte(translate))
-				}
+				data = bytes.ReplaceAll(data, []byte(candidate), []byte(translate))
 			}
 		}
 
-		if len(chosen) == 0 {
-			return data
-		}
-
-		return result
+		return data
 	}
 }
 
