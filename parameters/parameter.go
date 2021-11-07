@@ -121,14 +121,14 @@ func (p parameterService) Modify(key, value string) error {
 
 	parameter.Value = value
 	if err = parameter.Validate(); err != nil {
-		return fmt.Errorf(`值[%s]不满足要求[%s]`, value, parameter.Description)
+		return fmt.Errorf(`错误信息: [%v],值[%s]不满足要求[%s]`, err, parameter.Value, parameter.Description)
 	}
 
 	if err := p.deleteFromRedis(key); err != nil {
 		return errors.Wrap(err, `删除缓存`)
 	}
 
-	if err := p.updateMYSQL(key, value); err != nil {
+	if err := p.updateMYSQL(key, parameter.Value); err != nil {
 		return errors.Wrap(err, `更新MYSQL`)
 	}
 
