@@ -21,6 +21,7 @@ type Parameter struct {
 	Description string `gorm:"column:description;type:varchar(256);comment:值描述" valid:"required,stringlength(1|256)" json:"description"`    //nolint:lll    // 值描述
 	UpdateTime  int64  `gorm:"column:updateTime;type:bigint;comment:更新时间" json:"update_time"`                                               //nolint:lll    // 最后更新时间
 	ValidKey    string `gorm:"column:validKey;type:varchar(32);comment:验证方法key" valid:"required,ascii" json:"validKey"`                     //nolint:lll    // 验证方法key github.com/asaskevich/govalidator
+	Err         error  `gorm:"-" json:"-"`                                                                                                  // 错误信息
 }
 
 /*NewParameter 新建业务参数
@@ -64,12 +65,13 @@ func (p Parameter) MarshalBinary() (data []byte, err error) {
 	return json.Marshal(p)
 }
 
-/*Validate 验证
+/*Validate 验证 Parameter.Value,Parameter.Err 可被修改
 参数:
 返回值:
 *	error	error	返回值1
 */
-func (p Parameter) Validate() error { // nolint:golint,revive
+
+func (p *Parameter) Validate() error { // nolint:golint,revive
 	if _, err := govalidator.ValidateStruct(p); err != nil {
 		return errors.Wrap(err, `字段不满足`)
 	}
@@ -108,6 +110,9 @@ func (p Parameter) Validate() error { // nolint:golint,revive
 
 	if customValidator, exist = govalidator.CustomTypeTagMap.Get(p.ValidKey); exist {
 		if !customValidator(p.Value, p) {
+			if p.Err != nil {
+				return p.Err
+			}
 			return fmt.Errorf(validateFailFMT, p.Value, p.ValidKey)
 		}
 
