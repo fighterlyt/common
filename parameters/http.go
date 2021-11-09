@@ -49,14 +49,8 @@ func (s *service) setParameters(ctx *gin.Context) {
 
 		// 验证码不为空进行验证
 		ok, err := s.auth.Validate(argument.Code)
-		if !ok {
+		if !ok || err != nil {
 			err = errors.New("验证码错误")
-			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, err, err.Error())
-
-			return
-		}
-
-		if err != nil {
 			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, err, err.Error())
 
 			return
