@@ -3,6 +3,7 @@ package parameters
 import (
 	"encoding/json"
 	"fmt"
+	"gitlab.com/nova_dubai/common/twofactor"
 	"os"
 	"time"
 
@@ -22,13 +23,15 @@ const (
 )
 
 type service struct {
-	db        *gorm.DB         // 数据库
-	client    *redis.Client    // redis
-	parameter ParameterService // 核心参数服务
-	history   HistoryService   // 变更历史服务
-	logger    log.Logger       // 日志器
-	router    gin.IRouter      // http router
-	shutdown  model.Shutdown   // 关闭
+	db                *gorm.DB         // 数据库
+	client            *redis.Client    // redis
+	parameter         ParameterService // 核心参数服务
+	history           HistoryService   // 变更历史服务
+	logger            log.Logger       // 日志器
+	router            gin.IRouter      // http router
+	shutdown          model.Shutdown   // 关闭
+	auth              twofactor.Auth   // 验证器
+	needTwoFactorKeys []string         // 需要二次验证的key
 }
 
 func (s *service) Close() {
@@ -87,7 +90,12 @@ func NewService(db *gorm.DB, client *redis.Client, logger log.Logger, iRouter gi
 	return targetService, nil
 }
 
-func (s service) GetParameters(keys ...string) (parameters map[string]*Parameter, err error) {
+func (s *service) SetTwoFactorAuth(needTwoFactorKeys []string, auth twofactor.Auth) {
+	s.needTwoFactorKeys = needTwoFactorKeys
+	s.auth = auth
+}
+
+func (s *service) GetParameters(keys ...string) (parameters map[string]*Parameter, err error) {
 	return s.parameter.GetParameters(keys...)
 }
 
@@ -98,7 +106,7 @@ func (s service) GetParameters(keys ...string) (parameters map[string]*Parameter
 返回值:
 *	error   	error            	错误
 */
-func (s service) Modify(keyValue map[string]string, userID int64) error {
+func (s *service) Modify(keyValue map[string]string, userID int64) error {
 	for key, value := range keyValue {
 		if err := s.parameter.Modify(key, value); err != nil {
 			return errors.Wrap(err, `修改数据`)
@@ -160,7 +168,7 @@ func (s *service) Create(parameter *Parameter) error {
 返回值:
 *	error	error	错误
 */
-func (s service) init() error {
+func (s *service) init() error {
 	if err := s.dbInit(); err != nil {
 		return errors.Wrap(err, `数据库初始化失败`)
 	}
@@ -179,7 +187,7 @@ func (s service) init() error {
 返回值:
 *	error	error	错误
 */
-func (s service) dbInit() error {
+func (s *service) dbInit() error {
 	if err := s.db.AutoMigrate(&History{}); err != nil {
 		return errors.Wrap(err, `创建变更表`)
 	}
@@ -196,7 +204,7 @@ func (s service) dbInit() error {
 返回值:
 *	error	error	返回值1
 */
-func (s service) loadConfig() error {
+func (s *service) loadConfig() error {
 	file, err := os.Open(dataPath)
 	if err != nil {
 		return errors.Wrapf(err, `打开数据文件[%s]`, dataPath)

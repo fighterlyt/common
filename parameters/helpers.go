@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s service) GetString(key string) (wallet string, err error) {
+func (s *service) GetString(key string) (wallet string, err error) {
 	var (
 		result map[string]*Parameter
 	)
