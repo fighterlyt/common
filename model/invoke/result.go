@@ -24,6 +24,8 @@ const (
 	Fail StatCode = 0
 	// Unauthorized 未授权
 	Unauthorized StatCode = -1
+	// NeedTwoFactor 需要二次验证
+	NeedTwoFactor StatCode = 2
 )
 
 // ListResult HTTP表格返回参数

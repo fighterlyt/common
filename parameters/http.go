@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s service) http() {
+func (s *service) http() {
 	s.router.POST(`/set`, s.setParameters)
 	s.router.POST(`/get`, s.getParameters)
 	s.router.POST(`/getHistory`, s.getHistory)
@@ -20,7 +20,7 @@ func (s service) http() {
 *	ctx	*gin.Context	gin
 返回值:
 */
-func (s service) setParameters(ctx *gin.Context) {
+func (s *service) setParameters(ctx *gin.Context) {
 	argument := &setParametersArgument{}
 
 	var (
@@ -38,6 +38,31 @@ func (s service) setParameters(ctx *gin.Context) {
 		return
 	}
 
+	// 是否需要二次验证
+	if s.needTwoFactor(argument.Parameters) {
+		// 验证码为空,直接返回需要二次验证
+		if argument.Code == "" {
+			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, err, err.Error())
+
+			return
+		}
+
+		// 验证码不为空进行验证
+		ok, err := s.auth.Validate(argument.Code)
+		if !ok {
+			err = errors.New("验证码错误")
+			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, err, err.Error())
+
+			return
+		}
+
+		if err != nil {
+			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, err, err.Error())
+
+			return
+		}
+	}
+
 	if err = s.Modify(argument.Parameters, argument.UserID); err != nil {
 		err = errors.Wrap(err, `修改参数`)
 		invoke2.ReturnFail(ctx, invoke2.Fail, err, err.Error())
@@ -48,9 +73,22 @@ func (s service) setParameters(ctx *gin.Context) {
 	invoke2.ReturnSuccess(ctx, nil)
 }
 
+func (s *service) needTwoFactor(keys map[string]string) (need bool) {
+	for key, _ := range keys {
+		for i := range s.needTwoFactorKeys {
+			if key == s.needTwoFactorKeys[i] {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 type setParametersArgument struct {
 	Parameters map[string]string `json:"parameters"`
 	UserID     int64             `json:"userID"`
+	Code       string            `json:"code"`
 }
 
 func (s setParametersArgument) Validate() error {
@@ -65,7 +103,7 @@ func (s setParametersArgument) Validate() error {
 	return nil
 }
 
-func (s service) getParameters(ctx *gin.Context) {
+func (s *service) getParameters(ctx *gin.Context) {
 	argument := &getParametersArgument{}
 
 	var (
@@ -98,7 +136,7 @@ type getParametersArgument struct {
 	Keys []string `json:"keys"`
 }
 
-func (s getParametersArgument) Validate() error {
+func (s *getParametersArgument) Validate() error {
 	if len(s.Keys) == 0 {
 		return errors.New(`参数不能为空`)
 	}
@@ -106,7 +144,7 @@ func (s getParametersArgument) Validate() error {
 	return nil
 }
 
-func (s service) getHistory(ctx *gin.Context) {
+func (s *service) getHistory(ctx *gin.Context) {
 	query := &historyQuery{}
 	argument, err := invoke2.NewListArgument(query)
 
@@ -152,7 +190,7 @@ type historyQuery struct {
 	Key   string `json:"key"`
 }
 
-func (d historyQuery) Validate() error {
+func (d *historyQuery) Validate() error {
 	if d.Start < 0 {
 		return fmt.Errorf(`start[%d]必须大于等于0`, d.Start)
 	}
@@ -172,6 +210,6 @@ func (d historyQuery) Validate() error {
 	return nil
 }
 
-func (d historyQuery) Scope(db *gorm.DB) *gorm.DB {
+func (d *historyQuery) Scope(db *gorm.DB) *gorm.DB {
 	return db
 }

@@ -1,6 +1,8 @@
 package parameters
 
-import "github.com/asaskevich/govalidator"
+import (
+	"github.com/asaskevich/govalidator"
+)
 
 /*Init 初始化
 参数:
@@ -27,5 +29,4 @@ func Init(path string, validators map[string]govalidator.CustomTypeValidator) {
 	govalidator.CustomTypeTagMap.Set(`isString`, isString)
 	govalidator.CustomTypeTagMap.Set(`isAttr`, isAttr)
 	govalidator.CustomTypeTagMap.Set(`notifyExpressionRate`, notifyExpressionRate)
-
 }
