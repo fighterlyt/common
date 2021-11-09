@@ -42,7 +42,7 @@ func (s *service) setParameters(ctx *gin.Context) {
 	if s.needTwoFactor(argument.Parameters) {
 		// 验证码为空,直接返回需要二次验证
 		if argument.Code == "" {
-			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, err, err.Error())
+			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, errors.New("需要进行谷歌二次验证"), "请输入谷歌二次验证码")
 
 			return
 		}
@@ -51,7 +51,7 @@ func (s *service) setParameters(ctx *gin.Context) {
 		ok, err := s.auth.Validate(argument.Code)
 		if !ok || err != nil {
 			err = errors.New("验证码错误")
-			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, err, err.Error())
+			invoke2.ReturnFail(ctx, invoke2.NeedTwoFactor, invoke2.ErrFail, err.Error())
 
 			return
 		}
@@ -59,7 +59,7 @@ func (s *service) setParameters(ctx *gin.Context) {
 
 	if err = s.Modify(argument.Parameters, argument.UserID); err != nil {
 		err = errors.Wrap(err, `修改参数`)
-		invoke2.ReturnFail(ctx, invoke2.Fail, err, err.Error())
+		invoke2.ReturnFail(ctx, invoke2.Fail, invoke2.ErrFail, err.Error())
 
 		return
 	}
