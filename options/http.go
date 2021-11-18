@@ -13,12 +13,18 @@ func (s service) http() {
 }
 
 type getArgument struct {
-	Key string `json:"key"`
+	Keys []string `json:"keys"`
 }
 
 func (g getArgument) Validate() error {
-	if strings.TrimSpace(g.Key) == `` {
-		return errors.New(`key 不能为空`)
+	if len(g.Keys) == 0 {
+		return errors.New(`keys不能为空`)
+	}
+	for _, key := range g.Keys {
+		if strings.TrimSpace(key) == `` {
+			return errors.New(`key 不能为空`)
+		}
+
 	}
 
 	return nil
@@ -40,5 +46,11 @@ func (s service) httpGet(ctx *gin.Context) {
 		return
 	}
 
-	invoke.ReturnSuccess(ctx, Get(argument.Key))
+	result := make(map[string][]item, len(argument.Keys))
+
+	for _, key := range argument.Keys {
+		result[key] = Get(key)
+	}
+
+	invoke.ReturnSuccess(ctx, result)
 }
