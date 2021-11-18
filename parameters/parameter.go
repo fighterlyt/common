@@ -43,8 +43,6 @@ func (p parameterService) GetParameters(keys ...string) (parameters map[string]*
 		if parameter, err = p.get(key); err != nil {
 			return nil, errors.Wrapf(err, `获取[%s]失败`, key)
 		}
-
-		parameters[key] = parameter
 	}
 
 	return parameters, nil
@@ -148,6 +146,7 @@ func (p parameterService) deleteFromRedis(key string) error {
 func (p parameterService) updateMYSQL(key, value string) error {
 	if err := p.db.Model(p.model).Where(`elemKey = ?`, key).Updates(map[string]interface{}{
 		`value`:      value,
+		`lock`:       false,
 		`updateTime`: time.Now().Unix(),
 	}).Error; err != nil {
 		return errors.Wrapf(err, `更新MYSQL key[%s],value[%s]`, key, value)

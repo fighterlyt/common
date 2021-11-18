@@ -21,7 +21,8 @@ type Parameter struct {
 	Description string `gorm:"column:description;type:varchar(256);comment:值描述" valid:"required,stringlength(1|256)" json:"description"`    //nolint:lll    // 值描述
 	UpdateTime  int64  `gorm:"column:updateTime;type:bigint;comment:更新时间" json:"update_time"`                                               //nolint:lll    // 最后更新时间
 	ValidKey    string `gorm:"column:validKey;type:varchar(32);comment:验证方法key" valid:"required,ascii" json:"validKey"`                     //nolint:lll    // 验证方法key github.com/asaskevich/govalidator
-	Err         error  `gorm:"-" json:"-"`                                                                                                  // 错误信息
+	Hide        bool   `gorm:"column:lock;comment:是否锁定,前端获取不到也不能修改" valid:"isBool" json:"hide"`
+	Err         error  `gorm:"-" json:"-"` // 错误信息
 }
 
 /*NewParameter 新建业务参数
