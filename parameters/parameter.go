@@ -43,6 +43,8 @@ func (p parameterService) GetParameters(keys ...string) (parameters map[string]*
 		if parameter, err = p.get(key); err != nil {
 			return nil, errors.Wrapf(err, `获取[%s]失败`, key)
 		}
+
+		parameters[key] = parameter
 	}
 
 	return parameters, nil
