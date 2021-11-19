@@ -30,7 +30,12 @@ func (h historyService) Save(key, value string, userID int64) error {
 func (h historyService) Get(key string, startTime, endTime int64, start, limit int) (allCount int64, histories []History, err error) {
 	h.logger.Debug(`获取数据`, zap.String(`elemKey`, key), zap.Ints(`开始/数量`, []int{start, limit}))
 
-	query := h.db.Model(h.model).Debug().Where(`elemKey= ?`, key)
+	query := h.db.Model(h.model).Debug()
+
+	if key != "" {
+		query = query.Where(`elemKey= ?`, key)
+	}
+
 	if startTime != 0 {
 		query = query.Where(`updateTime >= ? `, startTime)
 	}
