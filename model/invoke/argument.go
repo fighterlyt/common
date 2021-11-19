@@ -1,6 +1,7 @@
 package invoke
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -58,6 +59,14 @@ type ListArgument struct {
 	Query       Query  `json:"query"` // 查询条件
 	Sorts       Sorts  `json:"sorts"` // 排序字符串
 	DefaultSort string `json:"-"`     // 默认排序
+}
+
+func (a *ListArgument) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, a)
+}
+
+func (a ListArgument) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(a)
 }
 
 func (a ListArgument) Scope(db *gorm.DB) *gorm.DB {
