@@ -1,7 +1,6 @@
 package invoke
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"github.com/vmihailenco/msgpack"
 	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 )
@@ -62,11 +62,11 @@ type ListArgument struct {
 }
 
 func (a *ListArgument) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, a)
+	return msgpack.Unmarshal(data, a)
 }
 
 func (a ListArgument) MarshalBinary() (data []byte, err error) {
-	return json.Marshal(a)
+	return msgpack.Marshal(a)
 }
 
 func (a ListArgument) Scope(db *gorm.DB) *gorm.DB {
