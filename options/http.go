@@ -20,11 +20,11 @@ func (g getArgument) Validate() error {
 	if len(g.Keys) == 0 {
 		return errors.New(`keys不能为空`)
 	}
+
 	for _, key := range g.Keys {
 		if strings.TrimSpace(key) == `` {
 			return errors.New(`key 不能为空`)
 		}
-
 	}
 
 	return nil
