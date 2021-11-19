@@ -108,7 +108,7 @@ func ReturnFail(ctx *gin.Context, code StatCode, err error, detail string) {
 
 	helpers.CtxError(ctx, err)
 
-	ctx.Render(http.StatusAccepted, translateJSON{Data: NewResult(code, msg, nil, detail), lang: ctx.GetHeader(`lang`)})
+	ctx.Render(http.StatusOK, translateJSON{Data: NewResult(code, msg, nil, detail), lang: ctx.GetHeader(`lang`)})
 }
 
 func ReturnSuccess(ctx *gin.Context, data interface{}) {
@@ -117,7 +117,7 @@ func ReturnSuccess(ctx *gin.Context, data interface{}) {
 }
 
 func JSON(ctx *gin.Context, data interface{}) {
-	ctx.Render(http.StatusAccepted, translateJSON{Data: NewSuccessResult(``, data), lang: ctx.GetHeader(`lang`)})
+	ctx.Render(http.StatusOK, translateJSON{Data: NewSuccessResult(``, data), lang: ctx.GetHeader(`lang`)})
 
 }
 
