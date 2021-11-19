@@ -1,6 +1,10 @@
 package helpers
 
 import (
+	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
@@ -125,3 +129,58 @@ func (b *bitmapper) bitmap() int {
 func (b *bitmapper) bitmapIs(bit int) bool {
 	return b.bitmap()&bit == bit
 }
+
+func BuildScope(data interface{}, excludes []string) Scope {
+	v := reflect.ValueOf(data)
+	t := v.Type()
+	tag := `json`
+
+	excludeDict := make(map[string]struct{}, len(excludes))
+	for _, exclude := range excludes {
+		excludeDict[exclude] = struct{}{}
+	}
+
+	return func(db *gorm.DB) *gorm.DB {
+		for i := 0; i < v.NumField(); i++ {
+			field := v.Field(i)
+			name := t.Field(i).Tag.Get(tag)
+
+			if _, exist := excludeDict[name]; exist { // 排除的字段
+				continue
+			}
+
+			operator := ``
+			switch field.Type().Kind() {
+			case reflect.Int64, timeKind:
+				if field.Int() > 0 {
+					if strings.HasSuffix(name, `min`) {
+						operator = `>=`
+					} else if strings.HasSuffix(name, `max`) {
+						operator = `<=`
+					}
+
+					db = db.Where(compose(name, operator), field)
+				}
+			case reflect.String:
+				if field.Len() > 0 {
+					db = db.Where(compose(name, operator), field)
+				}
+			default:
+
+			}
+		}
+		return db
+	}
+}
+
+func compose(name, operator string) string {
+	if operator == `` {
+		operator = `=`
+	}
+	return fmt.Sprintf(`%s %s ?`, name, operator)
+}
+
+var (
+	t        = Now()
+	timeKind = reflect.TypeOf(t).Kind()
+)

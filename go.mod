@@ -23,6 +23,7 @@ require (
 	github.com/shirou/gopsutil v3.21.8+incompatible
 	github.com/shopspring/decimal v1.2.0
 	github.com/stretchr/testify v1.7.0
+	github.com/xuri/excelize/v2 v2.4.1 // indirect
 	gitlab.com/nova_dubai/cache v0.0.0-20210824010034-1c70f17b8fe4
 	go.uber.org/atomic v1.9.0
 	go.uber.org/multierr v1.7.0
