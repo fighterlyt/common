@@ -202,9 +202,9 @@ func (d *historyQuery) Validate() error {
 		return fmt.Errorf(`end[%d]必须大于start[%d]`, d.End, d.Start)
 	}
 
-	if d.Key == `` {
-		return errors.New(`key不能为空`)
-	}
+	// if d.Key == `` {
+	// 	return errors.New(`key不能为空`)
+	// }
 
 	return nil
 }
