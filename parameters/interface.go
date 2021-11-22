@@ -19,6 +19,7 @@ type Service interface {
 	GetHistory(key string, startTime, endTime int64, start, limit int) (allCount int64, histories []History, err error)
 	GetString(key string) (value string, err error)
 	SetTwoFactorAuth(needTwoFactorKeys []string, auth twofactor.Auth)
+	SetValidate(validate ParameterValidate)
 	model.Module
 }
 

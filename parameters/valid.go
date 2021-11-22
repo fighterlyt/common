@@ -65,7 +65,7 @@ var (
 			return false
 		}
 
-		if rateInfo.LessThanOrEqual(decimal.Zero) || rateInfo.GreaterThanOrEqual(decimal.NewFromInt(100)) {
+		if rateInfo.LessThan(decimal.Zero) || rateInfo.GreaterThan(decimal.NewFromInt(100)) {
 			moduleLogger.Error("比率必须在0-100之间", zap.String(`实际`, rateInfo.String()))
 
 			return false
