@@ -112,7 +112,7 @@ func (s *service) Modify(keyValue map[string]string, userID int64) error {
 
 	for key, value := range keyValue {
 		if s.validate != nil {
-			if err = s.validate.Validate(key); err != nil {
+			if err = s.validate.Validate(key, value); err != nil {
 				return errors.Wrap(err, "参数验证失败")
 			}
 		}
@@ -250,7 +250,7 @@ var (
 )
 
 type ParameterValidate interface {
-	Validate(key string) error
+	Validate(key, value string) error
 }
 
 func (s *service) SetValidate(validate ParameterValidate) {
