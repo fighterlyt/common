@@ -123,6 +123,10 @@ func (s *service) getParameters(ctx *gin.Context) {
 		return
 	}
 	for i := range parameters {
+		if parameters[i] == nil {
+			continue
+		}
+
 		if parameters[i].Hide {
 			parameters[i].Value = ``
 		}

@@ -32,6 +32,7 @@ type service struct {
 	shutdown          model.Shutdown   // 关闭
 	auth              twofactor.Auth   // 验证器
 	needTwoFactorKeys []string         // 需要二次验证的key
+	validate          ParameterValidate
 }
 
 func (s *service) Close() {
@@ -107,6 +108,12 @@ func (s *service) GetParameters(keys ...string) (parameters map[string]*Paramete
 *	error   	error            	错误
 */
 func (s *service) Modify(keyValue map[string]string, userID int64) error {
+	if s.validate != nil {
+		if err := s.validate.Validate(keyValue); err != nil {
+			return errors.Wrap(err, "参数验证失败")
+		}
+	}
+
 	for key, value := range keyValue {
 		if err := s.parameter.Modify(key, value); err != nil {
 			return errors.Wrap(err, `修改数据`)
@@ -239,3 +246,11 @@ func (s *service) loadConfig() error {
 var (
 	dataPath string
 )
+
+type ParameterValidate interface {
+	Validate(keyValue map[string]string) error
+}
+
+func (s *service) SetValidate(validate ParameterValidate) {
+	s.validate = validate
+}
