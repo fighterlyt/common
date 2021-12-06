@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 )
 
 func (s *service) GetString(key string) (wallet string, err error) {
@@ -20,4 +21,16 @@ func (s *service) GetString(key string) (wallet string, err error) {
 	}
 
 	return result[key].Value, nil
+}
+
+func (s *service) GetDecimal(key string) (value decimal.Decimal, err error) {
+	var (
+		result string
+	)
+
+	if result, err = s.GetString(key); err != nil {
+		return value, err
+	}
+
+	return decimal.NewFromString(result)
 }

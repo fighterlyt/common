@@ -2,6 +2,8 @@ package parameters
 
 import (
 	"context"
+
+	"github.com/shopspring/decimal"
 	"gitlab.com/nova_dubai/common/twofactor"
 
 	"gitlab.com/nova_dubai/common/model"
@@ -18,6 +20,7 @@ type Service interface {
 	Modify(keyValue map[string]string, userID int64) error
 	GetHistory(key string, startTime, endTime int64, start, limit int) (allCount int64, histories []History, err error)
 	GetString(key string) (value string, err error)
+	GetDecimal(key string) (value decimal.Decimal, err error)
 	SetTwoFactorAuth(needTwoFactorKeys []string, auth twofactor.Auth)
 	SetValidate(validate ParameterValidate)
 	model.Module
