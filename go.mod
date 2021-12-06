@@ -9,6 +9,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dgryski/dgoogauth v0.0.0-20190221195224-5a805980a5f3
+	github.com/elastic/go-elasticsearch/v7 v7.10.0
 	github.com/ethereum/go-ethereum v1.10.7
 	github.com/fighterlyt/gormlogger v0.0.0-20210729161641-ae2b6a621523
 	github.com/fighterlyt/gotron-sdk v0.0.0-20210726202906-8b77a73e46fb
@@ -22,8 +23,9 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/shirou/gopsutil v3.21.8+incompatible
 	github.com/shopspring/decimal v1.2.0
+	github.com/smartystreets/assertions v1.1.1 // indirect
 	github.com/stretchr/testify v1.7.0
-	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
+	github.com/vmihailenco/msgpack v4.0.4+incompatible
 	github.com/xuri/excelize/v2 v2.4.1
 	gitlab.com/nova_dubai/cache v0.0.0-20210824010034-1c70f17b8fe4
 	go.uber.org/atomic v1.9.0
