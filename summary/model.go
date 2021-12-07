@@ -23,6 +23,7 @@ type Detail struct {
 	Value     decimal.Decimal `gorm:"column:value;type:decimal(30,8);comment:汇总值" json:"value"`                                     // 汇总值
 	SlotValue int64           `gorm:"column:slotValue;type:bigint(10);uniqueIndex:ownerID_slotValue;comment:汇总时间" json:"slotValue"` // 所属的时间
 	tableName string          // 表名
+	Times     int64           `gorm:"column:times;comment:次数" json:"次数"`
 }
 
 /*newSummary 新建数据
@@ -73,4 +74,8 @@ func (s Detail) GetValue() decimal.Decimal {
 
 func (s Detail) GetSlotValue() int64 {
 	return s.SlotValue
+}
+
+func (s Detail) GetTimes() int64 {
+	return s.Times
 }
