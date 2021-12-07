@@ -105,8 +105,11 @@ func (m *client) Summarize(ownerID int64, amount decimal.Decimal) error {
 
 	// 写入或者更新
 	err = db.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
-		DoUpdates: clause.Assignments(map[string]interface{}{"value": gorm.Expr(`value + ?`, amount)}),
+		Columns: []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
+		DoUpdates: clause.Assignments(map[string]interface{}{
+			"value": gorm.Expr(`value + ?`, amount),
+			`times`: gorm.Expr(`times + ?`, 1),
+		}),
 	}).Create(&data).Error
 	if err != nil {
 		return errors.WithMessage(err, m.tableName)
@@ -124,8 +127,11 @@ func (m *client) SummarizeDay(date, ownerID int64, amount decimal.Decimal) error
 	db := m.db.Session(&gorm.Session{})
 
 	return db.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
-		DoUpdates: clause.Assignments(map[string]interface{}{"value": gorm.Expr(`value + ?`, amount)}),
+		Columns: []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
+		DoUpdates: clause.Assignments(map[string]interface{}{
+			"value": gorm.Expr(`value + ?`, amount),
+			`times`: gorm.Expr(`times + ?`, 1),
+		}),
 	}).Create(&data).Error
 }
 

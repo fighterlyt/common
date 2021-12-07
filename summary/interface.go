@@ -21,4 +21,5 @@ type Summary interface {
 	GetValue() decimal.Decimal
 	GetSlotValue() int64
 	TableName() string
+	GetTimes() int64
 }
