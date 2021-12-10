@@ -1,4 +1,4 @@
-package summary
+package summaryextend
 
 import (
 	"github.com/shopspring/decimal"
