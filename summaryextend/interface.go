@@ -7,7 +7,7 @@ import (
 // Client 客户端抽象
 type Client interface {
 	Model() Summary
-	Summarize(ownerID int64, amount decimal.Decimal) error
+	Summarize(ownerID string, amount decimal.Decimal) error
 	SummarizeDay(date int64, ownerID string, amount decimal.Decimal) error
 	Key() string
 	GetSummary(ownerIDs []string, from, to int64) (records []Summary, err error)
