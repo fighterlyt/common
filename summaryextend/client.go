@@ -154,7 +154,7 @@ func (m client) Model() Summary {
 	return m.model
 }
 
-func (m client) GetSummary(ownerIDs []int64, from, to int64) (records []Summary, err error) {
+func (m client) GetSummary(ownerIDs []string, from, to int64) (records []Summary, err error) {
 	query := m.db.Session(&gorm.Session{})
 	if len(ownerIDs) > 0 {
 		query = query.Where(`ownerID in ?`, ownerIDs)
