@@ -3,7 +3,6 @@ package summaryextend
 import (
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -125,7 +124,6 @@ func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue .
 		}
 	}
 
-	spew.Dump(updates)
 	// 写入或者更新
 	err = db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
