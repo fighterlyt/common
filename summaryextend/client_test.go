@@ -15,22 +15,22 @@ var (
 )
 
 func TestDayClient(t *testing.T) {
-	dayClient, err = NewClient(`summary_1`, SlotDay, logger, db)
+	dayClient, err = NewClient(`summary_extend`, SlotDay, logger, db)
 	require.NoError(t, err, `构建Client`)
 }
 
 func TestHistoryClient(t *testing.T) {
-	historyClient, err = NewClient(`historyIncome`, SlotWhole, logger, db)
+	historyClient, err = NewClient(`historyIncome_extend`, SlotWhole, logger, db)
 	require.NoError(t, err, `构建Client`)
 }
 
 func TestClient_Summarize(t *testing.T) {
 	TestDayClient(t)
-	require.NoError(t, dayClient.Summarize(1, decimal.New(1, 0)))
+	require.NoError(t, dayClient.Summarize(`1`, decimal.New(1, 0), decimal.New(2, 0), decimal.New(3, 0), decimal.New(4, 0)))
 }
 
 func BenchmarkClient_Summarize(b *testing.B) {
-	dayClient, err = NewClient(`summary_1`, SlotDay, logger, db)
+	dayClient, err = NewClient(`summary_extend`, SlotDay, logger, db)
 	require.NoError(b, err, `构建Client`)
 
 	b.ResetTimer()
@@ -45,7 +45,7 @@ func BenchmarkClient_Summarize(b *testing.B) {
 	for i := 0; i < count; i++ {
 		go func() {
 			for j := 0; j < times; j++ {
-				require.NoError(b, dayClient.Summarize(1, decimal.New(1, 0)))
+				require.NoError(b, dayClient.Summarize(`2`, decimal.New(1, 0)))
 			}
 			wg.Done()
 		}()
@@ -57,7 +57,7 @@ func BenchmarkClient_Summarize(b *testing.B) {
 func TestClient_Get(t *testing.T) {
 	TestHistoryClient(t)
 	now := time.Now().Unix()
-	records, err := historyClient.GetSummary([]int64{2}, now, now+1)
+	records, err := historyClient.GetSummary([]string{`2`}, now, now+1)
 
 	require.NoError(t, err)
 	t.Log(records)

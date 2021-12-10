@@ -41,7 +41,7 @@ func (c chainClients) Model() Summary {
 	return nil
 }
 
-func (c chainClients) Summarize(ownerID string, amount decimal.Decimal) error {
+func (c chainClients) Summarize(ownerID string, amount decimal.Decimal, extend ...decimal.Decimal) error {
 	var (
 		err, singleErr error
 	)
@@ -55,7 +55,7 @@ func (c chainClients) Summarize(ownerID string, amount decimal.Decimal) error {
 	return err
 }
 
-func (c chainClients) SummarizeDay(_ int64, _ string, _ decimal.Decimal) error {
+func (c chainClients) SummarizeDay(_ int64, _ string, _ decimal.Decimal, _ ...decimal.Decimal) error {
 	return nil
 }
 func (c chainClients) Key() string {

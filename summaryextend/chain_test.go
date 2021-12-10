@@ -21,5 +21,5 @@ func TestChain(t *testing.T) {
 
 func TestChain_Add(t *testing.T) {
 	TestChain(t)
-	require.NoError(t, chainClient.Summarize(1, decimal.New(1, 0)))
+	require.NoError(t, chainClient.Summarize(`1`, decimal.New(1, 0)))
 }

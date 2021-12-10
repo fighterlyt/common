@@ -3,6 +3,7 @@ package summaryextend
 import (
 	"fmt"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -89,7 +90,7 @@ func NewClient(tableName string, slot Slot, logger log.Logger, db *gorm.DB) (res
 返回值:
 *	error  	error          	错误
 */
-func (m *client) Summarize(ownerID string, amount decimal.Decimal) error {
+func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
 	var (
 		slotValue string
 		err       error
@@ -103,13 +104,32 @@ func (m *client) Summarize(ownerID string, amount decimal.Decimal) error {
 
 	db := m.db.Session(&gorm.Session{})
 
+	updates := map[string]interface{}{
+		"value": gorm.Expr(`value + ?`, amount),
+		`times`: gorm.Expr(`times + ?`, 1),
+	}
+
+	for i, extend := range extendValue {
+		key := fmt.Sprintf(`value_%d`, i+1)
+		updates[key] = gorm.Expr(fmt.Sprintf(`%s + ?`, key), extend)
+
+		switch i {
+		case 0:
+			data.Value1 = extend
+		case 1:
+			data.Value2 = extend
+		case 2:
+			data.Value3 = extend
+		case 3:
+			data.Value4 = extend
+		}
+	}
+
+	spew.Dump(updates)
 	// 写入或者更新
 	err = db.Clauses(clause.OnConflict{
-		Columns: []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
-		DoUpdates: clause.Assignments(map[string]interface{}{
-			"value": gorm.Expr(`value + ?`, amount),
-			`times`: gorm.Expr(`times + ?`, 1),
-		}),
+		Columns:   []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
+		DoUpdates: clause.Assignments(updates),
 	}).Create(&data).Error
 	if err != nil {
 		return errors.WithMessage(err, m.tableName)
@@ -118,20 +138,38 @@ func (m *client) Summarize(ownerID string, amount decimal.Decimal) error {
 	return nil
 }
 
-func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal) error {
+func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
 	// 写入或者更新
 	slotValue := date
 
 	data := newSummary(m.slot, ownerID, amount, fmt.Sprintf(`%d`, slotValue))
 
+	updates := map[string]interface{}{
+		"value": gorm.Expr(`value + ?`, amount),
+		`times`: gorm.Expr(`times + ?`, 1),
+	}
+
+	for i, extend := range extendValue {
+		key := fmt.Sprintf(`value_%d`, i+1)
+		updates[key] = gorm.Expr(fmt.Sprintf(`%s + ?`, key), extend)
+
+		switch i {
+		case 0:
+			data.Value1 = extend
+		case 1:
+			data.Value2 = extend
+		case 2:
+			data.Value3 = extend
+		case 3:
+			data.Value4 = extend
+		}
+	}
+
 	db := m.db.Session(&gorm.Session{})
 
 	return db.Clauses(clause.OnConflict{
-		Columns: []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
-		DoUpdates: clause.Assignments(map[string]interface{}{
-			"value": gorm.Expr(`value + ?`, amount),
-			`times`: gorm.Expr(`times + ?`, 1),
-		}),
+		Columns:   []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
+		DoUpdates: clause.Assignments(updates),
 	}).Create(&data).Error
 }
 
