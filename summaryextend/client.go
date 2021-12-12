@@ -121,6 +121,20 @@ func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue .
 			data.Value3 = extend
 		case 3:
 			data.Value4 = extend
+		case 4:
+			data.Value5 = extend
+		case 5:
+			data.Value6 = extend
+		case 6:
+			data.Value7 = extend
+		case 7:
+			data.Value8 = extend
+		case 8:
+			data.Value9 = extend
+		case 9:
+			data.Value10 = extend
+		default:
+			return fmt.Errorf(`最多支持10个扩展数据`)
 		}
 	}
 
@@ -160,6 +174,20 @@ func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal
 			data.Value3 = extend
 		case 3:
 			data.Value4 = extend
+		case 4:
+			data.Value5 = extend
+		case 5:
+			data.Value6 = extend
+		case 6:
+			data.Value7 = extend
+		case 7:
+			data.Value8 = extend
+		case 8:
+			data.Value9 = extend
+		case 9:
+			data.Value10 = extend
+		default:
+			return fmt.Errorf(`最多支持10个扩展数据`)
 		}
 	}
 

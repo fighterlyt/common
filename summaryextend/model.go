@@ -17,18 +17,23 @@ const (
 
 // Detail 真实数据
 type Detail struct {
-	ID      int64           `gorm:"column:id;primary_key;column:id;type:bigint(20) unsigned AUTO_INCREMENT;not null;comment:ID" json:"id"`
-	Slot    Slot            `gorm:"column:slot;type:varchar(128);comment:槽位类型" json:"slot"`                                     // 槽位类型
-	OwnerID string          `gorm:"column:ownerID;uniqueIndex:ownerID_slotValue;type:varchar(64);comment:所有者ID" json:"ownerID"` //nolint:lll    // 所有者ID， 如果是个人统计，那就是用户ID， 如果是组，那就是组ID
-	Value   decimal.Decimal `gorm:"column:value;type:decimal(30,8);comment:汇总值" json:"value"`                                   // 汇总值
-	Value1  decimal.Decimal `gorm:"column:value_1;type:decimal(30,8);comment:汇总值1" json:"value_1"`                              // 汇总值1
-	Value2  decimal.Decimal `gorm:"column:value_2;type:decimal(30,8);comment:汇总值2" json:"value_2"`                              // 汇总值2
-	Value3  decimal.Decimal `gorm:"column:value_3;type:decimal(30,8);comment:汇总值3" json:"value_3"`                              // 汇总值3
-	Value4  decimal.Decimal `gorm:"column:value_4;type:decimal(30,8);comment:汇总值4" json:"value_4"`                              // 汇总值4
-
-	SlotValue string `gorm:"column:slotValue;type:varchar(64);uniqueIndex:ownerID_slotValue;comment:汇总时间" json:"slotValue"` // 所属的时间
-	tableName string // 表名
-	Times     int64  `gorm:"column:times;comment:次数" json:"次数"`
+	ID        int64           `gorm:"column:id;primary_key;column:id;type:bigint(20) unsigned AUTO_INCREMENT;not null;comment:ID" json:"id"`
+	Slot      Slot            `gorm:"column:slot;type:varchar(128);comment:槽位类型" json:"slot"`                                        // 槽位类型
+	OwnerID   string          `gorm:"column:ownerID;uniqueIndex:ownerID_slotValue;type:varchar(64);comment:所有者ID" json:"ownerID"`    //nolint:lll    // 所有者ID， 如果是个人统计，那就是用户ID， 如果是组，那就是组ID
+	Value     decimal.Decimal `gorm:"column:value;type:decimal(30,8);comment:汇总值" json:"value"`                                      // 汇总值
+	Value1    decimal.Decimal `gorm:"column:value_1;type:decimal(30,8);comment:汇总值1" json:"value_1"`                                 // 汇总值1
+	Value2    decimal.Decimal `gorm:"column:value_2;type:decimal(30,8);comment:汇总值2" json:"value_2"`                                 // 汇总值2
+	Value3    decimal.Decimal `gorm:"column:value_3;type:decimal(30,8);comment:汇总值3" json:"value_3"`                                 // 汇总值3
+	Value4    decimal.Decimal `gorm:"column:value_4;type:decimal(30,8);comment:汇总值4" json:"value_4"`                                 // 汇总值4
+	Value5    decimal.Decimal `gorm:"column:value_5;type:decimal(30,8);comment:汇总值5" json:"value_5"`                                 // 汇总值5
+	Value6    decimal.Decimal `gorm:"column:value_6;type:decimal(30,8);comment:汇总值6" json:"value_6"`                                 // 汇总值6
+	Value7    decimal.Decimal `gorm:"column:value_7;type:decimal(30,8);comment:汇总值7" json:"value_7"`                                 // 汇总值7
+	Value8    decimal.Decimal `gorm:"column:value_8;type:decimal(30,8);comment:汇总值8" json:"value_8"`                                 // 汇总值8
+	Value9    decimal.Decimal `gorm:"column:value_9;type:decimal(30,8);comment:汇总值9" json:"value_9"`                                 // 汇总值9
+	Value10   decimal.Decimal `gorm:"column:value_10;type:decimal(30,8);comment:汇总值_10" json:"value_10"`                             // 汇总值10
+	SlotValue string          `gorm:"column:slotValue;type:varchar(64);uniqueIndex:ownerID_slotValue;comment:汇总时间" json:"slotValue"` // 所属的时间
+	tableName string          // 表名
+	Times     int64           `gorm:"column:times;comment:次数" json:"次数"`
 }
 
 /*newSummary 新建数据
@@ -78,7 +83,7 @@ func (s Detail) GetValue() decimal.Decimal {
 	return s.Value
 }
 func (s Detail) GetExtendValue() []decimal.Decimal {
-	return []decimal.Decimal{s.Value1, s.Value2, s.Value3, s.Value4}
+	return []decimal.Decimal{s.Value1, s.Value2, s.Value3, s.Value4, s.Value5, s.Value6, s.Value7, s.Value8, s.Value9, s.Value10}
 }
 
 func (s Detail) GetSlotValue() string {
