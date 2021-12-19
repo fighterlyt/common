@@ -16,7 +16,12 @@ var (
 	beijin          *time.Location
 	beijingLocation = `Asia/Shanghai`
 	loadBeiJinLock  = &sync.Mutex{}
+	defaultLocation *time.Location
 )
+
+func SetTimeZone(location *time.Location) {
+	defaultLocation = location
+}
 
 /*NowInBeiJin 北京时间同时设置北京时区
 参数:
@@ -184,7 +189,7 @@ func (t Time) MarshalText() ([]byte, error) {
 		return nil, nil
 	}
 
-	return []byte(time.Unix(int64(t), 0).In(GetBeiJin()).Format(`2006-01-02 15:04:05`)), nil
+	return []byte(time.Unix(int64(t), 0).In(defaultLocation).Format(`2006-01-02 15:04:05`)), nil
 }
 
 /*Value 放入数据库值的序列化方法
@@ -237,6 +242,12 @@ func TimeToBeijingDate(t time.Time) int {
 	return beijingt.Year()*before4Mask + int(beijingt.Month())*after2Mask + beijingt.Day()
 }
 
+func TimeToDate(t time.Time) int {
+	localTime := t.In(defaultLocation)
+
+	return localTime.Year()*before4Mask + int(localTime.Month())*after2Mask + localTime.Day()
+}
+
 const dateStrLen = 8
 
 /*UnmarshalJSON 反序列化方法 支持int类型的日期 时间戳 2006-01-02 15:04:05 类型的字符串
@@ -250,7 +261,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 	s := string(data)
 
 	if len(data) == dateStrLen {
-		_, err := time.ParseInLocation("20060102", s, beijin)
+		_, err := time.ParseInLocation("20060102", s, defaultLocation)
 		if err != nil {
 			return err
 		}
@@ -276,7 +287,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	value, err := time.ParseInLocation(layout[:len(data)], s, beijin)
+	value, err := time.ParseInLocation(layout[:len(data)], s, defaultLocation)
 	if err != nil {
 		return err
 	}
