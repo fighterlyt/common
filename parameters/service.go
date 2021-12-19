@@ -3,9 +3,10 @@ package parameters
 import (
 	"encoding/json"
 	"fmt"
-	"gitlab.com/nova_dubai/common/twofactor"
 	"os"
 	"time"
+
+	"gitlab.com/nova_dubai/common/twofactor"
 
 	"github.com/fighterlyt/log"
 	"github.com/gin-gonic/gin"
@@ -244,7 +245,8 @@ func (s *service) loadConfig() error {
 }
 
 var (
-	dataPath string
+	dataPath      string
+	pageGroupInfo map[string][]string
 )
 
 type ParameterValidate interface {
