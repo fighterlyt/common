@@ -239,6 +239,7 @@ func (m JSONMap) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return []byte("null"), nil
 	}
+
 	t := map[string]string(m)
 
 	return json.Marshal(t)
