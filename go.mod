@@ -18,6 +18,7 @@ require (
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/go-redsync/redsync/v4 v4.4.1
+	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
@@ -31,6 +32,6 @@ require (
 	go.uber.org/multierr v1.7.0
 	go.uber.org/zap v1.19.1
 	gopkg.in/tucnak/telebot.v2 v2.4.0
-	gorm.io/driver/mysql v1.1.2
-	gorm.io/gorm v1.21.15
+	gorm.io/driver/mysql v1.2.1
+	gorm.io/gorm v1.22.4
 )

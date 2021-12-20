@@ -1,12 +1,18 @@
 package helpers
 
 import (
+	"context"
+	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
 
 	"github.com/pkg/errors"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"gorm.io/gorm/schema"
 )
 
 // Scope mysql查询时的限制条件
@@ -150,6 +156,7 @@ func BuildScope(data interface{}, excludes []string) Scope {
 			}
 
 			operator := ``
+
 			switch field.Type().Kind() {
 			case reflect.Int64, timeKind:
 				if field.Int() > 0 {
@@ -166,9 +173,9 @@ func BuildScope(data interface{}, excludes []string) Scope {
 					db = db.Where(compose(name, operator), field)
 				}
 			default:
-
 			}
 		}
+
 		return db
 	}
 }
@@ -177,6 +184,7 @@ func compose(name, operator string) string {
 	if operator == `` {
 		operator = `=`
 	}
+
 	return fmt.Sprintf(`%s %s ?`, name, operator)
 }
 
@@ -184,3 +192,97 @@ var (
 	t        = Now()
 	timeKind = reflect.TypeOf(t).Kind()
 )
+
+// JSONMap defiend JSON data type, need to implements driver.Valuer, sql.Scanner interface
+type JSONMap map[string]string
+
+// Value return json value, implement driver.Valuer interface
+func (m JSONMap) Value() (driver.Value, error) {
+	if m == nil {
+		return nil, nil
+	}
+
+	ba, err := m.MarshalJSON()
+
+	return string(ba), err
+}
+
+// Scan scan value into Jsonb, implements sql.Scanner interface
+func (m *JSONMap) Scan(val interface{}) error {
+	if val == nil {
+		*m = make(JSONMap)
+		return nil
+	}
+
+	var ba []byte
+
+	switch v := val.(type) {
+	case []byte:
+		ba = v
+	case string:
+		ba = []byte(v)
+	default:
+		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", val))
+	}
+
+	t := map[string]string{}
+
+	err := json.Unmarshal(ba, &t)
+
+	*m = t
+
+	return err
+}
+
+// MarshalJSON to output non base64 encoded []byte
+func (m JSONMap) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return []byte("null"), nil
+	}
+	t := map[string]string(m)
+
+	return json.Marshal(t)
+}
+
+// UnmarshalJSON to deserialize []byte
+func (m *JSONMap) UnmarshalJSON(b []byte) error {
+	t := map[string]string{}
+	err := json.Unmarshal(b, &t)
+	*m = t
+
+	return err
+}
+
+// GormDataType gorm common data type
+func (m JSONMap) GormDataType() string {
+	return "jsonmap"
+}
+
+// GormDBDataType gorm db data type
+func (m JSONMap) GormDBDataType(db *gorm.DB, field *schema.Field) string {
+	switch db.Dialector.Name() {
+	case "sqlite":
+		return "JSON"
+	case "mysql":
+		return "JSON"
+	case "postgres":
+		return "JSONB"
+	case "sqlserver":
+		return "NVARCHAR(MAX)"
+	}
+
+	return ""
+}
+
+func (m JSONMap) GormValue(_ context.Context, db *gorm.DB) clause.Expr {
+	data, _ := m.MarshalJSON()
+
+	switch db.Dialector.Name() {
+	case "mysql":
+		if v, ok := db.Dialector.(*mysql.Dialector); ok && !strings.Contains(v.ServerVersion, "MariaDB") {
+			return gorm.Expr("CAST(? AS JSON)", string(data))
+		}
+	}
+
+	return gorm.Expr("?", string(data))
+}
