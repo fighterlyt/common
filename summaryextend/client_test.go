@@ -1,6 +1,7 @@
 package summaryextend
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -20,7 +21,7 @@ func TestDayClient(t *testing.T) {
 }
 
 func TestHistoryClient(t *testing.T) {
-	historyClient, err = NewClient(`historyIncome_extend`, SlotWhole, logger, db)
+	historyClient, err = NewClient(`summary_offline_charge_day`, SlotWhole, logger, db)
 	require.NoError(t, err, `构建Client`)
 }
 
@@ -57,8 +58,16 @@ func BenchmarkClient_Summarize(b *testing.B) {
 func TestClient_Get(t *testing.T) {
 	TestHistoryClient(t)
 	now := time.Now().Unix()
-	records, err := historyClient.GetSummary([]string{`2`}, now, now+1)
+	records, err := historyClient.GetSummary(nil, now, now+1)
 
 	require.NoError(t, err)
 	t.Log(records)
+}
+
+func Test_client_GetSummarySummary(t *testing.T) {
+	TestHistoryClient(t)
+	record, err := historyClient.GetSummarySummary(nil, 0, 0)
+
+	require.NoError(t, err)
+	t.Log(fmt.Sprintf("%+v", record))
 }
