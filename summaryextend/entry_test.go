@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 		panic(`构建日志器` + err.Error())
 	}
 
-	dsn := "root:dubaihell@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:dubaihell@tcp(127.0.0.1:6033)/first?charset=utf8mb4&parseTime=True&loc=Local"
 
 	mysqlLogger := gormlogger.NewLogger(logger.Derive(`mysql`).SetLevel(zapcore.DebugLevel).AddCallerSkip(1), time.Second, nil)
 

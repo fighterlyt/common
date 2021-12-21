@@ -300,3 +300,24 @@ func newErrNotSupportSlot(slot Slot) *ErrNotSupportSlot {
 func (e ErrNotSupportSlot) Error() string {
 	return fmt.Sprintf(`不支持的Slot[%s]`, e.slot)
 }
+
+func (m client) GetSummarySummary(ownerIDs []string, from, to int64) (record Summary, err error) {
+	query := m.db.Session(&gorm.Session{})
+	if len(ownerIDs) > 0 {
+		query = query.Where(`ownerID in ?`, ownerIDs)
+	}
+
+	var (
+		data Detail
+	)
+
+	if query, err = m.buildScopeByRange(from, to, query); err != nil {
+		return nil, errors.Wrap(err, `构建时间查询`)
+	}
+
+	if err = query.Select("sum(value) as value,sum(value_1) as value_1,sum(value_2) as value_2,sum(value_3) as value_3,sum(value_4) as value_4,sum(value_5) as value_5,sum(value_6) as value_6,sum(value_7) as value_7,sum(value_8) as value_8,sum(value_9) as value_9,sum(value_10) as value_10,sum(times) as times").Find(&data).Error; err != nil {
+		return nil, errors.Wrap(err, `数据库操作`)
+	}
+
+	return data, nil
+}
