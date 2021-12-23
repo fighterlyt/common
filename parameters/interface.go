@@ -19,8 +19,7 @@ type Service interface {
 	AddParameters(parameters ...*Parameter) error
 	Modify(keyValue map[string]string, userID int64) error
 	GetHistory(key string, startTime, endTime int64, start, limit int) (allCount int64, histories []History, err error)
-	GetString(key string) (value string, err error)
-	GetDecimal(key string) (value decimal.Decimal, err error)
+	HelperService
 	SetTwoFactorAuth(needTwoFactorKeys []string, auth twofactor.Auth)
 	SetValidate(validate ParameterValidate)
 	model.Module
@@ -37,4 +36,10 @@ type ParameterService interface {
 type HistoryService interface {
 	Save(key, value string, userID int64) error
 	Get(key string, startTime, endTime int64, start, limit int) (count int64, histories []History, err error)
+}
+
+type HelperService interface {
+	GetInts(key, delimiter string) (value []int64, err error)
+	GetString(key string) (value string, err error)
+	GetDecimal(key string) (value decimal.Decimal, err error)
 }
