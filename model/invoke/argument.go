@@ -165,6 +165,8 @@ func (s Sorts) Order() string {
 		if len(to[i]) > 1 {
 			if to[i][:1] == "-" {
 				to[i] = to[i][1:] + " desc"
+			} else {
+				to[i] = to[i] + " asc"
 			}
 		}
 	}
