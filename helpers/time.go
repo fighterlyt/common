@@ -49,6 +49,10 @@ func NowInDefault() time.Time {
 	return time.Now().In(defaultLocation)
 }
 
+func GetDefaultLocation() *time.Location {
+	return defaultLocation
+}
+
 /*GetBeiJin 获取北京时区
 参数:
 返回值:
