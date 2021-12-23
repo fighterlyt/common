@@ -2,6 +2,8 @@ package parameters
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -33,4 +35,26 @@ func (s *service) GetDecimal(key string) (value decimal.Decimal, err error) {
 	}
 
 	return decimal.NewFromString(result)
+}
+
+func (s *service) GetIntArray(key, delimiter string) (value []int64, err error) {
+	var (
+		result string
+		temp   int64
+	)
+
+	if result, err = s.GetString(key); err != nil {
+		return value, err
+	}
+
+	fields := strings.Split(result, delimiter)
+
+	for _, field := range fields {
+		if temp, err = strconv.ParseInt(field, 10, 64); err != nil {
+			return nil, err
+		}
+		value = append(value, temp)
+	}
+
+	return value, nil
 }
