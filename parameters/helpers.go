@@ -37,7 +37,7 @@ func (s *service) GetDecimal(key string) (value decimal.Decimal, err error) {
 	return decimal.NewFromString(result)
 }
 
-func (s *service) GetIntArray(key, delimiter string) (value []int64, err error) {
+func (s *service) GetInts(key, delimiter string) (value []int64, err error) {
 	var (
 		result string
 		temp   int64
