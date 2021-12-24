@@ -3,6 +3,7 @@ package helpers
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,9 +15,7 @@ type ExportRecord interface {
 	GetExportFields() []interface{}
 }
 
-// 专门处理导出为xlsx
-
-func BuildXLSX(ctx *gin.Context, headers map[string]int, headerOrders []string, fileName, title string, records ...ExportRecord) error {
+func BuildXLSFile(writer io.Writer, headers map[string]int, headerOrders []string, title string, records ...ExportRecord) error {
 	for i, record := range records {
 		if len(headers) != len(record.GetExportFields()) {
 			return fmt.Errorf(`第[%d]条记录,字段数量错误`, i+1)
@@ -59,9 +58,19 @@ func BuildXLSX(ctx *gin.Context, headers map[string]int, headerOrders []string, 
 		}
 	}
 
-	var b bytes.Buffer
-	if err := f.Write(&b); err != nil {
+	if err := f.Write(writer); err != nil {
 		return errors.Wrap(err, `写入应答`)
+	}
+
+	return nil
+}
+
+// 专门处理导出为xlsx
+func BuildXLSX(ctx *gin.Context, headers map[string]int, headerOrders []string, fileName, title string, records ...ExportRecord) error {
+	var b bytes.Buffer
+
+	if err := BuildXLSFile(&b, headers, headerOrders, title, records...); err != nil {
+		return err
 	}
 
 	ctx.Header("Content-Type", "application/octet-stream")
