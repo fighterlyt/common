@@ -125,6 +125,11 @@ func GetDate() int {
 	return now.Year()*before4Mask + int(now.Month())*after2Mask + now.Day()
 }
 
+func GetDateInDefault() int {
+	now := NowInDefault()
+	return now.Year()*before4Mask + int(now.Month())*after2Mask + now.Day()
+}
+
 // FormatDateTime 转换时间格式 date格式为yyyymmdd
 func FormatDateTime(date int) time.Time {
 	return time.Date(date/before4Mask, time.Month(date%before4Mask/after2Mask), date%after2Mask, 0, 0, 0, 0, GetBeiJin())
