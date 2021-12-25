@@ -1,6 +1,7 @@
 package options
 
 import (
+	"github.com/youthlin/t"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -50,6 +51,17 @@ func (s service) httpGet(ctx *gin.Context) {
 
 	for _, key := range argument.Keys {
 		result[key] = Get(key)
+	}
+
+	var ts *t.Translations
+	if tr, ok := ctx.Get("$Translations"); ok {
+		if ts, ok = tr.(*t.Translations); ok {
+			for _, item := range result {
+				for i := range item {
+					item[i].Text = ts.T(item[i].Text)
+				}
+			}
+		}
 	}
 
 	invoke.ReturnSuccess(ctx, result)
