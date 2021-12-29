@@ -196,6 +196,34 @@ var (
 // JSONMap defiend JSON data type, need to implements driver.Valuer, sql.Scanner interface
 type JSONMap map[string]string
 
+/*GetWithAlternativeKey 根据key获取值,如果该key对应的值为空且alterKey 不为空字符串(非alterKey的值)，那么返回alterKey的值
+参数:
+*	key       	string	key
+*	alterKey	string	可替换key
+返回值:
+*	string    	string	值
+*/
+func (m JSONMap) GetWithAlternativeKey(key, alterKey string) string {
+	if m.Get(key) == `` && alterKey != `` {
+		return m.Get(alterKey)
+	}
+	return m.Get(key)
+}
+
+/*Get 根据key获取值
+参数:
+*	key       	string	key值
+返回值:
+*	string    	string 值
+*/
+func (m JSONMap) Get(key string) string {
+	return m[key]
+}
+
+func (m JSONMap) Set(key, value string) {
+	m[key] = value
+}
+
 // Value return json value, implement driver.Valuer interface
 func (m JSONMap) Value() (driver.Value, error) {
 	if m == nil {
