@@ -19,6 +19,11 @@ var (
 	defaultLocation *time.Location
 )
 
+/*SetTimeZone 设置时区
+参数:
+*	location	*time.Location	时区
+返回值:
+*/
 func SetTimeZone(location *time.Location) {
 	defaultLocation = location
 }
@@ -45,10 +50,20 @@ func NowInBeiJin() time.Time {
 	return time.Now().In(beijin)
 }
 
+/*NowInDefault 默认时区的当前时间
+参数:
+返回值:
+*	time.Time	time.Time	返回值1
+*/
 func NowInDefault() time.Time {
 	return time.Now().In(defaultLocation)
 }
 
+/*GetDefaultLocation 获取默认时区
+参数:
+返回值:
+*	*time.Location	*time.Location	返回值1
+*/
 func GetDefaultLocation() *time.Location {
 	return defaultLocation
 }
@@ -125,6 +140,11 @@ func GetDate() int {
 	return now.Year()*before4Mask + int(now.Month())*after2Mask + now.Day()
 }
 
+/*GetDateInDefault 获取默认时区的当前天 20060102的格式，4位年2位月2位日
+参数:
+返回值:
+*	int	int	天
+*/
 func GetDateInDefault() int {
 	now := NowInDefault()
 	return now.Year()*before4Mask + int(now.Month())*after2Mask + now.Day()
@@ -171,6 +191,7 @@ func GetDatesByRange(from, to int64) []int {
 	return result
 }
 
+// Time 特别定义的时间
 type Time int64
 
 /*IsZero 是否为0值
@@ -251,8 +272,8 @@ func DataCal(date, add int) int {
 *	int	int      	int类型的Date
 */
 func TimeToBeijingDate(t time.Time) int {
-	beijingt := t.In(beijin)
-	return beijingt.Year()*before4Mask + int(beijingt.Month())*after2Mask + beijingt.Day()
+	timeInBeijing := t.In(beijin)
+	return timeInBeijing.Year()*before4Mask + int(timeInBeijing.Month())*after2Mask + timeInBeijing.Day()
 }
 
 func TimeToDate(t time.Time) int {

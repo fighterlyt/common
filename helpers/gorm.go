@@ -193,7 +193,7 @@ var (
 	timeKind = reflect.TypeOf(t).Kind()
 )
 
-// JSONMap defiend JSON data type, need to implements driver.Valuer, sql.Scanner interface
+// JSONMap 定义的map[string]string,底层使用mysql的json
 type JSONMap map[string]string
 
 /*GetWithAlternativeKey 根据key获取值,如果该key对应的值为空且alterKey 不为空字符串(非alterKey的值)，那么返回alterKey的值
@@ -220,11 +220,17 @@ func (m JSONMap) Get(key string) string {
 	return m[key]
 }
 
+/*Set 设置key/value
+参数:
+*	key  	string	键值
+*	value	string  值
+返回值:
+*/
 func (m JSONMap) Set(key, value string) {
 	m[key] = value
 }
 
-// Value return json value, implement driver.Valuer interface
+// Value 返回了mysql存储的真实类型
 func (m JSONMap) Value() (driver.Value, error) {
 	if m == nil {
 		return nil, nil

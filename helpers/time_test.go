@@ -2,7 +2,9 @@ package helpers
 
 import (
 	"context"
+	"reflect"
 	"testing"
+	"time"
 )
 
 func TestDataCal(t *testing.T) {
@@ -36,3 +38,19 @@ func TestDataCal(t *testing.T) {
 var (
 	bg = context.Background()
 )
+
+func TestBeginningOfDay(t *testing.T) {
+	tests := []struct {
+		name string
+		want time.Time
+	}{
+		{},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := BeginningOfDay(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("BeginningOfDay() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
