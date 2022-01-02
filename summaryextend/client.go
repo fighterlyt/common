@@ -202,7 +202,7 @@ func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal
 func (m client) getSlotValue(userID string) (value string, err error) {
 	switch m.slot {
 	case SlotDay: // 如果是天,那么就是yyyy-mm-dd
-		return fmt.Sprintf(`%d`, helpers.GetDate()), nil
+		return fmt.Sprintf(`%d`, helpers.GetDateInDefault()), nil
 	case SlotWhole:
 		return userID, nil
 	default:
