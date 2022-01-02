@@ -155,14 +155,14 @@ func FormatDateTime(date int) time.Time {
 	return time.Date(date/before4Mask, time.Month(date%before4Mask/after2Mask), date%after2Mask, 0, 0, 0, 0, GetBeiJin())
 }
 
-/*GetDateByTime 获取时间戳在北京时区的int类型日期
+/*GetDateByTime 获取时间戳在默认时区的int类型日期
 参数:
 *	t  	int64	时间戳
 返回值:
 *	int	int  	int类型的日期
 */
 func GetDateByTime(t int64) int {
-	now := time.Unix(t, 0).In(GetBeiJin())
+	now := time.Unix(t, 0).In(defaultLocation)
 
 	return now.Year()*before4Mask + int(now.Month())*after2Mask + now.Day()
 }
