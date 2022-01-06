@@ -321,3 +321,11 @@ func (m JSONMap) GormValue(_ context.Context, db *gorm.DB) clause.Expr {
 
 	return gorm.Expr("?", string(data))
 }
+
+func IsDuplicate(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	return strings.Contains(err.Error(), `Error 1062: Duplicate entry`)
+}
