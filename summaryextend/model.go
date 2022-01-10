@@ -11,6 +11,8 @@ type Slot string
 const (
 	// SlotDay 按天汇总
 	SlotDay Slot = `天`
+	// SlotMonth 按月汇总
+	SlotMonth Slot = `月`
 	// SlotWhole 总汇总
 	SlotWhole Slot = `开天辟地到地老天荒`
 )

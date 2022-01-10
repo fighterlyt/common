@@ -205,6 +205,8 @@ func (m client) getSlotValue(userID string) (value string, err error) {
 		return fmt.Sprintf(`%d`, helpers.GetDateInDefault()), nil
 	case SlotWhole:
 		return userID, nil
+	case SlotMonth:
+		return fmt.Sprintf(`%d`, helpers.GetMonthInDefault()), nil
 	default:
 		return ``, newErrNotSupportSlot(m.slot)
 	}
@@ -281,6 +283,14 @@ func (m client) getSlotValueByRange(from, to int64) (scope helpers.Scope, err er
 
 		return func(db *gorm.DB) *gorm.DB {
 			return db.Where(`slotValue in (?)`, helpers.GetDatesByRange(from, to))
+		}, nil
+	case SlotMonth:
+		if from >= to {
+			return nil, fmt.Errorf(`开始时间[%d]必须小于结束时间[%d]`, from, to)
+		}
+
+		return func(db *gorm.DB) *gorm.DB {
+			return db.Where(`slotValue >= ? and slotValue <= ?`, helpers.GetMonthByTime(from), helpers.GetMonthByTime(to))
 		}, nil
 	case SlotWhole:
 		return nil, nil
