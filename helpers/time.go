@@ -150,6 +150,16 @@ func GetDateInDefault() int {
 	return now.Year()*before4Mask + int(now.Month())*after2Mask + now.Day()
 }
 
+/*GetMonthInDefault 获取默认时区的当前月 200601的格式，4位年2位月
+参数:
+返回值:
+*	int	int	月
+*/
+func GetMonthInDefault() int {
+	now := NowInDefault()
+	return now.Year()*before4Mask + int(now.Month())*after2Mask
+}
+
 // FormatDateTime 转换时间格式 date格式为yyyymmdd
 func FormatDateTime(date int) time.Time {
 	return time.Date(date/before4Mask, time.Month(date%before4Mask/after2Mask), date%after2Mask, 0, 0, 0, 0, GetBeiJin())
@@ -165,6 +175,18 @@ func GetDateByTime(t int64) int {
 	now := time.Unix(t, 0).In(defaultLocation)
 
 	return now.Year()*before4Mask + int(now.Month())*after2Mask + now.Day()
+}
+
+/*GetMonthByTime 获取时间戳在默认时区的int类型日期
+参数:
+*	t  	int64	时间戳
+返回值:
+*	int	int  	int类型的月份
+*/
+func GetMonthByTime(t int64) int {
+	now := time.Unix(t, 0).In(defaultLocation)
+
+	return now.Year()*before4Mask + int(now.Month())*after2Mask
 }
 
 /*GetDatesByRange 通过时间戳获取中间的日期
