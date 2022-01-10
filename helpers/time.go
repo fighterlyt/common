@@ -157,7 +157,7 @@ func GetDateInDefault() int {
 */
 func GetMonthInDefault() int {
 	now := NowInDefault()
-	return now.Year()*before4Mask + int(now.Month())*after2Mask
+	return now.Year()*after2Mask + int(now.Month())
 }
 
 // FormatDateTime 转换时间格式 date格式为yyyymmdd
@@ -186,7 +186,7 @@ func GetDateByTime(t int64) int {
 func GetMonthByTime(t int64) int {
 	now := time.Unix(t, 0).In(defaultLocation)
 
-	return now.Year()*before4Mask + int(now.Month())*after2Mask
+	return now.Year()*after2Mask + int(now.Month())
 }
 
 /*GetDatesByRange 通过时间戳获取中间的日期
