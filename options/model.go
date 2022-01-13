@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/pkg/errors"
 	"gitlab.com/nova_dubai/common/model"
 )
@@ -57,6 +58,7 @@ func Register(items model.OptionItems) error {
 
 	allItems.data[items.Key()] = data
 
+	spew.Dump(`allItems`, allItems)
 	return nil
 }
 
