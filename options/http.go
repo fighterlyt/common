@@ -61,12 +61,13 @@ func (s service) httpGet(ctx *gin.Context) {
 		s.Logger.Warn(`多语言`, zap.Any(`tr`, tr), zap.Reflect(`tr`, tr))
 
 		if ts, ok = tr.(*t.Translations); ok {
-			s.Logger.Warn(`多语言`, zap.Any(`locale`, ts.Locale()), zap.Any(`domains`, ts.Domains()), zap.Any(`domain`, ts.Domain()))
-			for _, item := range result {
+			s.Logger.Warn(`多语言`, zap.Any(`locale`, ts.Locale()), zap.Any(`domains`, ts.GetOrNoop(`default`)))
+			for key, item := range result {
 				for i := range item {
-					item[i].Text = ts.T(item[i].Text)
+					result[key][i].Text = ts.T(result[key][i].Text)
 				}
 			}
+			s.Logger.Warn(`多语言结果`, zap.Any(`结果`, result))
 		}
 	}
 
