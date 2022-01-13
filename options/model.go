@@ -64,5 +64,9 @@ func Get(key string) []item {
 	allItems.RLock()
 	defer allItems.RUnlock()
 
-	return allItems.data[key]
+	items := make([]item, len(allItems.data[key]))
+
+	copy(items, allItems.data[key])
+
+	return items
 }
