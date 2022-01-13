@@ -1,8 +1,10 @@
 package options
 
 import (
-	"github.com/youthlin/t"
 	"strings"
+
+	"github.com/youthlin/t"
+	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -54,7 +56,9 @@ func (s service) httpGet(ctx *gin.Context) {
 	}
 
 	var ts *t.Translations
+
 	if tr, ok := ctx.Get("$Translations"); ok {
+		s.Logger.Warn(`多语言`, zap.Any(`tr`, tr))
 		if ts, ok = tr.(*t.Translations); ok {
 			for _, item := range result {
 				for i := range item {
