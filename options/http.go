@@ -72,6 +72,7 @@ func (s service) httpGet(ctx *gin.Context) {
 				}
 			}
 			s.Logger.Warn(`多语言结果`, zap.Any(`结果`, target))
+			result = target
 		}
 	}
 
