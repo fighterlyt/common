@@ -331,3 +331,34 @@ func (m client) GetSummarySummary(ownerIDs []string, from, to int64) (record Sum
 
 	return data, nil
 }
+
+func (m client) GetSummaryExclude(excludeOwnerID []string, from, to int64, selects ...string) (records []Summary, err error) {
+	query := m.db.Session(&gorm.Session{})
+	if len(excludeOwnerID) > 0 {
+		query = query.Where(`ownerID nin ?`, excludeOwnerID)
+	}
+
+	var (
+		data []*Detail
+	)
+
+	if query, err = m.buildScopeByRange(from, to, query); err != nil {
+		return nil, errors.Wrap(err, `构建时间查询`)
+	}
+
+	for _, item := range selects {
+		query = query.Select(item)
+	}
+
+	if err = query.Find(&data).Error; err != nil {
+		return nil, errors.Wrap(err, `数据库操作`)
+	}
+
+	records = make([]Summary, 0, len(data))
+
+	for i := range data {
+		records = append(records, data[i])
+	}
+
+	return records, nil
+}

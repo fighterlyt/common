@@ -13,6 +13,7 @@ type Client interface {
 	GetSummary(ownerIDs []string, from, to int64) (records []Summary, err error)
 	// GetSummarySummary 获取汇总的汇总
 	GetSummarySummary(ownerIDs []string, from, to int64) (record Summary, err error)
+	GetSummaryExclude(excludeOwnerID []string, from, to int64, selects ...string) (records []Summary, err error)
 }
 
 // Summary 记录抽象
