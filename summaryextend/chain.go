@@ -78,6 +78,6 @@ func (c chainClients) GetSummarySummary(ownerIDs []string, from, to int64) (reco
 	return nil, errors.New(`chain不支持查询`)
 }
 
-func (c chainClients) GetSummaryExclude(_ []string, _, _int64, _ ...string) (records []Summary, err error) {
+func (c chainClients) GetSummaryExclude(_ []string, _, _ int64, _ ...string) (records []Summary, err error) {
 	return nil, errors.New(`chain 不支持查询`)
 }
