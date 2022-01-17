@@ -281,8 +281,16 @@ func (m client) getSlotValueByRange(from, to int64) (scope helpers.Scope, err er
 			return nil, fmt.Errorf(`开始时间[%d]必须小于结束时间[%d]`, from, to)
 		}
 
+		ranges := helpers.GetDatesByRange(from, to)
+
+		result := make([]string, 0, len(ranges))
+
+		for _, item := range ranges {
+			result = append(result, fmt.Sprintf(`%d`, item))
+		}
+
 		return func(db *gorm.DB) *gorm.DB {
-			return db.Where(`slotValue in (?)`, helpers.GetDatesByRange(from, to))
+			return db.Where(`slotValue in (?)`, result)
 		}, nil
 	case SlotMonth:
 		if from >= to {
@@ -290,7 +298,7 @@ func (m client) getSlotValueByRange(from, to int64) (scope helpers.Scope, err er
 		}
 
 		return func(db *gorm.DB) *gorm.DB {
-			return db.Where(`slotValue >= ? and slotValue <= ?`, helpers.GetMonthByTime(from), helpers.GetMonthByTime(to))
+			return db.Where(`slotValue >= ? and slotValue <= ?`, fmt.Sprintf(`%d`, helpers.GetMonthByTime(from)), fmt.Sprintf(`%d`, helpers.GetMonthByTime(to))) //nolint:lll
 		}, nil
 	case SlotWhole:
 		return nil, nil
