@@ -2,15 +2,46 @@ package helpers
 
 import (
 	"context"
+	"io"
+	"reflect"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
+	"github.com/pkg/errors"
+	jaegercfg "github.com/uber/jaeger-client-go/config"
+	"go.uber.org/zap/buffer"
 	"gorm.io/gorm"
 )
 
 const (
-	spanKey SpanKey = `span`
+	spanKey    SpanKey = `span`
+	spanGinKey string  = `span-gin`
 )
+
+func loadTracer(serviceName string) (tracer *Tracer, err error) {
+	cfg := jaegercfg.Configuration{
+		ServiceName: serviceName,
+		Sampler: &jaegercfg.SamplerConfig{
+			Type:  "const",
+			Param: 1,
+		},
+	}
+
+	tracer = &Tracer{}
+
+	if tracer.Tracer, tracer.Closer, err = cfg.NewTracer(); err != nil {
+		return nil, errors.Wrap(err, `初始化tracer`)
+	}
+
+	return tracer, nil
+}
+
+type Tracer struct {
+	Tracer opentracing.Tracer
+	Closer io.Closer
+}
 
 type SpanKey string
 
@@ -132,6 +163,7 @@ func (s *Span) SetTag(key string, value interface{}) {
 	s.span.SetTag(key, value)
 }
 
+// GormTracing gorm 追踪
 type GormTracing struct {
 }
 
@@ -172,4 +204,102 @@ func (g GormTracing) AfterFind(tx *gorm.DB) {
 	span.SetTag(`stmt`, tx.Dialector.Explain(tx.Statement.SQL.String(), tx.Statement.Vars...))
 
 	span.FinishSpan(tx.Error)
+}
+
+func getBody(ctx *gin.Context) string {
+	data := &buffer.Buffer{}
+
+	if ctx.Request.Body != nil {
+		_, _ = io.Copy(data, ctx.Request.Body)
+	}
+
+	body := data.String()
+	displayBody := body
+
+	if len(body) > 4*1024 {
+		displayBody = `大于4K,请查看日志`
+	}
+
+	ctx.Request.Body = io.NopCloser(strings.NewReader(body))
+
+	return displayBody
+}
+
+func Trace(tracer opentracing.Tracer) func(ctx *gin.Context) {
+	return func(ctx *gin.Context) {
+		if tracer != nil {
+			start := time.Now()
+
+			span := tracer.StartSpan(ctx.Request.URL.String(), opentracing.StartTime(start), opentracing.Tags{
+				`token`:      ctx.GetHeader(`token`),
+				`method`:     ctx.Request.Method,
+				`path`:       ctx.Request.URL.Path,
+				`query`:      ctx.Request.URL.RawQuery,
+				`ip`:         ctx.ClientIP(),
+				`user-agent`: ctx.Request.UserAgent(),
+				`req-size`:   ctx.Request.ContentLength,
+			})
+
+			span.SetTag(`body`, getBody(ctx))
+
+			PutSpanInGin(span, ctx)
+			ctx.Next()
+
+			setPostValues(span, ctx)
+
+			span.SetTag(`latency`, time.Since(start).String())
+			span.SetTag(`status`, ctx.Writer.Status())
+			span.SetTag(`size`, ctx.Writer.Size())
+			span.Finish()
+		}
+	}
+}
+
+func setPostValues(span opentracing.Span, ctx *gin.Context) {
+	value := ctx.Value(spanGinKey)
+
+	if m, ok := value.(map[string]interface{}); ok {
+		for k, v := range m {
+			span.SetTag(spanGinKey+`_`+k, v)
+		}
+	} else if value != nil {
+		span.SetTag(`type`, reflect.TypeOf(value).String())
+	}
+}
+
+/*GinTraceSet 将数据写入到span 中，注意value类型必须是字符串、数值和布尔
+参数:
+*	ctx  	*gin.Context	gin环境变量
+*	key  	string          key
+*	value	interface{} 	值,必须是字符串、数值、布尔类型
+返回值:
+*/
+func GinTraceSet(ctx *gin.Context, key string, value interface{}) {
+	spanValue := ctx.Value(spanGinKey)
+	if spanValue == nil {
+		spanValue = make(map[string]interface{})
+	}
+
+	if m, ok := spanValue.(map[string]interface{}); ok {
+		m[key] = value
+		ctx.Set(spanGinKey, m)
+	}
+}
+
+/*WrapGinMiddle 封装gin的中间件，提供了时间信息
+参数:
+*	name                  	string                	中间件名称
+*	fun                   	func(ctx *gin.Context)	中间件方法
+返回值:
+*	func(ctx *gin.Context)	func(ctx *gin.Context)	封装后的中间件
+*/
+func WrapGinMiddle(name string, fun func(ctx *gin.Context)) func(ctx *gin.Context) {
+	return func(ctx *gin.Context) {
+		span := StartChild(GetSpanFromGin(ctx), `gin-`+name)
+
+		fun(ctx)
+		ctx.Next()
+
+		span.FinishSpan(nil)
+	}
 }
