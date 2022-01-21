@@ -99,11 +99,11 @@ func (s *Service) checkWalletBalance(protocol model.Protocol, address, symbol st
 
 // GetPayWalletDetails 查询钱包余额
 func (s Service) GetPayWalletDetails() (result []*model.BalanceDetail, err error) {
-	if s.tronBalanceDetail != nil {
+	if s.tronBalanceDetail.Address != "" {
 		result = append(result, s.tronBalanceDetail)
 	}
 
-	if s.ethBalanceDetail != nil {
+	if s.ethBalanceDetail.Address != "" {
 		result = append(result, s.ethBalanceDetail)
 	}
 
