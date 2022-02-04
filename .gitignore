@@ -24,3 +24,4 @@ keystore/
 *-linux
 data/data
 local.json
+localdb/badger/db
