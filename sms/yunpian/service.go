@@ -284,6 +284,8 @@ func (s *Service) getReport() {
 			if err := s.getNewReport(); err != nil {
 				s.logger.Error(`获取最新状态错误`, zap.String(`错误`, err.Error()))
 			}
+
+			time.Sleep(s.pullStatusInterval)
 		}
 	}()
 }
