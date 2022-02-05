@@ -165,6 +165,11 @@ func FormatDateTime(date int) time.Time {
 	return time.Date(date/before4Mask, time.Month(date%before4Mask/after2Mask), date%after2Mask, 0, 0, 0, 0, GetBeiJin())
 }
 
+// FormatDateTimeInDefault 转换时间格式 date格式为yyyymmdd
+func FormatDateTimeInDefault(date int) time.Time {
+	return time.Date(date/before4Mask, time.Month(date%before4Mask/after2Mask), date%after2Mask, 0, 0, 0, 0, GetDefaultLocation())
+}
+
 /*GetDateByTime 获取时间戳在默认时区的int类型日期
 参数:
 *	t  	int64	时间戳

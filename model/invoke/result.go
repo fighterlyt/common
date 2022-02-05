@@ -65,8 +65,7 @@ type Result struct {
 	Code   StatCode    `json:"code"`
 	Msg    string      `json:"msg"`
 	Detail string      `json:"detail"`
-	Data   interface{} `json:"data"`  // 业务数据
-	Refer  string      `json:"refer"` // 跳转链接
+	Data   interface{} `json:"data"` // 业务数据
 }
 
 func NewSuccessResult(msg string, data interface{}) *Result {
@@ -91,16 +90,6 @@ func NewResult(code StatCode, msg string, data interface{}, detail string) *Resu
 		Msg:    msg,
 		Data:   data,
 		Detail: detail,
-	}
-}
-
-func NewFullResult(code StatCode, msg string, data interface{}, detail, refer string) *Result {
-	return &Result{
-		Code:   code,
-		Msg:    msg,
-		Data:   data,
-		Detail: detail,
-		Refer:  refer,
 	}
 }
 
