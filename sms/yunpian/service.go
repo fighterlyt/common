@@ -78,6 +78,8 @@ func (s Service) DirectSend(_, _ string) error {
 }
 
 func (s Service) TemplateSend(target, content, id string) error {
+	s.logger.Info(`发送短信`, zap.Strings(`目标/内容/id`, []string{target, content, id}))
+
 	target = strings.ReplaceAll(target, `-`, ``)
 
 	if !strings.HasPrefix(target, `+`) {
