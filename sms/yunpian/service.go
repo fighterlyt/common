@@ -96,7 +96,7 @@ func (s Service) TemplateSend(target, content, id string) error {
 
 	exceeded, err := s.send(sendSMSURL, values, result, debug)
 
-	if err == nil || !exceeded {
+	if err != nil && !exceeded {
 		return err
 	}
 
