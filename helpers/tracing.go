@@ -5,6 +5,7 @@ import (
 	"io"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -112,6 +113,11 @@ func GetSpanFromCtx(ctx context.Context) *Span {
 
 type Span struct {
 	span opentracing.Span
+}
+
+func NewSpan(operationName string, tags map[string]interface{}) *Span {
+	span := opentracing.StartSpan(operationName, opentracing.StartTime(time.Now().In(GetDefaultLocation())), opentracing.Tags(tags))
+	return &Span{span: span}
 }
 
 /*StartChild 创建启动并返回一个包含上一个的span的新span
@@ -225,7 +231,12 @@ func getBody(ctx *gin.Context) string {
 	return displayBody
 }
 
+var once sync.Once
+
 func Trace(tracer opentracing.Tracer) func(ctx *gin.Context) {
+	once.Do(func() {
+		opentracing.SetGlobalTracer(tracer)
+	})
 	return func(ctx *gin.Context) {
 		if tracer != nil {
 			start := time.Now()
