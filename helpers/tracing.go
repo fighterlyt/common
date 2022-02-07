@@ -114,7 +114,8 @@ type Span struct {
 	span opentracing.Span
 }
 
-func NewSpan(span opentracing.Span) *Span {
+func NewSpan(operationName string, tags map[string]interface{}) *Span {
+	span := opentracing.StartSpan(operationName, opentracing.StartTime(time.Now().In(GetDefaultLocation())), opentracing.Tags(tags))
 	return &Span{span: span}
 }
 
