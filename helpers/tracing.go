@@ -115,6 +115,7 @@ type Span struct {
 }
 
 func NewSpan(operationName string, tags map[string]interface{}) *Span {
+	// 注意 应用需要先调用 opentracing.SetGlobalTracer()
 	span := opentracing.StartSpan(operationName, opentracing.StartTime(time.Now().In(GetDefaultLocation())), opentracing.Tags(tags))
 	return &Span{span: span}
 }
