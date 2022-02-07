@@ -114,6 +114,10 @@ type Span struct {
 	span opentracing.Span
 }
 
+func NewSpan(span opentracing.Span) *Span {
+	return &Span{span: span}
+}
+
 /*StartChild 创建启动并返回一个包含上一个的span的新span
 参数:
 *	span 	*Span 	原span
