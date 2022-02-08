@@ -2,9 +2,12 @@ package helpers
 
 import (
 	"context"
+	"encoding/json"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestDataCal(t *testing.T) {
@@ -53,4 +56,33 @@ func TestBeginningOfDay(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRange_UnMarshal(t *testing.T) {
+	data := `{
+	"a":{
+		"min":1,
+		"max":2
+	},
+	"b":{
+		"min":3,
+		"max":4
+	}
+	}
+`
+	type temp struct {
+		A Range `json:"a"`
+		B Range `json:"b"`
+	}
+
+	result := &temp{}
+
+	require.NoError(t, json.Unmarshal([]byte(data), result))
+
+	require.EqualValues(t, 1, result.A.Min)
+	require.EqualValues(t, 2, result.A.Max)
+
+	require.EqualValues(t, 3, result.B.Min)
+	require.EqualValues(t, 4, result.B.Max)
+
 }

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 var (
@@ -535,4 +536,24 @@ func EndOfDay(now time.Time) time.Time {
 */
 func DecreaseOneDay(now time.Time) time.Time {
 	return now.AddDate(0, 0, -1)
+}
+
+// Range 时间范围
+type Range struct {
+	Min int64 `json:"min"`
+	Max int64 `json:"max"`
+}
+
+func (r Range) Scope(field string) Scope {
+	return func(db *gorm.DB) *gorm.DB {
+		if r.Min > 0 {
+			db = db.Where(fmt.Sprintf(`%s >= ?`, field), r.Min)
+		}
+
+		if r.Max > 0 {
+			db = db.Where(fmt.Sprintf(`%s <= ?`, field), r.Max)
+		}
+
+		return db
+	}
 }
