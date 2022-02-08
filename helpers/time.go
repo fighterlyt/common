@@ -557,3 +557,19 @@ func (r Range) Scope(field string) Scope {
 		return db
 	}
 }
+
+func (r Range) Validate() error {
+	if r.Min < 0 {
+		return errors.New(`开始时间必须大于等于0`)
+	}
+
+	if r.Max < 0 {
+		return errors.New(`结束时间必须大于等于0`)
+	}
+
+	if r.Max != 0 && r.Min != 0 && r.Max < r.Min {
+		return fmt.Errorf(`开始时间[%d]必须小于等于结束时间[%d]`, r.Min, r.Max)
+	}
+
+	return nil
+}
