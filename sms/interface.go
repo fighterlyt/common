@@ -38,6 +38,8 @@ type RecordAccess interface {
 type SendStatus int
 
 const (
+	// SendAll 所有
+	SendAll SendStatus = 0
 	// SendSuccess 发送成功
 	SendSuccess SendStatus = 1
 	// SendFail 发送失败
@@ -45,3 +47,22 @@ const (
 	// SendUnknown 发送结果未知，尚未知晓
 	SendUnknown SendStatus = 3
 )
+
+func (s SendStatus) Value() int {
+	return int(s)
+}
+
+func (s SendStatus) Text() string {
+	switch s {
+	case SendAll:
+		return "所有"
+	case SendSuccess:
+		return `发送成功`
+	case SendFail:
+		return `发送失败`
+	case SendUnknown:
+		return `发送结果未知`
+	default:
+		return "未知状态"
+	}
+}
