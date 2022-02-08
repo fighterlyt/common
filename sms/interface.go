@@ -3,6 +3,7 @@ package sms
 import (
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
+	"gitlab.com/nova_dubai/common/model"
 )
 
 type Service interface {
@@ -65,4 +66,8 @@ func (s SendStatus) Text() string {
 	default:
 		return "未知状态"
 	}
+}
+
+func (s SendStatus) MarshalJSON() ([]byte, error) {
+	return model.MarshalJSON(s)
 }
