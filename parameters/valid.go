@@ -29,7 +29,7 @@ var (
 
 		return err == nil
 	}
-	keyValid      = regex(delimiter(`\w+`, FieldDelimiter, 2))
+	keyValid      = Regex(Delimiter(`\w+`, FieldDelimiter, 2))
 	isTronAddress = func(i interface{}, o interface{}) bool {
 		data, ok := i.(string)
 		if !ok {
@@ -37,8 +37,8 @@ var (
 		}
 		return helpers.ValidateAddress(data)
 	}
-	usdtPositiveValue = regex(regexp.MustCompile(`^\d+(\.\d{1,6})?$`))
-	usdtValue         = regex(regexp.MustCompile(`^-?\d+(\.\d{1,6})?$`))
+	usdtPositiveValue = Regex(regexp.MustCompile(`^\d+(\.\d{1,6})?$`))
+	usdtValue         = Regex(regexp.MustCompile(`^-?\d+(\.\d{1,6})?$`))
 	tronAddresses     = func(i interface{}, o interface{}) bool {
 		data, ok := i.(string)
 		if !ok {
@@ -151,13 +151,13 @@ var (
 	}
 )
 
-/*regex 使用正则表达式验证
+/*Regex 使用正则表达式验证
 参数:
 *	regexExpr       *regexp.Regexp                              正则表达式
 返回值:
 *	validator       func(i interface{}, o interface{}) bool		govalidator的自定义验证器
 */
-func regex(regexExpr *regexp.Regexp) func(i interface{}, o interface{}) bool {
+func Regex(regexExpr *regexp.Regexp) func(i interface{}, o interface{}) bool {
 	return func(i interface{}, _ interface{}) bool {
 		data, ok := i.(string)
 		if !ok {
@@ -168,15 +168,15 @@ func regex(regexExpr *regexp.Regexp) func(i interface{}, o interface{}) bool {
 	}
 }
 
-/*delimiter 生成一个由delimiter分隔，每个部分内容为content,共有count个content
+/*Delimiter 生成一个由delimiter分隔，每个部分内容为content,共有count个content
 参数:
 *	content       	string        	内容
-*	delimiter     	string        	分隔符
+*	Delimiter     	string        	分隔符
 *	count         	int           	内容数量
 返回值:
 *	*regexp.Regexp	*regexp.Regexp	正则
 */
-func delimiter(content, delimiter string, count int) *regexp.Regexp {
+func Delimiter(content, delimiter string, count int) *regexp.Regexp {
 	result := content
 
 	for i := 0; i < count-1; i++ {
