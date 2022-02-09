@@ -70,22 +70,47 @@ func (a ListArgument) MarshalBinary() (data []byte, err error) {
 }
 
 func (a ListArgument) Scope(db *gorm.DB) *gorm.DB {
-	db = db.Offset(a.Start)
-	if a.Limit <= 0 {
-		db = db.Limit(math.MaxInt32)
-	} else {
-		db = db.Limit(a.Limit)
-	}
-	orderStr := a.Sorts.Order()
-	if orderStr != "" {
-		db = db.Order(orderStr)
-	} else if a.DefaultSort != "" {
-		db = db.Order(a.DefaultSort)
+	return a.ScopeGeneric(db, ScopeSpec{
+		Offset: true,
+		Limit:  true,
+		Order:  true,
+		Query:  true,
+	})
+}
+
+type ScopeSpec struct {
+	Offset, Limit, Order, Query bool
+}
+
+func (a ListArgument) ScopeGeneric(db *gorm.DB, spec ScopeSpec) *gorm.DB {
+	if spec.Offset {
+		db = db.Offset(a.Start)
 	}
 
-	if a.Query != nil {
-		a.Query.Scope(db)
+	if spec.Limit {
+		if a.Limit <= 0 {
+			db = db.Limit(math.MaxInt32)
+		} else {
+			db = db.Limit(a.Limit)
+		}
 	}
+
+	if spec.Order {
+		orderStr := a.Sorts.Order()
+
+		if orderStr != "" {
+			db = db.Order(orderStr)
+		} else if a.DefaultSort != "" {
+			db = db.Order(a.DefaultSort)
+		}
+	}
+
+	if spec.Query {
+		if a.Query != nil {
+			a.Query.Scope(db)
+		}
+	}
+
 	return db
 }
 
