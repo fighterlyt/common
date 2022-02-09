@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/shopspring/decimal"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -328,4 +329,9 @@ func IsDuplicate(err error) bool {
 	}
 
 	return strings.Contains(err.Error(), `Error 1062: Duplicate entry`)
+}
+
+// Amount 专门用于sum(*)的结果
+type Amount struct {
+	Data decimal.Decimal `gorm:"column:data"`
 }
