@@ -25,8 +25,8 @@ func loadTracer(serviceName string) (tracer *Tracer, err error) {
 	cfg := jaegercfg.Configuration{
 		ServiceName: serviceName,
 		Sampler: &jaegercfg.SamplerConfig{
-			Type:  "const",
-			Param: 1,
+			Type:  "ratelimiting",
+			Param: 100,
 		},
 	}
 
