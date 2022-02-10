@@ -25,8 +25,8 @@ func loadTracer(serviceName string) (tracer *Tracer, err error) {
 	cfg := jaegercfg.Configuration{
 		ServiceName: serviceName,
 		Sampler: &jaegercfg.SamplerConfig{
-			Type:  "ratelimiting",
-			Param: 100,
+			Type:  "constant",
+			Param: 1,
 		},
 	}
 
@@ -266,12 +266,17 @@ func Trace(tracer opentracing.Tracer, ignorePrefix ...string) func(ctx *gin.Cont
 			PutSpanInGin(span, ctx)
 			ctx.Next()
 
-			setPostValues(span, ctx)
+			duration := time.Since(start)
 
-			span.SetTag(`latency`, time.Since(start).String())
-			span.SetTag(`status`, ctx.Writer.Status())
-			span.SetTag(`size`, ctx.Writer.Size())
-			span.Finish()
+			if duration.Milliseconds() >= 100 {
+				setPostValues(span, ctx)
+
+				span.SetTag(`latency`, duration.String())
+				span.SetTag(`status`, ctx.Writer.Status())
+				span.SetTag(`size`, ctx.Writer.Size())
+				span.Finish()
+			}
+
 		}
 	}
 }
