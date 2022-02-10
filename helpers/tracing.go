@@ -233,15 +233,25 @@ func getBody(ctx *gin.Context) string {
 
 var once sync.Once
 
-func Trace(tracer opentracing.Tracer) func(ctx *gin.Context) {
+func Trace(tracer opentracing.Tracer, ignorePrefix ...string) func(ctx *gin.Context) {
 	once.Do(func() {
 		opentracing.SetGlobalTracer(tracer)
 	})
+
 	return func(ctx *gin.Context) {
 		if tracer != nil {
+			visit := ctx.Request.URL.String()
+
+			for _, prefix := range ignorePrefix {
+				if strings.HasPrefix(visit, prefix) {
+					visit = prefix
+					break
+				}
+			}
+
 			start := time.Now()
 
-			span := tracer.StartSpan(ctx.Request.URL.String(), opentracing.StartTime(start), opentracing.Tags{
+			span := tracer.StartSpan(visit, opentracing.StartTime(start), opentracing.Tags{
 				`token`:      ctx.GetHeader(`token`),
 				`method`:     ctx.Request.Method,
 				`path`:       ctx.Request.URL.Path,
