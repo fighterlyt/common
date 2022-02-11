@@ -10,6 +10,9 @@ type Counter interface {
 	Clear(bit int64)
 	// ClearIf  满足条件清理
 	ClearIf(bit int64, value uint64)
+	// IsSet 是否已经设置，清理过的不计入数据
+	IsSet(bits ...int64) map[int64]bool
+	IsSetWithCount(bits ...int64) (setCount int64, unsetBits []int64)
 	// Count 统计所有非默认值，真实写入的数量
 	Count() int64
 	// ClearAll 无条件清理全部
@@ -65,6 +68,44 @@ func (c *counter) Set(bit int64, value uint64) {
 	if !exist || old == placeHolder {
 		c.count++
 	}
+}
+
+/*IsSet 是否已经设置，清理过的不计入这个数据内
+参数:
+*	bit 	int64	位数
+返回值:
+*	bool	bool 	是否已经设置
+*/
+func (c *counter) IsSet(bits ...int64) map[int64]bool {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+
+	result := make(map[int64]bool, len(bits))
+
+	for _, bit := range bits {
+		old, exist := c.data[bit]
+		result[bit] = exist && old != placeHolder // 存在，且值不是默认值
+	}
+
+	return result
+}
+
+func (c *counter) IsSetWithCount(bits ...int64) (setCount int64, unsetBits []int64) {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+
+	for _, bit := range bits {
+		old, exist := c.data[bit]
+
+		if exist && old != placeHolder { // 存在，且值不是默认值
+			setCount++
+			continue
+		}
+
+		unsetBits = append(unsetBits, bit)
+	}
+
+	return setCount, unsetBits
 }
 
 /*Clear 清理单个
