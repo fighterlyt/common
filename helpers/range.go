@@ -2,19 +2,19 @@ package helpers
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
 type DecimalRangeArgument struct {
-	Min decimal.Decimal `json:"min"`
-	Max decimal.Decimal `json:"max"`
+	Min   decimal.Decimal `json:"min"`
+	Max   decimal.Decimal `json:"max"`
+	Filed string          `json:"-"` // 属性名称,用于返回错误信息
 }
 
 func (d DecimalRangeArgument) Validate() error {
 	if d.Min.GreaterThan(decimal.Zero) && d.Max.GreaterThan(decimal.Zero) && d.Min.GreaterThan(d.Max) {
-		return errors.New("开始时间必须早于结束时间")
+		return fmt.Errorf("%s金额上限不能低于金额下限", d.Filed)
 	}
 
 	return nil
