@@ -58,3 +58,15 @@ func (s *service) GetInts(key, delimiter string) (value []int64, err error) {
 
 	return value, nil
 }
+
+func (s *service) GetInt(key string) (value int64, err error) {
+	var (
+		result string
+	)
+
+	if result, err = s.GetString(key); err != nil {
+		return value, err
+	}
+
+	return strconv.ParseInt(result, 10, 64)
+}

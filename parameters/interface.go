@@ -42,4 +42,5 @@ type HelperService interface {
 	GetInts(key, delimiter string) (value []int64, err error)
 	GetString(key string) (value string, err error)
 	GetDecimal(key string) (value decimal.Decimal, err error)
+	GetInt(key string) (value int64, err error)
 }
