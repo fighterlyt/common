@@ -14,7 +14,7 @@ type DecimalRangeArgument struct {
 
 func (d DecimalRangeArgument) Validate() error {
 	if d.Min.GreaterThan(decimal.Zero) && d.Max.GreaterThan(decimal.Zero) && d.Min.GreaterThan(d.Max) {
-		return errors.New("开始时间必须早于结束时间")
+		return errors.New("金额上限不能低于金额下限")
 	}
 
 	return nil
