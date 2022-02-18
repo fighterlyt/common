@@ -23,7 +23,10 @@ func NewGaugeVec(name, help string, labelNames []string, logger log.Logger) (*Ga
 		logger:     logger,
 		name:       name,
 		labelNames: labelNames,
-		gaugeVec:   promauto.NewGaugeVec(prometheus.GaugeOpts{Name: name, Help: help}, labelNames),
+		gaugeVec: promauto.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: argument.Namespace,
+			Name:      name,
+			Help:      help}, labelNames),
 	}
 
 	gaugeVecValues, err := loadMetricsVec(generateRedisKey(name))

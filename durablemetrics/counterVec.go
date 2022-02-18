@@ -23,7 +23,10 @@ func NewCounterVec(name, help string, labelNames []string, logger log.Logger) (*
 		logger:     logger,
 		name:       name,
 		labelNames: labelNames,
-		counterVec: promauto.NewCounterVec(prometheus.CounterOpts{Name: name, Help: help}, labelNames),
+		counterVec: promauto.NewCounterVec(prometheus.CounterOpts{
+			Namespace: argument.Namespace,
+			Name:      name, Help: help,
+		}, labelNames),
 	}
 
 	counterVecValues, err := loadMetricsVec(generateRedisKey(name))

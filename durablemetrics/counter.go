@@ -20,7 +20,9 @@ type Counter struct {
 func NewCounter(name, help string, logger log.Logger) (*Counter, error) {
 	counter := &Counter{
 		Counter: promauto.NewCounter(prometheus.CounterOpts{
-			Name: name, Help: help,
+			Namespace: argument.Namespace,
+			Name:      name,
+			Help:      help,
 		}),
 		name:   name,
 		logger: logger,

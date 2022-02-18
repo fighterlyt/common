@@ -18,8 +18,9 @@ type Gauge struct {
 
 func NewGauge(name, help string, logger log.Logger) (*Gauge, error) {
 	gauge := &Gauge{Gauge: promauto.NewGauge(prometheus.GaugeOpts{
-		Name: name,
-		Help: help,
+		Name:      name,
+		Help:      help,
+		Namespace: argument.Namespace,
 	}), name: name, logger: logger}
 
 	value, err := getValueFromRedis(name)
