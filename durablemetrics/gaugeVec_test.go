@@ -10,6 +10,7 @@ func TestGaugeVec_WithLabelValuesAdd(t *testing.T) {
 		f   float64
 		lvs []string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -22,6 +23,7 @@ func TestGaugeVec_WithLabelValuesAdd(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gaugeVec.WithLabelValuesAdd(tt.args.f, tt.args.lvs...)

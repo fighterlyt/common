@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 	})
 
 	helpers.EnsureGo(logger, func() {
-		engine.Run(":1235")
+		_ = engine.Run(":1235")
 	})
 
 	counter, err = NewCounter("test_cunter", "test_help", logger)
