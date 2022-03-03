@@ -247,6 +247,30 @@ func (m client) GetSummary(ownerIDs []string, from, to int64) (records []Summary
 	return records, nil
 }
 
+func (m client) GetSummaryByLike(like string, from, to int64) (records []Summary, err error) {
+	query := m.db.Session(&gorm.Session{}).Where(`ownerID like ?`, "%"+like+"%")
+
+	var (
+		data []*Detail
+	)
+
+	if query, err = m.buildScopeByRange(from, to, query); err != nil {
+		return nil, errors.Wrap(err, `构建时间查询`)
+	}
+
+	if err = query.Find(&data).Error; err != nil {
+		return nil, errors.Wrap(err, `数据库操作`)
+	}
+
+	records = make([]Summary, 0, len(data))
+
+	for i := range data {
+		records = append(records, data[i])
+	}
+
+	return records, nil
+}
+
 func (m client) buildScopeByRange(from, to int64, db *gorm.DB) (query *gorm.DB, err error) {
 	var (
 		scope helpers.Scope

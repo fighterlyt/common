@@ -11,6 +11,8 @@ type Client interface {
 	SummarizeDay(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
 	Key() string
 	GetSummary(ownerIDs []string, from, to int64) (records []Summary, err error)
+	GetSummaryByLike(like string, from, to int64) (records []Summary, err error)
+
 	// GetSummarySummary 获取汇总的汇总
 	GetSummarySummary(ownerIDs []string, from, to int64) (record Summary, err error)
 	GetSummaryExclude(excludeOwnerID []string, from, to int64, selects ...string) (records []Summary, err error)

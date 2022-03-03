@@ -73,6 +73,9 @@ func (c chainClients) Key() string {
 func (c chainClients) GetSummary(_ []string, _, _ int64) (records []Summary, err error) {
 	return nil, errors.New(`chain不支持查询`)
 }
+func (c chainClients) GetSummaryByLike(_ string, _, _ int64) (records []Summary, err error) {
+	return nil, errors.New(`chain不支持查询`)
+}
 
 func (c chainClients) GetSummarySummary(ownerIDs []string, from, to int64) (record Summary, err error) {
 	return nil, errors.New(`chain不支持查询`)
