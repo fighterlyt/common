@@ -82,6 +82,10 @@ func NewClient(tableName string, slot Slot, logger log.Logger, db *gorm.DB) (res
 	}, nil
 }
 
+func (m *client) SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	return m.summarize(ownerID, amount, false, extendValue...)
+}
+
 /*Summarize 汇总
 参数:
 *	ownerID	string          所有者
@@ -90,6 +94,10 @@ func NewClient(tableName string, slot Slot, logger log.Logger, db *gorm.DB) (res
 *	error  	error          	错误
 */
 func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	return m.summarize(ownerID, amount, true, extendValue...)
+}
+
+func (m *client) summarize(ownerID string, amount decimal.Decimal, addTimes bool, extendValue ...decimal.Decimal) error {
 	var (
 		slotValue string
 		err       error
@@ -105,7 +113,10 @@ func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue .
 
 	updates := map[string]interface{}{
 		"value": gorm.Expr(`value + ?`, amount),
-		`times`: gorm.Expr(`times + ?`, 1),
+	}
+
+	if addTimes {
+		updates["times"] = gorm.Expr(`times + ?`, 1)
 	}
 
 	for i, extend := range extendValue {

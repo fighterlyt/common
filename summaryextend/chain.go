@@ -54,6 +54,19 @@ func (c chainClients) Summarize(ownerID string, amount decimal.Decimal, extend .
 
 	return err
 }
+func (c chainClients) SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extend ...decimal.Decimal) error {
+	var (
+		err, singleErr error
+	)
+
+	for _, client := range c {
+		if singleErr = client.SummarizeNotAddTimes(ownerID, amount); singleErr != nil {
+			err = multierr.Append(err, errors.Wrap(singleErr, client.Key()))
+		}
+	}
+
+	return err
+}
 
 func (c chainClients) SummarizeDay(_ int64, _ string, _ decimal.Decimal, _ ...decimal.Decimal) error {
 	return nil
