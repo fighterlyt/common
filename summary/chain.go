@@ -55,7 +55,7 @@ func (c chainClients) Summarize(ownerID int64, amount decimal.Decimal) error {
 	return err
 }
 
-func (c chainClients) SummarizeDay(_, _ int64, _ decimal.Decimal) error {
+func (c chainClients) SummarizeDay(date int64, ownerID string, amount decimal.Decimal) error {
 	return nil
 }
 func (c chainClients) Key() string {
@@ -70,6 +70,6 @@ func (c chainClients) Key() string {
 	return build.String()
 }
 
-func (c chainClients) GetSummary(_ []int64, _, _ int64) (records []Summary, err error) {
+func (c chainClients) GetSummary(ownerIDs []string, from, to int64) (records []Summary, err error) {
 	return nil, errors.New(`chain不支持查询`)
 }
