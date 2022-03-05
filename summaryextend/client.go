@@ -83,7 +83,7 @@ func NewClient(tableName string, slot Slot, logger log.Logger, db *gorm.DB) (res
 }
 
 func (m *client) SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
-	return m.summarize(ownerID, amount, false, extendValue...)
+	return m.summarize(ownerID, amount, 0, extendValue...)
 }
 
 /*Summarize 汇总
@@ -94,10 +94,19 @@ func (m *client) SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, ex
 *	error  	error          	错误
 */
 func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
-	return m.summarize(ownerID, amount, true, extendValue...)
+	return m.summarize(ownerID, amount, 1, extendValue...)
 }
 
-func (m *client) summarize(ownerID string, amount decimal.Decimal, addTimes bool, extendValue ...decimal.Decimal) error {
+func (m *client) RevertSummarize(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	var extendValue2 []decimal.Decimal
+	for _, d := range extendValue {
+		extendValue2 = append(extendValue2, d.Neg())
+	}
+
+	return m.summarize(ownerID, amount.Neg(), -1, extendValue2...)
+}
+
+func (m *client) summarize(ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) error {
 	var (
 		slotValue string
 		err       error
@@ -115,8 +124,8 @@ func (m *client) summarize(ownerID string, amount decimal.Decimal, addTimes bool
 		"value": gorm.Expr(`value + ?`, amount),
 	}
 
-	if addTimes {
-		updates["times"] = gorm.Expr(`times + ?`, 1)
+	if times != 0 {
+		updates["times"] = gorm.Expr(`times + ?`, times)
 	}
 
 	for i, extend := range extendValue {
