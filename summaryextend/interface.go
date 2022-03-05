@@ -8,9 +8,9 @@ import (
 type Client interface {
 	Model() Summary
 	Summarize(ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
-	RevertSummarize(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error
-	SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extend ...decimal.Decimal) error
 	SummarizeDay(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
+	RevertSummarizeDay(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
+
 	Key() string
 	GetSummary(ownerIDs []string, from, to int64) (records []Summary, err error)
 	GetSummaryByLike(like string, from, to int64) (records []Summary, err error)

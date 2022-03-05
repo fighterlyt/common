@@ -82,10 +82,6 @@ func NewClient(tableName string, slot Slot, logger log.Logger, db *gorm.DB) (res
 	}, nil
 }
 
-func (m *client) SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
-	return m.summarize(ownerID, amount, 0, extendValue...)
-}
-
 /*Summarize 汇总
 参数:
 *	ownerID	string          所有者
@@ -170,7 +166,16 @@ func (m *client) summarize(ownerID string, amount decimal.Decimal, times int, ex
 	return nil
 }
 
-func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+func (m *client) RevertSummarizeDay(date int64, ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	var extendValue2 []decimal.Decimal
+	for _, d := range extendValue {
+		extendValue2 = append(extendValue2, d.Neg())
+	}
+
+	return m.summarizeDay(date, ownerID, amount.Neg(), -1, extendValue2...)
+}
+
+func (m *client) summarizeDay(date int64, ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) error {
 	// 写入或者更新
 	slotValue := date
 
@@ -178,7 +183,10 @@ func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal
 
 	updates := map[string]interface{}{
 		"value": gorm.Expr(`value + ?`, amount),
-		`times`: gorm.Expr(`times + ?`, 1),
+	}
+
+	if times != 0 {
+		updates["times"] = gorm.Expr(`times + ?`, times)
 	}
 
 	for i, extend := range extendValue {
@@ -217,6 +225,10 @@ func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal
 		Columns:   []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
 		DoUpdates: clause.Assignments(updates),
 	}).Create(&data).Error
+}
+
+func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	return m.summarizeDay(date, ownerID, amount, 1, extendValue...)
 }
 
 func (m client) getSlotValue(userID string) (value string, err error) {
