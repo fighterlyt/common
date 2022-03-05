@@ -37,6 +37,20 @@ func Chain(clients ...Client) (client Client, err error) {
 
 type chainClients []Client
 
+func (c chainClients) RevertSummarize(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	var (
+		err, singleErr error
+	)
+
+	for _, client := range c {
+		if singleErr = client.Summarize(ownerID, amount, extendValue...); singleErr != nil {
+			err = multierr.Append(err, errors.Wrap(singleErr, client.Key()))
+		}
+	}
+
+	return err
+}
+
 func (c chainClients) Model() Summary {
 	return nil
 }
@@ -47,7 +61,7 @@ func (c chainClients) Summarize(ownerID string, amount decimal.Decimal, extend .
 	)
 
 	for _, client := range c {
-		if singleErr = client.Summarize(ownerID, amount); singleErr != nil {
+		if singleErr = client.Summarize(ownerID, amount, extend...); singleErr != nil {
 			err = multierr.Append(err, errors.Wrap(singleErr, client.Key()))
 		}
 	}
@@ -60,7 +74,7 @@ func (c chainClients) SummarizeNotAddTimes(ownerID string, amount decimal.Decima
 	)
 
 	for _, client := range c {
-		if singleErr = client.SummarizeNotAddTimes(ownerID, amount); singleErr != nil {
+		if singleErr = client.SummarizeNotAddTimes(ownerID, amount, extend...); singleErr != nil {
 			err = multierr.Append(err, errors.Wrap(singleErr, client.Key()))
 		}
 	}
