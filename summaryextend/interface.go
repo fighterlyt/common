@@ -8,6 +8,7 @@ import (
 type Client interface {
 	Model() Summary
 	Summarize(ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
+	SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extend ...decimal.Decimal) error
 	SummarizeDay(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
 	RevertSummarizeDay(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
 

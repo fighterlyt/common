@@ -93,6 +93,10 @@ func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue .
 	return m.summarize(ownerID, amount, 1, extendValue...)
 }
 
+func (m *client) SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	return m.summarize(ownerID, amount, 0, extendValue...)
+}
+
 func (m *client) RevertSummarize(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
 	var extendValue2 []decimal.Decimal
 	for _, d := range extendValue {
