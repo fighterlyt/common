@@ -38,6 +38,10 @@ type Detail struct {
 	Times     int64           `gorm:"column:times;comment:次数" json:"次数"`
 }
 
+func (s Detail) SetValue(value decimal.Decimal) {
+	s.Value = value
+}
+
 /*newSummary 新建数据
 参数:
 *	slot     	Slot           	slot种类
