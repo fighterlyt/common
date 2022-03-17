@@ -38,7 +38,7 @@ type Detail struct {
 	Times     int64           `gorm:"column:times;comment:次数" json:"次数"`
 }
 
-func (s Detail) SetValue(value decimal.Decimal) {
+func (s *Detail) SetValue(value decimal.Decimal) {
 	s.Value = value
 }
 
