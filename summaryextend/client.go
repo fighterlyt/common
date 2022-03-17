@@ -253,7 +253,7 @@ func (m client) Key() string {
 }
 
 func (m client) Model() Summary {
-	return m.model
+	return &m.model
 }
 
 func (m client) GetSummary(ownerIDs []string, from, to int64) (records []Summary, err error) {
@@ -397,7 +397,7 @@ func (m client) GetSummarySummary(ownerIDs []string, from, to int64) (record Sum
 		return nil, errors.Wrap(err, `数据库操作`)
 	}
 
-	return data, nil
+	return &data, nil
 }
 
 func (m client) GetSummaryExclude(excludeOwnerID []string, from, to int64, selects ...string) (records []Summary, err error) {
