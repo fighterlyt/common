@@ -18,9 +18,7 @@ var (
 )
 
 func CtxError(ctx *gin.Context, err error) {
-	userID, _ := GetUserID(ctx)
-
-	_ = ctx.Error(errors.Wrapf(err, "userID:%d,url:%s", userID, ctx.Request.URL.String()))
+	_ = ctx.Error(errors.Wrapf(err, "url:%s", ctx.Request.URL.String()))
 }
 
 // GetUserID 从session登录的用户信息
