@@ -38,11 +38,11 @@ func UnmarshalJSON(data []byte) (value int, err error) {
 
 	var value64 int64
 	if err = json.Unmarshal(data, item); err != nil {
-
 		if value64, err = strconv.ParseInt(string(data), 10, 64); err == nil {
 			value = int(value64)
 			return value, nil
 		}
+
 		return 0, err
 	}
 
