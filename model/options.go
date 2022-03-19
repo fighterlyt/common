@@ -30,6 +30,16 @@ func MarshalJSON(item OptionItem) ([]byte, error) {
 	})
 }
 
+func UnmarshalJSON(data []byte) (value int, err error) {
+	item := &temp{}
+
+	if err = json.Unmarshal(data, item); err != nil {
+		return 0, err
+	}
+
+	return item.Value, nil
+}
+
 type temp struct {
 	Value int    `json:"value"`
 	Text  string `json:"text"`
