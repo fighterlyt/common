@@ -1,38 +1,31 @@
-package options
+package header
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"strings"
 	"sync"
-
-	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/model"
 )
-
-type item struct {
-	Value int    `json:"value"`
-	Text  string `json:"text"`
-}
 
 type AllItems struct {
 	*sync.RWMutex
-	data map[string][]item
+	data map[string][]Resp
 }
 
 var (
 	allItems = &AllItems{
 		RWMutex: &sync.RWMutex{},
-		data:    make(map[string][]item, 10),
+		data:    make(map[string][]Resp, 10),
 	}
 )
 
-func Register(items model.OptionItems) error {
+func Register(items Items) error {
 	if items == nil {
 		return errors.New(`参数不能为nil`)
 	}
 
 	if len(items.Items()) == 0 {
-		return errors.New(`OptionItems() 不能返回空`)
+		return errors.New(`Items() 不能返回空`)
 	}
 
 	if strings.TrimSpace(items.Key()) == `` {
@@ -46,13 +39,10 @@ func Register(items model.OptionItems) error {
 		return fmt.Errorf(`%s 已经注册`, items.Key())
 	}
 
-	data := make([]item, 0, len(items.Items()))
+	data := make([]Resp, 0, len(items.Items()))
 
 	for _, elem := range items.Items() {
-		data = append(data, item{
-			Value: elem.Value(),
-			Text:  elem.Text(),
-		})
+		data = append(data, elem)
 	}
 
 	allItems.data[items.Key()] = data
@@ -60,11 +50,11 @@ func Register(items model.OptionItems) error {
 	return nil
 }
 
-func Get(key string) []item {
+func Get(key string) []Resp {
 	allItems.RLock()
 	defer allItems.RUnlock()
 
-	items := make([]item, len(allItems.data[key]))
+	items := make([]Resp, len(allItems.data[key]))
 
 	copy(items, allItems.data[key])
 
