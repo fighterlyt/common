@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -572,4 +573,43 @@ func (r Range) Validate() error {
 	}
 
 	return nil
+}
+
+// HourAndMinute 小时:分钟
+type HourAndMinute string
+
+func (h HourAndMinute) Validate() error {
+	var (
+		hour    int
+		minutes int
+	)
+
+	if _, err := fmt.Fscanf(strings.NewReader(string(h)), `%d:%d`, &hour, &minutes); err != nil {
+		return errors.New(`格式错误，必须是 小时:分钟`)
+	}
+
+	if hour >= 0 && hour <= 23 && minutes >= 0 && minutes <= 59 {
+		return nil
+	}
+
+	return errors.New(`小时必须大于等于0，小于等于23，分钟必须大于等于0，小于等于59`)
+}
+
+/*GetValue 获取分钟数 小时*60+分钟
+参数:
+返回值:
+*	value	int  	返回值1
+*	err  	error	返回值2
+*/
+func (h HourAndMinute) GetValue() (value int, err error) {
+	var (
+		hour    int
+		minutes int
+	)
+
+	if _, err := fmt.Fscanf(strings.NewReader(string(h)), `%d:%d`, &hour, &minutes); err != nil {
+		return 0, errors.New(`格式错误，必须是 小时:分钟`)
+	}
+
+	return hour*64 + minutes, nil
 }
