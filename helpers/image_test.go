@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"image"
 	"image/png"
+	"io"
 	"io/fs"
 	"io/ioutil"
 	"os"
@@ -119,4 +120,59 @@ func TestIsPNGRadioMatch(t *testing.T) {
 	require.NoError(t, err)
 
 	require.False(t, IsPNGRadioMatch(bytes.NewReader(data), 3, 4))
+}
+
+func TestDownloadAndOpenAsType(t *testing.T) {
+	type args struct {
+		imageURL     string
+		validateFunc func(reader io.Reader) error
+	}
+
+	pngValidate := func(reader io.Reader) error {
+		_, err = png.Decode(reader)
+		return err
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: `合法png`,
+			args: args{
+				imageURL:     "https://dubai-real.oss-accelerate-overseas.aliyuncs.com/first/telegram.png",
+				validateFunc: pngValidate,
+			},
+			wantErr: false,
+		},
+		{
+			name: `非png文件`,
+			args: args{
+				imageURL:     "https://dubai-common.oss-me-east-1.aliyuncs.com/%E5%A4%B4%E5%83%8F/%E7%94%B7%E6%80%A7/10.jpeg",
+				validateFunc: pngValidate,
+			},
+			wantErr: true,
+		},
+		{
+			name: "路径错误",
+			args: args{
+				imageURL:     "https://dubai-common.oss-me-east-1.aliyuncs.com/%E5%A4%B4%E5%83%8F/%E7%94%B7%E6%80%A7/10.jpe",
+				validateFunc: pngValidate,
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err = DownloadAndOpenAsType(tt.args.imageURL, tt.args.validateFunc)
+
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
 }

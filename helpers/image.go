@@ -1,12 +1,16 @@
 package helpers
 
 import (
+	"bytes"
 	"image"
 	"image/draw"
 	"image/png"
 	"io"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/owner888/resize"
+	"github.com/pkg/errors"
 )
 
 /*MergeImages 合并图形
@@ -125,4 +129,37 @@ func IsImageRadioMatch(reader io.Reader, decodeFunc func(io.Reader) (image.Image
 */
 func IsPNGRadioMatch(reader io.Reader, width, height int) bool {
 	return IsImageRadioMatch(reader, png.Decode, width, height)
+}
+
+/*DownloadAndOpenAsType 下载并且以指定文件格式(打开
+参数:
+*	imageURL  	    string                                     	下载路径
+*	validateFunc	func(reader io.Reader)  error	            解析器
+返回值:
+*	reader    	    io.Reader                                  	数据
+*	err       	    error                                      	错误
+*/
+func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) error) (reader io.Reader, err error) {
+	var (
+		resp   *http.Response
+		buffer []byte
+	)
+
+	if resp, err = http.Get(imageURL); err != nil {
+		return nil, errors.Wrap(err, `下载文件`)
+	}
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	if buffer, err = ioutil.ReadAll(resp.Body); err != nil {
+		return nil, errors.Wrap(err, `读取文件`)
+	}
+
+	if err = validateFunc(bytes.NewBuffer(buffer)); err != nil {
+		return nil, errors.Wrap(err, `解析`)
+	}
+
+	return bytes.NewBuffer(buffer), nil
 }
