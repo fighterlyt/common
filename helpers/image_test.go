@@ -125,13 +125,10 @@ func TestIsPNGRadioMatch(t *testing.T) {
 func TestDownloadAndOpenAsType(t *testing.T) {
 	type args struct {
 		imageURL     string
-		validateFunc func(reader io.Reader) error
+		validateFunc func(reader io.Reader) (image.Image, error)
 	}
 
-	pngValidate := func(reader io.Reader) error {
-		_, err = png.Decode(reader)
-		return err
-	}
+	pngValidate := png.Decode
 
 	tests := []struct {
 		name    string
@@ -166,11 +163,13 @@ func TestDownloadAndOpenAsType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err = DownloadAndOpenAsType(tt.args.imageURL, tt.args.validateFunc, nil)
+			img, _, err := DownloadAndOpenAsType(tt.args.imageURL, tt.args.validateFunc, nil)
 
 			if tt.wantErr {
 				require.Error(t, err)
+				require.Nil(t, img)
 			} else {
+				require.NotNil(t, img)
 				require.NoError(t, err)
 			}
 		})

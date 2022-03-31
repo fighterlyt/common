@@ -137,10 +137,11 @@ func IsPNGRadioMatch(reader io.Reader, width, height int) bool {
 *	validateFunc	func(reader io.Reader)  error	            解析器
 *   client          *http.Client                                http客户端
 返回值:
+*   img             image.Image                                 图片
 *	reader    	    io.Reader                                  	数据
 *	err       	    error                                      	错误
 */
-func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) error, client *http.Client) (reader io.Reader, err error) {
+func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) (image.Image, error), client *http.Client) (img image.Image, reader io.Reader, err error) {
 	var (
 		resp   *http.Response
 		buffer []byte
@@ -151,7 +152,7 @@ func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) 
 	}
 
 	if resp, err = client.Get(imageURL); err != nil {
-		return nil, errors.Wrap(err, `下载文件`)
+		return nil, nil, errors.Wrap(err, `下载文件`)
 	}
 
 	defer func() {
@@ -159,12 +160,12 @@ func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) 
 	}()
 
 	if buffer, err = ioutil.ReadAll(resp.Body); err != nil {
-		return nil, errors.Wrap(err, `读取文件`)
+		return nil, nil, errors.Wrap(err, `读取文件`)
 	}
 
-	if err = validateFunc(bytes.NewBuffer(buffer)); err != nil {
-		return nil, errors.Wrap(err, `解析`)
+	if img, err = validateFunc(bytes.NewBuffer(buffer)); err != nil {
+		return nil, nil, errors.Wrap(err, `解析`)
 	}
 
-	return bytes.NewBuffer(buffer), nil
+	return img, bytes.NewBuffer(buffer), nil
 }
