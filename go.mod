@@ -21,6 +21,7 @@ require (
 	github.com/go-redsync/redsync/v4 v4.5.0
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/oschwald/geoip2-golang v1.6.1
+	github.com/owner888/resize v0.0.0-20220129095824-eaab3dc63835
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
