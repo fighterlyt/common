@@ -166,7 +166,7 @@ func TestDownloadAndOpenAsType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err = DownloadAndOpenAsType(tt.args.imageURL, tt.args.validateFunc)
+			_, err = DownloadAndOpenAsType(tt.args.imageURL, tt.args.validateFunc, nil)
 
 			if tt.wantErr {
 				require.Error(t, err)

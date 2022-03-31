@@ -135,17 +135,22 @@ func IsPNGRadioMatch(reader io.Reader, width, height int) bool {
 参数:
 *	imageURL  	    string                                     	下载路径
 *	validateFunc	func(reader io.Reader)  error	            解析器
+*   client          *http.Client                                http客户端
 返回值:
 *	reader    	    io.Reader                                  	数据
 *	err       	    error                                      	错误
 */
-func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) error) (reader io.Reader, err error) {
+func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) error, client *http.Client) (reader io.Reader, err error) {
 	var (
 		resp   *http.Response
 		buffer []byte
 	)
 
-	if resp, err = http.Get(imageURL); err != nil {
+	if client == nil {
+		client = &http.Client{}
+	}
+
+	if resp, err = client.Get(imageURL); err != nil {
 		return nil, errors.Wrap(err, `下载文件`)
 	}
 
