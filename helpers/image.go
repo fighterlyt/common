@@ -40,7 +40,9 @@ func MergeImages(images []image.Image, bg image.Image, width, height, distance i
 
 	des := image.NewRGBA(image.Rect(0, 0, finalWidth, finalHeight)) // 底板
 
-	bg = resize.Resize(uint(width), uint(height), bg, resize.Bicubic)
+	if bg != nil {
+		bg = resize.Resize(uint(width), uint(height), bg, resize.Bicubic)
+	}
 
 	for i := range images {
 		images[i] = resize.Resize(uint(width), uint(height), images[i], resize.Bicubic)
