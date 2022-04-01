@@ -16,6 +16,7 @@ import (
 /*MergeImages 合并图形
 参数:
 *	images     	[]image.Image	图形
+*   bg          image.Image     背景图，可以为空
 *	width      	int          	宽度
 *	height     	int          	高度
 *	distance   	int          	间隔
@@ -24,7 +25,7 @@ import (
 *	*image.RGBA	*image.RGBA  	结果
 *	error      	error        	错误
 */
-func MergeImages(images []image.Image, width, height, distance int, vertical bool) (*image.RGBA, error) {
+func MergeImages(images []image.Image, bg image.Image, width, height, distance int, vertical bool) (*image.RGBA, error) {
 	var (
 		finalHeight = height
 		finalWidth  = width
@@ -39,15 +40,10 @@ func MergeImages(images []image.Image, width, height, distance int, vertical boo
 
 	des := image.NewRGBA(image.Rect(0, 0, finalWidth, finalHeight)) // 底板
 
+	bg = resize.Resize(uint(width), uint(height), bg, resize.Bicubic)
+
 	for i := range images {
 		images[i] = resize.Resize(uint(width), uint(height), images[i], resize.Bicubic)
-
-		// bounds := images[i].Bounds()
-		//
-		// temp := image.NewRGBA(bounds)
-		// draw.Draw(temp, bounds, images[i], image.Pt(0, 0), draw.Over)
-		//
-		// images[i] = temp.SubImage(image.Rect(0, 0, width, height))
 
 		if vertical {
 			rect = image.Rectangle{
@@ -71,7 +67,8 @@ func MergeImages(images []image.Image, width, height, distance int, vertical boo
 			}
 		}
 
-		draw.Draw(des, rect, images[i], image.Pt(0, 0), draw.Src)
+		draw.Draw(des, rect, bg, image.Pt(0, 0), draw.Src)
+		draw.Draw(des, rect, images[i], image.Pt(0, 0), draw.Over)
 	}
 
 	return des, nil

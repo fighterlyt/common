@@ -16,13 +16,24 @@ import (
 )
 
 func TestMergeImages(t *testing.T) {
+
 	images := make([]image.Image, 0, 10)
 
 	var (
 		err    error
 		temp   image.Image
 		target *image.RGBA
+		bg     image.Image
+		file   *os.File
 	)
+
+	file, err = os.Open(`./bg_jp.png`)
+	require.NoError(t, err)
+
+	defer file.Close()
+
+	bg, err = png.Decode(file)
+	require.NoError(t, err)
 
 	err = filepath.WalkDir(`./合并`, func(path string, d fs.DirEntry, err error) error {
 		if filepath.Ext(d.Name()) != `.png` {
@@ -42,7 +53,7 @@ func TestMergeImages(t *testing.T) {
 
 	require.NoError(t, err)
 
-	target, err = MergeImages(images, 120, 160, 40, true)
+	target, err = MergeImages(images, bg, 120, 160, 40, true)
 
 	require.NoError(t, err)
 	require.NoError(t, outputImage(target))
