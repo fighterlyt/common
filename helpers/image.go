@@ -106,19 +106,19 @@ func IsPNG(reader io.Reader) bool {
 返回值:
 *	bool      	bool                                	是否吻合
 */
-func IsImageRadioMatch(reader io.Reader, decodeFunc func(io.Reader) (image.Image, error), width, height int) bool {
+func IsImageRadioMatch(reader io.Reader, decodeFunc func(io.Reader) (image.Image, error), width, height int) (match bool, actualWidth, actualHeight int) {
 	var (
 		img image.Image
 		err error
 	)
 
 	if img, err = decodeFunc(reader); err != nil {
-		return false
+		return false, 0, 0
 	}
 
 	bounds := img.Bounds()
 
-	return bounds.Max.X*height == bounds.Max.Y*width
+	return bounds.Max.X*height == bounds.Max.Y*width, bounds.Max.X, bounds.Max.Y
 }
 
 /*IsPNGRadioMatch 判断png 比例，具体查看IsImageRadioMatch
@@ -129,7 +129,7 @@ func IsImageRadioMatch(reader io.Reader, decodeFunc func(io.Reader) (image.Image
 返回值:
 *	bool  	bool     	返回值1
 */
-func IsPNGRadioMatch(reader io.Reader, width, height int) bool {
+func IsPNGRadioMatch(reader io.Reader, width, height int) (match bool, actualWidth, actualHeight int) {
 	return IsImageRadioMatch(reader, png.Decode, width, height)
 }
 
