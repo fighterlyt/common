@@ -69,7 +69,10 @@ func MergeImages(images []image.Image, bg image.Image, width, height, distance i
 			}
 		}
 
-		draw.Draw(des, rect, bg, image.Pt(0, 0), draw.Src)
+		if bg != nil {
+			draw.Draw(des, rect, bg, image.Pt(0, 0), draw.Src)
+		}
+
 		draw.Draw(des, rect, images[i], image.Pt(0, 0), draw.Over)
 	}
 
