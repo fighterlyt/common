@@ -1,4 +1,4 @@
-package parser
+package tron
 
 import (
 	"testing"
@@ -6,6 +6,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	// "github.com/fighterlyt/gotron-sdk/pkg/common"
 	"github.com/stretchr/testify/require"
+)
+
+var (
+	abi = Trc20Abi{}
 )
 
 func TestTrc20Abi_UnpackTransfer(t *testing.T) {
