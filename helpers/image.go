@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"bytes"
+	"encoding/json"
 	"image"
 	"image/draw"
 	"image/png"
@@ -14,12 +15,18 @@ import (
 )
 
 type MergeParam struct {
-	Width         int  // 宽度
-	Height        int  // 高度
-	Distance      int  // 间隔
-	Vertical      bool // 合并方向(是否垂直）
-	FirstDistance bool // 第一幅图前，是否需要间隔
-	LastDistance  bool // 最后一幅图后，是否需要间隔
+	Width         int  `json:"width"`          // 宽度
+	Height        int  `json:"height"`         // 高度
+	Distance      int  `json:"distance"`       // 间隔
+	Vertical      bool `json:"vertical"`       // 合并方向(是否垂直）
+	FirstDistance bool `json:"first_distance"` // 第一幅图前，是否需要间隔
+	LastDistance  bool `json:"last_distance"`  // 最后一幅图后，是否需要间隔
+}
+
+func (m MergeParam) Key() string {
+	data, _ := json.Marshal(m)
+
+	return string(data)
 }
 
 /*MergeImages 合并图形
