@@ -16,7 +16,6 @@ import (
 )
 
 func TestMergeImages(t *testing.T) {
-
 	images := make([]image.Image, 0, 10)
 
 	var (
@@ -53,7 +52,14 @@ func TestMergeImages(t *testing.T) {
 
 	require.NoError(t, err)
 
-	target, err = MergeImages(images, bg, 120, 160, 40, true)
+	target, err = MergeImages(images, bg, &MergeParam{
+		Width:         70,
+		Height:        100,
+		Distance:      25,
+		Vertical:      true,
+		FirstDistance: true,
+		LastDistance:  true,
+	})
 
 	require.NoError(t, err)
 	require.NoError(t, outputImage(target))
@@ -130,7 +136,8 @@ func TestIsPNGRadioMatch(t *testing.T) {
 	data, err = ioutil.ReadFile(`./gopher2.png`)
 	require.NoError(t, err)
 
-	require.False(t, IsPNGRadioMatch(bytes.NewReader(data), 3, 4))
+	match, _, _ := IsPNGRadioMatch(bytes.NewReader(data), 3, 4)
+	require.False(t, match)
 }
 
 func TestDownloadAndOpenAsType(t *testing.T) {

@@ -13,6 +13,15 @@ import (
 	"github.com/pkg/errors"
 )
 
+type MergeParam struct {
+	Width         int  // 宽度
+	Height        int  // 高度
+	Distance      int  // 间隔
+	Vertical      bool // 合并方向(是否垂直）
+	FirstDistance bool // 第一幅图前，是否需要间隔
+	LastDistance  bool // 最后一幅图后，是否需要间隔
+}
+
 /*MergeImages 合并图形
 参数:
 *	images     	[]image.Image	图形
@@ -25,18 +34,18 @@ import (
 *	*image.RGBA	*image.RGBA  	结果
 *	error      	error        	错误
 */
-func MergeImages(images []image.Image, bg image.Image, width, height, distance int, vertical bool) (*image.RGBA, error) {
+func MergeImages(images []image.Image, bg image.Image, param *MergeParam) (*image.RGBA, error) {
 	var (
-		finalHeight = height
-		finalWidth  = width
+		finalHeight = param.Height
+		finalWidth  = param.Height
 		rect        image.Rectangle
 	)
 
-	if vertical { // 垂直
-		finalHeight = height*len(images) + distance*(len(images)-1)
-	} else {
-		finalWidth = width*len(images) + distance*(len(images)-1)
-	}
+	width := param.Width
+	height := param.Height
+	distance := param.Distance
+
+	finalWidth, finalHeight = mergeCalFinalWidthHeight(param, len(images))
 
 	des := image.NewRGBA(image.Rect(0, 0, finalWidth, finalHeight)) // 底板
 
@@ -47,26 +56,32 @@ func MergeImages(images []image.Image, bg image.Image, width, height, distance i
 	for i := range images {
 		images[i] = resize.Resize(uint(width), uint(height), images[i], resize.Bicubic)
 
-		if vertical {
+		if param.Vertical {
 			rect = image.Rectangle{
 				Min: image.Point{X: 0, Y: i * height},
 				Max: image.Point{X: width, Y: (i + 1) * height},
 			}
 
-			if i > 0 {
-				rect.Min.Y += i * distance
-				rect.Max.Y += i * distance
+			distanceCount := i
+			if param.FirstDistance {
+				distanceCount += 1
 			}
+
+			rect.Min.Y += distanceCount * distance
+			rect.Max.Y += distanceCount * distance
 		} else {
 			rect = image.Rectangle{
 				Min: image.Point{X: i * width, Y: 0},
 				Max: image.Point{X: (i + 1) * width, Y: height},
 			}
 
-			if i > 0 {
-				rect.Min.X += i * distance
-				rect.Max.X += i * distance
+			distanceCount := i
+			if param.FirstDistance {
+				distanceCount += 1
 			}
+
+			rect.Min.X += distanceCount * distance
+			rect.Max.X += distanceCount * distance
 		}
 
 		if bg != nil {
@@ -77,6 +92,36 @@ func MergeImages(images []image.Image, bg image.Image, width, height, distance i
 	}
 
 	return des, nil
+}
+
+func mergeCalFinalWidthHeight(param *MergeParam, imageCount int) (width int, height int) {
+	width, height = param.Width, param.Height
+
+	if param.Vertical { // 垂直
+		height = param.Height*imageCount + param.Distance*(imageCount-1)
+
+		if param.FirstDistance && imageCount >= 1 {
+			height += param.Distance
+		}
+
+		if param.LastDistance && imageCount > 1 {
+			height += param.Distance
+		}
+
+		return width, height
+	}
+
+	width = param.Width*imageCount + param.Distance*(imageCount-1)
+
+	if param.FirstDistance && imageCount >= 1 {
+		width += param.Distance
+	}
+
+	if param.LastDistance && imageCount > 1 {
+		width += param.Distance
+	}
+
+	return width, height
 }
 
 func IsImageSpecificType(reader io.Reader, decodeFunc func(reader2 io.Reader) (image.Image, error)) bool {
