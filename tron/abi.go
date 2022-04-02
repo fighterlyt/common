@@ -30,15 +30,15 @@ const (
 
 		transferFrom(address,address,uint256)： 0x23b872dd
 	*/
-	transferMethodID     = "a9059cbb"
-	balanceOfMethodID    = "70a08231"
-	decimalsMethodID     = "313ce567"
-	allowanceMethodID    = "dd62ed3e"
-	symbolMethodID       = "95d89b41"
+	TransferMethodID     = "a9059cbb"
+	BalanceOfMethodID    = "70a08231"
+	DecimalsMethodID     = "313ce567"
+	AllowanceMethodID    = "dd62ed3e"
+	SymbolMethodID       = "95d89b41"
 	TotalSupplyMethodID  = "18160ddd"
-	nameMethodID         = "06fdde03"
-	approveMethodID      = "095ea7b3"
-	transferFromMethodID = "23b872dd"
+	NameMethodID         = "06fdde03"
+	ApproveMethodID      = "095ea7b3"
+	TransferFromMethodID = "23b872dd"
 )
 
 // trc20MethodType trc20方法类型
@@ -73,23 +73,23 @@ func (t Trc20Abi) MethodType(data string) trc20MethodType {
 	}
 
 	switch data[:methodIDLength] {
-	case transferMethodID:
+	case TransferMethodID:
 		return trc20Transfer
-	case balanceOfMethodID:
+	case BalanceOfMethodID:
 		return trc20BalanceOf
-	case decimalsMethodID:
+	case DecimalsMethodID:
 		return trc20Decimals
-	case allowanceMethodID:
+	case AllowanceMethodID:
 		return trc20Allowance
-	case symbolMethodID:
+	case SymbolMethodID:
 		return trc20Symbol
 	case TotalSupplyMethodID:
 		return trc20TotalSupply
-	case nameMethodID:
+	case NameMethodID:
 		return trc20Name
-	case transferFromMethodID:
+	case TransferFromMethodID:
 		return trc20TransferFrom
-	case approveMethodID:
+	case ApproveMethodID:
 		return trc20Approve
 	default:
 		return trc20Unknown
@@ -115,7 +115,7 @@ func (t Trc20Abi) UnpackTransfer(data string) (to string, value int64, err error
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
 
-	if data[:methodIDLength] != transferMethodID {
+	if data[:methodIDLength] != TransferMethodID {
 		return "", 0, fmt.Errorf("并非交易数据[%s]", data[:methodIDLength])
 	}
 
@@ -177,7 +177,7 @@ func (t Trc20Abi) UnpackApprove(data string) (to string, value int64, err error)
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
 
-	if data[:methodIDLength] != approveMethodID {
+	if data[:methodIDLength] != ApproveMethodID {
 		return "", 0, fmt.Errorf("并非授权数据[%s]", data[:methodIDLength])
 	}
 
@@ -244,7 +244,7 @@ func (t Trc20Abi) UnpackTransferFrom(data string) (to string, value int64, err e
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
 
-	if data[:methodIDLength] != transferFromMethodID {
+	if data[:methodIDLength] != TransferFromMethodID {
 		return "", 0, fmt.Errorf("并非transferFrom数据[%s]", data[:methodIDLength])
 	}
 
