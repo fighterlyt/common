@@ -1,4 +1,4 @@
-package tron
+package parser
 
 import (
 	"fmt"
@@ -30,15 +30,15 @@ const (
 
 		transferFrom(address,address,uint256)： 0x23b872dd
 	*/
-	TransferMethodID     = "a9059cbb"
-	BalanceOfMethodID    = "70a08231"
-	DecimalsMethodID     = "313ce567"
-	AllowanceMethodID    = "dd62ed3e"
-	SymbolMethodID       = "95d89b41"
+	transferMethodID     = "a9059cbb"
+	balanceOfMethodID    = "70a08231"
+	decimalsMethodID     = "313ce567"
+	allowanceMethodID    = "dd62ed3e"
+	symbolMethodID       = "95d89b41"
 	TotalSupplyMethodID  = "18160ddd"
-	NameMethodID         = "06fdde03"
-	ApproveMethodID      = "095ea7b3"
-	TransferFromMethodID = "23b872dd"
+	nameMethodID         = "06fdde03"
+	approveMethodID      = "095ea7b3"
+	transferFromMethodID = "23b872dd"
 )
 
 // trc20MethodType trc20方法类型
@@ -58,7 +58,7 @@ const (
 	trc20InValid = 101
 )
 
-type Trc20Abi struct {
+type trc20Abi struct {
 }
 
 /*MethodType 从合约原始数据判断方法类型
@@ -67,29 +67,29 @@ type Trc20Abi struct {
 返回值:
 *	trc20MethodType	trc20MethodType
 */
-func (t Trc20Abi) MethodType(data string) trc20MethodType {
+func (t trc20Abi) MethodType(data string) trc20MethodType {
 	if len(data) < methodIDLength {
 		return trc20InValid
 	}
 
 	switch data[:methodIDLength] {
-	case TransferMethodID:
+	case transferMethodID:
 		return trc20Transfer
-	case BalanceOfMethodID:
+	case balanceOfMethodID:
 		return trc20BalanceOf
-	case DecimalsMethodID:
+	case decimalsMethodID:
 		return trc20Decimals
-	case AllowanceMethodID:
+	case allowanceMethodID:
 		return trc20Allowance
-	case SymbolMethodID:
+	case symbolMethodID:
 		return trc20Symbol
 	case TotalSupplyMethodID:
 		return trc20TotalSupply
-	case NameMethodID:
+	case nameMethodID:
 		return trc20Name
-	case TransferFromMethodID:
+	case transferFromMethodID:
 		return trc20TransferFrom
-	case ApproveMethodID:
+	case approveMethodID:
 		return trc20Approve
 	default:
 		return trc20Unknown
@@ -110,12 +110,12 @@ func (t Trc20Abi) MethodType(data string) trc20MethodType {
 *	value	int64
 *	err  	error
 */
-func (t Trc20Abi) UnpackTransfer(data string) (to string, value int64, err error) {
+func (t trc20Abi) UnpackTransfer(data string) (to string, value int64, err error) {
 	if len(data) < trc20Length && len(data) != zeroValueLength {
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
 
-	if data[:methodIDLength] != TransferMethodID {
+	if data[:methodIDLength] != transferMethodID {
 		return "", 0, fmt.Errorf("并非交易数据[%s]", data[:methodIDLength])
 	}
 
@@ -172,12 +172,12 @@ func (t Trc20Abi) UnpackTransfer(data string) (to string, value int64, err error
 *	value	int64
 *	err  	error
 */
-func (t Trc20Abi) UnpackApprove(data string) (to string, value int64, err error) {
+func (t trc20Abi) UnpackApprove(data string) (to string, value int64, err error) {
 	if len(data) < trc20Length && len(data) != zeroValueLength {
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
 
-	if data[:methodIDLength] != ApproveMethodID {
+	if data[:methodIDLength] != approveMethodID {
 		return "", 0, fmt.Errorf("并非授权数据[%s]", data[:methodIDLength])
 	}
 
@@ -239,12 +239,12 @@ func (t Trc20Abi) UnpackApprove(data string) (to string, value int64, err error)
 *	value	int64
 *	err  	error
 */
-func (t Trc20Abi) UnpackTransferFrom(data string) (to string, value int64, err error) {
+func (t trc20Abi) UnpackTransferFrom(data string) (to string, value int64, err error) {
 	if len(data) < trc20Length && len(data) != zeroValueLength {
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
 
-	if data[:methodIDLength] != TransferFromMethodID {
+	if data[:methodIDLength] != transferFromMethodID {
 		return "", 0, fmt.Errorf("并非transferFrom数据[%s]", data[:methodIDLength])
 	}
 
