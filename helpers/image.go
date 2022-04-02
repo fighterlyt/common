@@ -43,8 +43,8 @@ func (m MergeParam) Key() string {
 */
 func MergeImages(images []image.Image, bg image.Image, param *MergeParam) (*image.RGBA, error) {
 	var (
-		finalHeight = param.Height
-		finalWidth  = param.Height
+		finalHeight int
+		finalWidth  int
 		rect        image.Rectangle
 	)
 
@@ -195,7 +195,7 @@ func IsPNGRadioMatch(reader io.Reader, width, height int) (match bool, actualWid
 *	reader    	    io.Reader                                  	数据
 *	err       	    error                                      	错误
 */
-func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) (image.Image, error), client *http.Client) (img image.Image, reader io.Reader, err error) {
+func DownloadAndOpenAsType(imageURL string, validateFunc func(reader io.Reader) (image.Image, error), client *http.Client) (img image.Image, reader io.Reader, err error) { //nolint:lll
 	var (
 		resp   *http.Response
 		buffer []byte
