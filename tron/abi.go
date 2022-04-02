@@ -58,7 +58,7 @@ const (
 	trc20InValid = 101
 )
 
-type trc20Abi struct {
+type Trc20Abi struct {
 }
 
 /*MethodType 从合约原始数据判断方法类型
@@ -67,7 +67,7 @@ type trc20Abi struct {
 返回值:
 *	trc20MethodType	trc20MethodType
 */
-func (t trc20Abi) MethodType(data string) trc20MethodType {
+func (t Trc20Abi) MethodType(data string) trc20MethodType {
 	if len(data) < methodIDLength {
 		return trc20InValid
 	}
@@ -110,7 +110,7 @@ func (t trc20Abi) MethodType(data string) trc20MethodType {
 *	value	int64
 *	err  	error
 */
-func (t trc20Abi) UnpackTransfer(data string) (to string, value int64, err error) {
+func (t Trc20Abi) UnpackTransfer(data string) (to string, value int64, err error) {
 	if len(data) < trc20Length && len(data) != zeroValueLength {
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
@@ -172,7 +172,7 @@ func (t trc20Abi) UnpackTransfer(data string) (to string, value int64, err error
 *	value	int64
 *	err  	error
 */
-func (t trc20Abi) UnpackApprove(data string) (to string, value int64, err error) {
+func (t Trc20Abi) UnpackApprove(data string) (to string, value int64, err error) {
 	if len(data) < trc20Length && len(data) != zeroValueLength {
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
@@ -239,7 +239,7 @@ func (t trc20Abi) UnpackApprove(data string) (to string, value int64, err error)
 *	value	int64
 *	err  	error
 */
-func (t trc20Abi) UnpackTransferFrom(data string) (to string, value int64, err error) {
+func (t Trc20Abi) UnpackTransferFrom(data string) (to string, value int64, err error) {
 	if len(data) < trc20Length && len(data) != zeroValueLength {
 		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
 	}
