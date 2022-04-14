@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewTelegram(t *testing.T) {
-	testTelegram, err = NewTelegram("test", `1886019351:AAGOCfqMyPC-xIbqpN0WsEkv0fkERKdnyE8`, logger, -1001376524055)
+	testTelegram, err = NewTelegram("test", `5383989770:AAEo8p96mLwOm24CPfaP0ztgrk0kYlMfzJg`, logger, -1001586947225)
 	require.NoError(t, err, `NewTelegram`)
 }
 
@@ -39,4 +39,10 @@ func TestPanic(t *testing.T) {
 	}()
 
 	panic(`1`)
+}
+
+func TestSendFileWithURL(t *testing.T) {
+	TestNewTelegram(t)
+
+	require.NoError(t, testTelegram.SendFileFromURL(`https://dubai-real.oss-accelerate-overseas.aliyuncs.com/report/20220413/484392322344_202203_cur.xlsx`, `报表.xlsx`), `SendFileWithURL`)
 }

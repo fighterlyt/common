@@ -2,6 +2,8 @@ package telegram
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"strings"
 	"sync"
 	"time"
@@ -22,6 +24,8 @@ type Telegram interface {
 	SendMarkdown(msg string) error
 	Handle(string, Handler) error
 	Start()
+	SendFile(reader io.Reader, fileName string) error
+	SendFileFromURL(url, fileName string) error
 }
 
 type telegram struct {
@@ -93,6 +97,29 @@ func (t telegram) SendMsg(msg string) error {
 
 		msg = msg[len(sendMsg)+1:]
 	}
+}
+
+func (t telegram) SendFile(reader io.Reader, fileName string) error {
+	_, err := t.bot.Send(t.group, &telebot.Document{
+		File:      telebot.FromReader(reader),
+		Thumbnail: nil,
+		Caption:   "",
+		MIME:      "",
+		FileName:  fileName,
+	})
+
+	return err
+}
+
+func (t telegram) SendFileFromURL(fileURL, fileName string) error {
+	resp, err := http.Get(fileURL)
+	if err != nil {
+		return errors.Wrap(err, `下载文件`)
+	}
+
+	defer resp.Body.Close()
+
+	return t.SendFile(resp.Body, fileName)
 }
 
 func (t telegram) getMessage(msg string) string {
@@ -171,4 +198,12 @@ func (n noneTelegram) Handle(string, Handler) error {
 }
 
 func (n noneTelegram) Start() {
+}
+
+func (n noneTelegram) SendFile(_ io.Reader, _ string) error {
+	return nil
+}
+
+func (n noneTelegram) SendFileFromURL(_, _ string) error {
+	return nil
 }
