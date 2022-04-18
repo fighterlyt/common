@@ -16,6 +16,12 @@ type ExportRecord interface {
 }
 
 func BuildXLSFile(writer io.Writer, headers map[string]int, headerOrders []string, title string, records ...ExportRecord) error {
+	for i, record := range records {
+		if len(headers) != len(record.GetExportFields()) {
+			return fmt.Errorf(`第[%d]条记录,字段数量错误`, i+1)
+		}
+	}
+
 	f, err := CreateXLSFile(headers, headerOrders, title, records...)
 	if err != nil {
 		return err
@@ -57,12 +63,6 @@ func charAdd(from byte, delta int) byte {
 
 // CreateXLSFile 创建xlsx文件
 func CreateXLSFile(headers map[string]int, headerOrders []string, title string, records ...ExportRecord) (*excelize.File, error) {
-	for i, record := range records {
-		if len(headers) != len(record.GetExportFields()) {
-			return nil, fmt.Errorf(`第[%d]条记录,字段数量错误`, i+1)
-		}
-	}
-
 	f := excelize.NewFile()
 
 	sheet1 := `Sheet1`
