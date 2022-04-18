@@ -7,18 +7,19 @@ import (
 	"github.com/fighterlyt/gotron-sdk/pkg/client"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/nova_dubai/usdtpay/model"
+	"gitlab.com/nova_dubai/common/cryptocurrency"
 	"google.golang.org/grpc"
 )
 
 func TestGrpcParser_Parse(t *testing.T) {
 	cl := client.NewGrpcClient("47.241.192.246:50051")
-	grpcParser := NewGRPCTronScanParser(mockConcern{}, cl, resource.Logger, model.ContractTRC20USDT, nil)
+	grpcParser := NewGRPCTronScanParser(mockConcern{}, cl, logger, cryptocurrency.ContractTRC20USDT, nil)
 
 	require.NoError(t, cl.Start(grpc.WithInsecure()))
 	block, err := cl.GetNowBlock()
 	require.NoError(t, err, `获取最新区块`)
 	t.Log(block.BlockHeader.RawData.Number)
+
 	trades, err := grpcParser.Parse(context.Background(), 36171457)
 	require.NoError(t, err)
 

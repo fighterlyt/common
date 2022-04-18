@@ -56,6 +56,22 @@ const (
 	trc20TransferFrom
 	trc20Unknown = 100
 	trc20InValid = 101
+	hex          = 16
+	boundary     = 100000000
+)
+
+var (
+	idToType = map[string]trc20MethodType{
+		transferMethodID:     trc20Transfer,
+		balanceOfMethodID:    trc20BalanceOf,
+		decimalsMethodID:     trc20Decimals,
+		allowanceMethodID:    trc20Allowance,
+		symbolMethodID:       trc20Symbol,
+		TotalSupplyMethodID:  trc20TotalSupply,
+		nameMethodID:         trc20Name,
+		approveMethodID:      trc20Approve,
+		transferFromMethodID: trc20TransferFrom,
+	}
 )
 
 type trc20Abi struct {
@@ -72,28 +88,31 @@ func (t trc20Abi) MethodType(data string) trc20MethodType {
 		return trc20InValid
 	}
 
-	switch data[:methodIDLength] {
-	case transferMethodID:
-		return trc20Transfer
-	case balanceOfMethodID:
-		return trc20BalanceOf
-	case decimalsMethodID:
-		return trc20Decimals
-	case allowanceMethodID:
-		return trc20Allowance
-	case symbolMethodID:
-		return trc20Symbol
-	case TotalSupplyMethodID:
-		return trc20TotalSupply
-	case nameMethodID:
-		return trc20Name
-	case transferFromMethodID:
-		return trc20TransferFrom
-	case approveMethodID:
-		return trc20Approve
-	default:
-		return trc20Unknown
+	if result, exist := idToType[data[:methodIDLength]]; exist {
+		return result
 	}
+
+	return trc20Unknown
+}
+
+func (t trc20Abi) getMoneyFromTransfer(data string) string {
+	var (
+		money string
+	)
+
+	if len(data) > zeroValueLength {
+		if len(data) > valueStartIndex {
+			if len(data) >= valueStartIndex+valueLength {
+				money = data[valueStartIndex : valueStartIndex+valueLength]
+			} else {
+				money = data[valueStartIndex:]
+			}
+		}
+
+		money = strings.TrimLeft(money, "0")
+	}
+
+	return money
 }
 
 /*UnpackTransfer 解析trc20协议中的transfer方法,该方法签名为 function transfer(address _to, uint _value) returns (bool success)
@@ -119,18 +138,7 @@ func (t trc20Abi) UnpackTransfer(data string) (to string, value int64, err error
 		return "", 0, fmt.Errorf("并非交易数据[%s]", data[:methodIDLength])
 	}
 
-	var money string
-	if len(data) > zeroValueLength {
-		if len(data) > valueStartIndex {
-			if len(data) >= valueStartIndex+valueLength {
-				money = data[valueStartIndex : valueStartIndex+valueLength]
-			} else {
-				money = data[valueStartIndex:]
-			}
-		}
-
-		money = strings.TrimLeft(money, "0")
-	}
+	money := t.getMoneyFromTransfer(data)
 
 	to = data[valueStartIndex-42 : valueStartIndex]
 
@@ -151,7 +159,7 @@ func (t trc20Abi) UnpackTransfer(data string) (to string, value int64, err error
 		return to, 0, nil
 	}
 
-	if value, err = strconv.ParseInt(money, 16, 64); err != nil {
+	if value, err = strconv.ParseInt(money, hex, 64); err != nil {
 		return "", 0, errors.Wrapf(err, "解析金额[%s]", money)
 	}
 
@@ -181,18 +189,7 @@ func (t trc20Abi) UnpackApprove(data string) (to string, value int64, err error)
 		return "", 0, fmt.Errorf("并非授权数据[%s]", data[:methodIDLength])
 	}
 
-	var money string
-	if len(data) > zeroValueLength {
-		if len(data) > valueStartIndex {
-			if len(data) >= valueStartIndex+valueLength {
-				money = data[valueStartIndex : valueStartIndex+valueLength]
-			} else {
-				money = data[valueStartIndex:]
-			}
-		}
-
-		money = strings.TrimLeft(money, "0")
-	}
+	money := t.getMoneyFromTransfer(data)
 
 	to = data[valueStartIndex-42 : valueStartIndex]
 
@@ -213,9 +210,9 @@ func (t trc20Abi) UnpackApprove(data string) (to string, value int64, err error)
 		return to, 0, nil
 	}
 
-	if value, err = strconv.ParseInt(money, 16, 64); err != nil {
+	if value, err = strconv.ParseInt(money, hex, 64); err != nil {
 		if strings.Contains(err.Error(), "value out of range") {
-			return to, 100000000, nil
+			return to, boundary, nil
 		}
 
 		return "", 0, errors.Wrapf(err, "解析金额[%s]", money)
@@ -249,15 +246,12 @@ func (t trc20Abi) UnpackTransferFrom(data string) (to string, value int64, err e
 	}
 
 	var money string
-	if len(data) > zeroValueLength {
-		if len(data) > valueStartIndex+addressLength {
-			money = data[valueStartIndex+addressLength:]
-		}
 
-		if len(data) >= valueStartIndex+valueLength {
+	if len(data) > zeroValueLength {
+		if len(data) >= valueStartIndex+valueLength+addressLength {
 			money = data[valueStartIndex+addressLength : valueStartIndex+valueLength+addressLength]
 		} else {
-			money = data[valueStartIndex:]
+			money = data[valueStartIndex+addressLength:]
 		}
 
 		money = strings.TrimLeft(money, "0")
@@ -282,7 +276,7 @@ func (t trc20Abi) UnpackTransferFrom(data string) (to string, value int64, err e
 		return to, 0, nil
 	}
 
-	if value, err = strconv.ParseInt(money, 16, 64); err != nil {
+	if value, err = strconv.ParseInt(money, hex, 64); err != nil {
 		return "", 0, errors.Wrapf(err, "解析金额[%s]", money)
 	}
 
