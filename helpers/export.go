@@ -53,7 +53,7 @@ func charIncr(from byte) string {
 	return string(from + 1)
 }
 
-func charAdd(from byte, delta int) byte {
+func CharAdd(from byte, delta int) byte {
 	for ; delta > 0; delta-- {
 		from = charIncr(from)[0]
 	}
@@ -72,7 +72,7 @@ func CreateXLSFile(headers map[string]int, headerOrders []string, title string, 
 		Horizontal: "center",
 	}})
 
-	last := charAdd('A', len(headers)-1)
+	last := CharAdd('A', len(headers)-1)
 	f.MergeCell(sheet1, `A1`, string(last)+`1`)
 
 	f.SetCellValue(sheet1, `A1`, title)
@@ -80,7 +80,7 @@ func CreateXLSFile(headers map[string]int, headerOrders []string, title string, 
 	i := 0
 	for _, text := range headerOrders {
 
-		column := string(charAdd('A', i))
+		column := string(CharAdd('A', i))
 		f.SetColStyle(sheet1, column, style)
 		f.SetColWidth(sheet1, column, column, float64(headers[text]))
 
@@ -94,7 +94,7 @@ func CreateXLSFile(headers map[string]int, headerOrders []string, title string, 
 
 	for i, record := range records {
 		for j, field := range record.GetExportFields() {
-			column := string(charAdd('A', j))
+			column := string(CharAdd('A', j))
 			f.SetCellValue(sheet1, fmt.Sprintf(`%s%d`, column, i+3), field)
 		}
 	}
