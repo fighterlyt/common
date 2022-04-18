@@ -22,43 +22,12 @@ func BuildXLSFile(writer io.Writer, headers map[string]int, headerOrders []strin
 		}
 	}
 
-	f := excelize.NewFile()
-
-	sheet1 := `Sheet1`
-	// Create a new sheet.
-	index := f.NewSheet(sheet1)
-	style, _ := f.NewStyle(&excelize.Style{Alignment: &excelize.Alignment{
-		Horizontal: "center",
-	}})
-
-	last := charAdd('A', len(headers)-1)
-	f.MergeCell(sheet1, `A1`, string(last)+`1`)
-
-	f.SetCellValue(sheet1, `A1`, title)
-
-	i := 0
-	for _, text := range headerOrders {
-
-		column := string(charAdd('A', i))
-		f.SetColStyle(sheet1, column, style)
-		f.SetColWidth(sheet1, column, column, float64(headers[text]))
-
-		f.SetCellValue(sheet1, column+"2", text)
-		i++
+	f, err := CreateXLSFile(headers, headerOrders, title, records...)
+	if err != nil {
+		return err
 	}
 
-	// Set active sheet of the workbook.
-	f.SetActiveSheet(index)
-	// Save spreadsheet by the given path.
-
-	for i, record := range records {
-		for j, field := range record.GetExportFields() {
-			column := string(charAdd('A', j))
-			f.SetCellValue(sheet1, fmt.Sprintf(`%s%d`, column, i+3), field)
-		}
-	}
-
-	if err := f.Write(writer); err != nil {
+	if err = f.Write(writer); err != nil {
 		return errors.Wrap(err, `写入应答`)
 	}
 
@@ -84,10 +53,51 @@ func charIncr(from byte) string {
 	return string(from + 1)
 }
 
-func charAdd(from byte, delta int) byte {
+func CharAdd(from byte, delta int) byte {
 	for ; delta > 0; delta-- {
 		from = charIncr(from)[0]
 	}
 
 	return from
+}
+
+// CreateXLSFile 创建xlsx文件
+func CreateXLSFile(headers map[string]int, headerOrders []string, title string, records ...ExportRecord) (*excelize.File, error) {
+	f := excelize.NewFile()
+
+	sheet1 := `Sheet1`
+	// Create a new sheet.
+	index := f.NewSheet(sheet1)
+	style, _ := f.NewStyle(&excelize.Style{Alignment: &excelize.Alignment{
+		Horizontal: "center",
+	}})
+
+	last := CharAdd('A', len(headers)-1)
+	f.MergeCell(sheet1, `A1`, string(last)+`1`)
+
+	f.SetCellValue(sheet1, `A1`, title)
+
+	i := 0
+	for _, text := range headerOrders {
+
+		column := string(CharAdd('A', i))
+		f.SetColStyle(sheet1, column, style)
+		f.SetColWidth(sheet1, column, column, float64(headers[text]))
+
+		f.SetCellValue(sheet1, column+"2", text)
+		i++
+	}
+
+	// Set active sheet of the workbook.
+	f.SetActiveSheet(index)
+	// Save spreadsheet by the given path.
+
+	for i, record := range records {
+		for j, field := range record.GetExportFields() {
+			column := string(CharAdd('A', j))
+			f.SetCellValue(sheet1, fmt.Sprintf(`%s%d`, column, i+3), field)
+		}
+	}
+
+	return f, nil
 }
