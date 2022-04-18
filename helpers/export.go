@@ -16,9 +16,50 @@ type ExportRecord interface {
 }
 
 func BuildXLSFile(writer io.Writer, headers map[string]int, headerOrders []string, title string, records ...ExportRecord) error {
+	f, err := CreateXLSFile(headers, headerOrders, title, records...)
+	if err != nil {
+		return err
+	}
+
+	if err = f.Write(writer); err != nil {
+		return errors.Wrap(err, `写入应答`)
+	}
+
+	return nil
+}
+
+// 专门处理导出为xlsx
+func BuildXLSX(ctx *gin.Context, headers map[string]int, headerOrders []string, fileName, title string, records ...ExportRecord) error {
+	var b bytes.Buffer
+
+	if err := BuildXLSFile(&b, headers, headerOrders, title, records...); err != nil {
+		return err
+	}
+
+	ctx.Header("Content-Type", "application/octet-stream")
+	ctx.Header(`Content-Disposition`, fmt.Sprintf(`attachment;filename=%s`, fileName))
+	ctx.Data(http.StatusOK, "application/octet-stream", b.Bytes())
+
+	return nil
+}
+
+func charIncr(from byte) string {
+	return string(from + 1)
+}
+
+func charAdd(from byte, delta int) byte {
+	for ; delta > 0; delta-- {
+		from = charIncr(from)[0]
+	}
+
+	return from
+}
+
+// CreateXLSFile 创建xlsx文件
+func CreateXLSFile(headers map[string]int, headerOrders []string, title string, records ...ExportRecord) (*excelize.File, error) {
 	for i, record := range records {
 		if len(headers) != len(record.GetExportFields()) {
-			return fmt.Errorf(`第[%d]条记录,字段数量错误`, i+1)
+			return nil, fmt.Errorf(`第[%d]条记录,字段数量错误`, i+1)
 		}
 	}
 
@@ -58,36 +99,5 @@ func BuildXLSFile(writer io.Writer, headers map[string]int, headerOrders []strin
 		}
 	}
 
-	if err := f.Write(writer); err != nil {
-		return errors.Wrap(err, `写入应答`)
-	}
-
-	return nil
-}
-
-// 专门处理导出为xlsx
-func BuildXLSX(ctx *gin.Context, headers map[string]int, headerOrders []string, fileName, title string, records ...ExportRecord) error {
-	var b bytes.Buffer
-
-	if err := BuildXLSFile(&b, headers, headerOrders, title, records...); err != nil {
-		return err
-	}
-
-	ctx.Header("Content-Type", "application/octet-stream")
-	ctx.Header(`Content-Disposition`, fmt.Sprintf(`attachment;filename=%s`, fileName))
-	ctx.Data(http.StatusOK, "application/octet-stream", b.Bytes())
-
-	return nil
-}
-
-func charIncr(from byte) string {
-	return string(from + 1)
-}
-
-func charAdd(from byte, delta int) byte {
-	for ; delta > 0; delta-- {
-		from = charIncr(from)[0]
-	}
-
-	return from
+	return f, nil
 }
