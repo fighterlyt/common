@@ -1,6 +1,10 @@
 package cache
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/pkg/errors"
+)
 
 var (
 	initCapacity = 10
@@ -23,6 +27,28 @@ func NewCache[K int | int64 | string, V any]() *Cache[K, V] {
 func (c *Cache[K, V]) init() {
 	c.data = make(map[K]V, initCapacity)
 	c.RWMutex = &sync.RWMutex{}
+}
+
+/*AddBatch 批量添加
+参数:
+*	keys  	[]K  	键值数组
+*	values	[]V  	值数组
+返回值:
+*	error 	error	错误
+*/
+func (c *Cache[K, V]) AddBatch(keys []K, values []V) error {
+	if len(keys) != len(values) {
+		return errors.New(`数量必须相同`)
+	}
+
+	c.Lock()
+	defer c.Unlock()
+
+	for i := range keys {
+		c.add(keys[i], values[i], false)
+	}
+
+	return nil
 }
 
 /*Add 添加元素
