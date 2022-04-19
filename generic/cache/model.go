@@ -83,6 +83,20 @@ func (c *Cache[K, V]) Remove(key K) {
 	c.remove(key, true)
 }
 
+/*RemoveBatch 批量删除
+参数:
+*	keys	[]K	键值数组
+返回值:
+*/
+func (c *Cache[K, V]) RemoveBatch(keys []K) {
+	c.Lock()
+	defer c.Unlock()
+
+	for _, key := range keys {
+		c.remove(key, false)
+	}
+}
+
 func (c *Cache[K, V]) remove(key K, needLock bool) {
 	if needLock {
 		c.Lock()
@@ -92,15 +106,40 @@ func (c *Cache[K, V]) remove(key K, needLock bool) {
 	delete(c.data, key)
 }
 
-/*Get 根据兼职获取值
+/*Get 根据键值获取值
 参数:
 *	key	K	键值
 返回值:
 *	V  	V	值
 */
 func (c Cache[K, V]) Get(key K) V {
+	return c.get(key, true)
+}
+
+/*GetBatch 根据键值批量获取
+参数:
+*	keys   	[]K    	键值数组
+返回值:
+*	map[K]V	map[K]V	k,v
+*/
+func (c *Cache[K, V]) GetBatch(keys []K) map[K]V {
 	c.RLock()
 	defer c.RUnlock()
+
+	result := make(map[K]V, initCapacity)
+
+	for _, key := range keys {
+		result[key] = c.get(key, false)
+	}
+
+	return result
+}
+
+func (c Cache[K, V]) get(key K, needLock bool) V {
+	if needLock {
+		c.RLock()
+		defer c.RUnlock()
+	}
 
 	return c.data[key]
 }
