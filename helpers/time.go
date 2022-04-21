@@ -115,7 +115,7 @@ func GetStartOfDayInLocation(date int, location *time.Location) (start time.Time
 	return start, nil
 }
 
-/*offset 在指定时区便宜了多少秒
+/*offset 在指定时区偏移了多少秒
 参数:
 *	location	*time.Location	时区
 返回值:
@@ -125,6 +125,20 @@ func GetStartOfDayInLocation(date int, location *time.Location) (start time.Time
 func offset(location *time.Location) int {
 	_, offset := time.Now().In(location).Zone()
 	return offset
+}
+
+/*OffSet 在指定时间偏移了多少
+参数:
+*	location	*time.Location	时区，如果为空，那么选择默认时区
+返回值:
+*	int     	int           	偏移量(秒)
+*/
+func OffSet(location *time.Location) int {
+	if location == nil {
+		location = defaultLocation
+	}
+
+	return offset(location)
 }
 
 const (
