@@ -15,3 +15,10 @@ func RemoveDuplicate[T int | int64 | string](data []T) []T {
 
 	return result
 }
+
+type Key interface {
+	int | int64 | string
+}
+type Object interface {
+	GetID() Key
+}

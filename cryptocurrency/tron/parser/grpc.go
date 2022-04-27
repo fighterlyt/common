@@ -10,10 +10,11 @@ import (
 	"github.com/fighterlyt/gotron-sdk/pkg/proto/api"
 	"github.com/fighterlyt/gotron-sdk/pkg/proto/core"
 	"github.com/fighterlyt/log"
-	"github.com/golang/protobuf/proto" // nolint:golint,staticcheck
+	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"gitlab.com/nova_dubai/common/cryptocurrency"
+	"gitlab.com/nova_dubai/common/model"
 	"go.uber.org/multierr"
 
 	"gitlab.com/nova_dubai/common/helpers"
@@ -35,6 +36,7 @@ type grpcParser struct {
 	concern    cryptocurrency.Concern     // concern 对地址的关注
 	contract   cryptocurrency.Contract    // 关注的智能合约
 	notify     cryptocurrency.TradeNotify // 交易通知
+	includeTRX bool                       // 是否包含TRX
 }
 
 /*NewGRPCTronScanParser grpc解析器
@@ -55,6 +57,10 @@ func NewGRPCTronScanParser(concern cryptocurrency.Concern, grpClient *client.Grp
 		contract:   contract,
 		notify:     notify,
 	}
+}
+
+func (g *grpcParser) IncludeTRX(include bool) {
+	g.includeTRX = include
 }
 
 /*IsBlockConfirmed 区块是否被确认
@@ -99,7 +105,7 @@ func (g grpcParser) Parse(ctx context.Context, blockNumber int64) (trades []*cry
 	}
 
 	for _, tx := range blockExtension.GetTransactions() {
-		if trade, detail, parseErr = g.ParseSingle(ctx, tx, logger, blockNumber); parseErr == nil && trade != nil {
+		if trade, detail, parseErr = g.ParseTX(ctx, tx, logger, blockNumber); parseErr == nil && trade != nil {
 			trades = append(trades, trade)
 			notifyDetails = append(notifyDetails, detail)
 		} else if parseErr != nil {
@@ -127,23 +133,116 @@ func getContract(tx *api.TransactionExtention) *core.Transaction_Contract {
 	return nil
 }
 
-func (g grpcParser) ParseSingle(_ context.Context, tx *api.TransactionExtention, logger log.Logger, blockNumber int64) (trade *cryptocurrency.Trade, detail *cryptocurrency.TransactionDetail, err error) {
+/*ParseTX  解析交易
+参数:
+*	_          	context.Context                  	上下文
+*	tx         	*api.TransactionExtention        	交易
+*	logger     	log.Logger                       	日志器
+*	blockNumber	int64                            	区块号
+返回值:
+*	trade      	*cryptocurrency.Trade            	返回值1
+*	detail     	*cryptocurrency.TransactionDetail	返回值2
+*	err        	error                            	返回值3
+*/
+func (g grpcParser) ParseTX(_ context.Context, tx *api.TransactionExtention, logger log.Logger, blockNumber int64) (trade *cryptocurrency.Trade, detail *cryptocurrency.TransactionDetail, err error) { //nolint:lll
 	var (
-		matched   bool
-		toAddress string
-		value     int64
-		contract  *core.Transaction_Contract
-		info      *core.TransactionInfo
-		tradeKind cryptocurrency.TradeKind
+		contract *core.Transaction_Contract
 	)
 
+	txID := hexutil.Encode(tx.Txid)[2:]
+
 	// 非智能合约或者不是触发了只能合约
-	if contract = getContract(tx); contract == nil || contract.GetType() != core.Transaction_Contract_TriggerSmartContract {
+	if contract = getContract(tx); contract == nil {
 		logger.Info(`非智能合约或者不是触发智能合约`)
 		return nil, nil, nil
 	}
 
+	switch contract.GetType() {
+	case core.Transaction_Contract_TriggerSmartContract:
+		return g.parseTrc20(contract, tx, logger, blockNumber, txID)
+	case core.Transaction_Contract_TransferContract:
+		if !g.includeTRX {
+			return nil, nil, nil
+		}
+
+		return g.parseTRx(contract, tx, logger, blockNumber, txID)
+	default:
+		return nil, nil, nil
+	}
+}
+
+func (g grpcParser) parseTRx(contract *core.Transaction_Contract, tx *api.TransactionExtention, logger log.Logger, blockNumber int64, txID string) (trade *cryptocurrency.Trade, detail *cryptocurrency.TransactionDetail, err error) {
+	var (
+		matched   bool
+		toAddress string
+		info      *core.TransactionInfo
+	)
+
+	transaction := &core.TransferContract{}
+
+	if err = proto.Unmarshal(contract.Parameter.GetValue(), transaction); err != nil {
+		return nil, nil, errors.Wrap(err, `解析value`)
+	}
+
+	ret := tx.Transaction.GetRet()
+
+	if ret == nil || !tx.GetResult().Result || core.Transaction_ResultContractResult_name[int32(ret[0].ContractRet)] != success { // nolint:golint,lll
+		return nil, nil, nil
+	}
+
+	toAddress = common.EncodeCheck(transaction.ToAddress)
+
+	amount := decimal.New(transaction.Amount, -g.contract.Precision())
+
+	ownerAddress := common.EncodeCheck(transaction.OwnerAddress)
+
+	logger.Info(`判断交易是否符合条件`, zap.Strings(`ownAddress/toAddress/amount`, []string{ownerAddress, toAddress, amount.String()}))
+
+	if g.concern == nil {
+		return nil, nil, nil
+	}
+
+	if matched, _, err = g.concern.FilterConcernedAccounts(ownerAddress, toAddress, amount); err != nil {
+		return nil, nil, errors.Wrapf(err, `判断关注交易错误,转出[%s]转入[%s],金额[%s]`, ownerAddress, toAddress, amount.String())
+	}
+
+	if !matched {
+		logger.Info(`不匹配`, zap.Strings(`ownAddress/toAddress/amount`, []string{ownerAddress, toAddress, amount.String()}))
+		return nil, nil, nil
+	}
+
+	logger.Info("交易匹配")
+
+	if info, err = g.grpcClient.GetTransactionInfoByID(hexutil.Encode(tx.Txid)); err != nil {
+		helpers.IgnoreError(g.logger, "重启波场grpc客户端", func() error {
+			return g.grpcClient.Reconnect(g.grpcClient.Address)
+		})
+
+		return nil, nil, errors.Wrap(err, "GetTransactionInfoByID")
+	}
+
+	fee := decimal.New(info.GetFee(), -6)
+
+	tradeTime := info.BlockTimeStamp / int64(kilo)
+
+	trade = cryptocurrency.NewTrade(cryptocurrency.Trc20, ownerAddress, toAddress, amount, model.TRX, txID, tradeTime, blockNumber, fee, cryptocurrency.TradeTransfer) // nolint:golint,lll
+
+	detail = cryptocurrency.NewFullTransactionDetail(amount, cryptocurrency.Trc20, model.TRX, ownerAddress, toAddress, blockNumber, txID, fee, tradeTime, cryptocurrency.TradeTransfer) //nolint:lll
+
+	return trade, detail, nil
+}
+
+func (g grpcParser) parseTrc20(contract *core.Transaction_Contract, tx *api.TransactionExtention, logger log.Logger, blockNumber int64, txID string) (trade *cryptocurrency.Trade, detail *cryptocurrency.TransactionDetail, err error) {
+	var (
+		matched   bool
+		toAddress string
+		value     int64
+		info      *core.TransactionInfo
+		tradeKind cryptocurrency.TradeKind
+	)
+
 	transaction := &core.TriggerSmartContract{}
+
 	if err = proto.Unmarshal(contract.Parameter.GetValue(), transaction); err != nil {
 		return nil, nil, errors.Wrap(err, `解析value`)
 	}
@@ -215,7 +314,6 @@ func (g grpcParser) ParseSingle(_ context.Context, tx *api.TransactionExtention,
 
 	fee := decimal.New(info.GetFee(), -6)
 
-	txID := hexutil.Encode(tx.Txid)[2:]
 	tradeTime := info.BlockTimeStamp / int64(kilo)
 
 	trade = cryptocurrency.NewTrade(cryptocurrency.Trc20, ownerAddress, toAddress, amount, g.contract.Token(), txID, tradeTime, blockNumber, fee, tradeKind) // nolint:golint,lll
