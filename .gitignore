@@ -25,3 +25,4 @@ keystore/
 data/data
 local.json
 localdb/badger/db
+cryptocurrency/balance/*.json
