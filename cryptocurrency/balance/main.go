@@ -28,7 +28,7 @@ import (
 // 将指定钱包里的TRX/USDT 转到 指定钱包
 
 var (
-	filePath  = `tjx_user_wallet.json`
+	filePath  = `10120_user_wallet.json`
 	USDT      = `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t`
 	USDC      = `TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8`
 	TRX       = ``
