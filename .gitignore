@@ -26,4 +26,4 @@ data/data
 local.json
 localdb/badger/db
 cryptocurrency/balance/*.json
-**secret_test.go
+**/secret_test.go
