@@ -130,10 +130,6 @@ func (t trc20Abi) getMoneyFromTransfer(data string) string {
 *	err  	error
 */
 func (t trc20Abi) UnpackTransfer(data string) (to string, value int64, err error) {
-	if len(data) < trc20Length && len(data) != zeroValueLength {
-		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
-	}
-
 	if data[:methodIDLength] != transferMethodID {
 		return "", 0, fmt.Errorf("并非交易数据[%s]", data[:methodIDLength])
 	}
@@ -181,10 +177,6 @@ func (t trc20Abi) UnpackTransfer(data string) (to string, value int64, err error
 *	err  	error
 */
 func (t trc20Abi) UnpackApprove(data string) (to string, value int64, err error) {
-	if len(data) < trc20Length && len(data) != zeroValueLength {
-		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
-	}
-
 	if data[:methodIDLength] != approveMethodID {
 		return "", 0, fmt.Errorf("并非授权数据[%s]", data[:methodIDLength])
 	}
@@ -237,10 +229,6 @@ func (t trc20Abi) UnpackApprove(data string) (to string, value int64, err error)
 *	err  	error
 */
 func (t trc20Abi) UnpackTransferFrom(data string) (to string, value int64, err error) {
-	if len(data) < trc20Length && len(data) != zeroValueLength {
-		return "", 0, fmt.Errorf("长度错误[%d]", len(data))
-	}
-
 	if data[:methodIDLength] != transferFromMethodID {
 		return "", 0, fmt.Errorf("并非transferFrom数据[%s]", data[:methodIDLength])
 	}

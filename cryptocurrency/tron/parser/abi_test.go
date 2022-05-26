@@ -17,3 +17,14 @@ func TestTrc20Abi_UnpackTransfer(t *testing.T) {
 		t.Log(value)
 	}
 }
+
+func TestTrc20Abi_UnpackApprove(t *testing.T) {
+	data := []string{`095ea7b3000000000000000000000000292f061ba6fef6b6aacd7e7ffa0367d10682f7c75000000000`}
+
+	for _, ele := range data {
+		to, value, err := abi.UnpackApprove(ele)
+		require.NoError(t, err, `approve`)
+		t.Log(to)
+		t.Log(value)
+	}
+}
