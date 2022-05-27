@@ -69,6 +69,16 @@ func (s service) findRecords(filter GetRecordFilter, needAllCount bool) (totalCo
 	return totalCount, records, nil
 }
 
+/*CreateFailRecord 创建操作鼠标记录
+参数:
+*	to    	string         	收益方
+*	errMsg	string         	错误信息
+*	amount	decimal.Decimal	金额
+*	freeze	bool           	是否冻结
+返回值:
+*	record	*FailOperation 	记录
+*	err   	error          	错误
+*/
 func (s service) CreateFailRecord(to, errMsg string, amount decimal.Decimal, freeze bool) (record *FailOperation, err error) {
 	record = NewFailOperation(s.from, to, errMsg, amount, helpers.Now(), freeze)
 

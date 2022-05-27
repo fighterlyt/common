@@ -33,6 +33,7 @@ type service struct {
 	privateKey string
 	tronClient *client.GrpcClient
 	locker     redislock.Locker
+	Hooks
 }
 
 func NewService(db *gorm.DB, logger log.Logger, tronClient *client.GrpcClient, locker redislock.Locker) (s Service, err error) {
@@ -46,6 +47,8 @@ func NewService(db *gorm.DB, logger log.Logger, tronClient *client.GrpcClient, l
 	if err = target.validate(); err != nil {
 		return nil, err
 	}
+
+	target.Hooks = NewHooks(logger.Derive(`hooks`))
 
 	if err = target.init(); err != nil {
 		return nil, err
@@ -124,7 +127,13 @@ func (s *service) SetUp(from, privateKey string) error {
 *	error    	error          	错误
 */
 func (s service) Freeze(to string, trxAmount decimal.Decimal) error {
+	info := NewFreezeInfo(s.from, to, trxAmount)
+
+	s.EveryBeforeFreeze(info)
+
 	txID, err := free.Freeze(s.tronClient, s.from, s.privateKey, to, core.ResourceCode_ENERGY, trxAmount.IntPart()*TRXToSUN)
+
+	s.EveryAfterFreeze(info, err)
 
 	if err != nil {
 		if _, saveErr := s.CreateFailRecord(to, err.Error(), trxAmount, true); saveErr != nil {
@@ -163,6 +172,7 @@ func (s service) UnFreeze(to string) error {
 	var (
 		mutex redislock.Mutex
 		err   error
+		txID  string
 	)
 	// 加锁，需要是解锁时，是一次性解锁所有已经到期的质押
 	if mutex, err = redislock.GetAndLock(s.locker, to, lockTimeout); err != nil {
@@ -173,7 +183,13 @@ func (s service) UnFreeze(to string) error {
 		_ = mutex.UnLock()
 	}()
 
-	txID, err := free.UnFreeze(s.tronClient, s.from, s.privateKey, to, core.ResourceCode_ENERGY)
+	info := NewFreezeInfo(s.from, to, decimal.Zero)
+
+	s.EveryBeforeUnfreeze(info)
+
+	txID, err = free.UnFreeze(s.tronClient, s.from, s.privateKey, to, core.ResourceCode_ENERGY)
+
+	s.EveryAfterUnfreeze(info, err)
 
 	if err != nil {
 		if _, saveErr := s.CreateFailRecord(to, err.Error(), decimal.Zero, false); saveErr != nil {

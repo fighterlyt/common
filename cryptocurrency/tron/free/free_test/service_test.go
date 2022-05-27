@@ -57,6 +57,8 @@ func TestNewService(t *testing.T) {
 
 func TestNewService1(t *testing.T) {
 	service, err = free.NewService(db, logger, g, locker)
+	require.NoError(t, service.Add(testHook{}))
+	require.Error(t, service.Add(testHook{}))
 	require.NoError(t, err)
 }
 
@@ -70,9 +72,12 @@ func TestService_Freeze(t *testing.T) {
 	TestService_SetUp1(t)
 
 	// 冻结金额太大
-	require.Error(t, service.Freeze(`TYjBaCYBgngDA3nMpBD76Qk7qBx8twvDqY`, decimal.New(10000, 1)))
+	require.Error(t, service.Freeze(`TQDKRosJu7ktdER5h4e864cXFxGePMiy9P`, decimal.New(10000, 1)))
+	require.True(t, beforeFreeze)
+	require.True(t, afterFreeze)
+	require.Error(t, afterFreezeError)
 
-	require.NoError(t, service.Freeze(`TYjBaCYBgngDA3nMpBD76Qk7qBx8twvDqY`, decimal.New(10, 0)))
+	require.NoError(t, service.Freeze(`TQDKRosJu7ktdER5h4e864cXFxGePMiy9P`, decimal.New(10, 0)))
 }
 
 func Test_service_SetUp(t *testing.T) {
@@ -120,4 +125,47 @@ func Test_service_SetUp(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestService_Unfreeze(t *testing.T) {
+	TestService_SetUp1(t)
+
+	// 冻结金额太大
+	require.Error(t, service.UnFreeze(`TYjBaCYBgngDA3nMpBD76Qk7qBx8twvDqY`))
+	require.True(t, beforeUnFreeze)
+	require.True(t, afterUnFreeze)
+	require.Error(t, afterUnFreezeError)
+}
+
+var (
+	beforeFreeze       = false
+	afterFreeze        = false
+	afterFreezeError   error
+	beforeUnFreeze     = false
+	afterUnFreeze      = false
+	afterUnFreezeError error
+)
+
+type testHook struct{}
+
+func (t testHook) Key() string {
+	return `test`
+}
+
+func (t testHook) BeforeFreeze(_ *free.FreezeInfo) {
+	beforeFreeze = true
+}
+
+func (t testHook) AfterFreeze(_ *free.FreezeInfo, err error) {
+	afterFreeze = true
+	afterFreezeError = err
+}
+
+func (t testHook) BeforeUnfreeze(_ *free.FreezeInfo) {
+	beforeUnFreeze = true
+}
+
+func (t testHook) AfterUnfreeze(_ *free.FreezeInfo, err error) {
+	afterUnFreeze = true
+	afterUnFreezeError = err
 }

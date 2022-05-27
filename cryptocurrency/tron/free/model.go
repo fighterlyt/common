@@ -82,6 +82,17 @@ type FailOperation struct {
 	Freeze bool            `gorm:"column:freeze;comment:是否是冻结"`
 }
 
+/*NewFailOperation 新建操作失败记录
+参数:
+*	from          	string         	质押来源地址
+*	to            	string         	质押收益地址
+*	error         	string         	错误信息
+*	amount        	decimal.Decimal	质押金额
+*	time          	helpers.Time   	发生时间
+*	freeze        	bool           	是否为质押
+返回值:
+*	*FailOperation	*FailOperation 	失败
+*/
 func NewFailOperation(from, to, error string, amount decimal.Decimal, time helpers.Time, freeze bool) *FailOperation {
 	return &FailOperation{
 		From:   from,

@@ -56,6 +56,7 @@ func TestMain(m *testing.M) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 
 	defer cancel()
+
 	if err = redisClient.Ping(ctx).Err(); err != nil {
 		panic(`redis` + err.Error())
 	}
