@@ -10,3 +10,7 @@ func NewExists[K comparable](capacity int) *Exists[K] {
 		Map: NewMap[K, struct{}](capacity),
 	}
 }
+
+func (e *Exists[K]) Add(key K) {
+	e.Map.Add(key, struct{}{})
+}

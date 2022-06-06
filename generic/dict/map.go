@@ -14,7 +14,7 @@ func NewMap[K comparable, V any](capacity int) *Map[K, V] {
 	}
 }
 
-func (m Map[K, V]) AddWithCheck(key K, value V) bool {
+func (m *Map[K, V]) AddWithCheck(key K, value V) bool {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
@@ -27,14 +27,14 @@ func (m Map[K, V]) AddWithCheck(key K, value V) bool {
 	return true
 }
 
-func (m Map[K, V]) Add(key K, value V) {
+func (m *Map[K, V]) Add(key K, value V) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
 	m.entries[key] = value
 }
 
-func (m Map[K, V]) Exist(key K) bool {
+func (m *Map[K, V]) Exist(key K) bool {
 	_, exist := m.entries[key]
 
 	return exist
