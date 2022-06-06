@@ -27,4 +27,8 @@ func (m Map[K, V]) Add(key K, value V) {
 	m.entries[key] = value
 }
 
-func (m Map[K, V]) Every()
+func (m Map[K, V]) Exist(key K) bool {
+	_, exist := m.entries[key]
+
+	return exist
+}
