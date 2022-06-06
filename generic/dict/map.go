@@ -7,6 +7,13 @@ type Map[K comparable, V any] struct {
 	lock    *sync.RWMutex
 }
 
+func NewMap[K comparable, V any](capacity int) *Map[K, V] {
+	return &Map[K, V]{
+		entries: make(map[K]V, capacity),
+		lock:    &sync.RWMutex{},
+	}
+}
+
 func (m Map[K, V]) AddWithCheck(key K, value V) bool {
 	m.lock.Lock()
 	defer m.lock.Unlock()
