@@ -25,7 +25,6 @@ type Service interface {
 }
 
 type captureService struct {
-	Picture    io.Reader
 	Pictures   []image.Image
 	PicDirPath string
 	Opacity    float64
@@ -36,6 +35,18 @@ type imgBuffer struct {
 	data *bytes.Buffer
 }
 
+/*Capture 生成一次验证
+参数:
+*	picWidth   	int             原图宽度
+*	picHeight  	int          	原图高度
+*	blockWidth 	int          	切块宽度
+*	blockHeight	int          	切块大小
+返回值:
+*	pic        	io.ReadCloser	背景图
+*	block      	io.ReadCloser	切块
+*	movement   	int          	x轴位移
+*	err        	error        	错误
+*/
 func (c *captureService) Capture(picWidth, picHeight, blockWidth, blockHeight int) (bg, block io.ReadCloser, movement int, err error) {
 	var (
 		chosenImg image.Image
@@ -73,7 +84,6 @@ func (c *captureService) Capture(picWidth, picHeight, blockWidth, blockHeight in
 
 /*NewCaptureService 构建服务
 参数:
-*	bg     	    io.Reader 	背景图
 *	picDirPath	string    	图片路径
 *	logger 	    log.Logger	日志器
 *	opacity		float64   	遮罩透明度
@@ -128,6 +138,7 @@ func (c *captureService) readPngPictures() error {
 //findRandomPic 随机出一张图片
 func (c *captureService) findRandomPic() (pic image.Image, err error) {
 	index := c.Random.Intn(len(c.Pictures))
+	//c.Logger.Info("选用图片：", zap.Int("索引", index))
 	return c.Pictures[index], nil
 }
 
