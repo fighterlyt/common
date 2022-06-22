@@ -130,6 +130,11 @@ func (m *client) summarize(ownerID string, amount decimal.Decimal, times int, ex
 
 	for i, extend := range extendValue {
 		key := fmt.Sprintf(`value_%d`, i+1)
+
+		if extend.IsZero() {
+			continue
+		}
+
 		updates[key] = gorm.Expr(fmt.Sprintf(`%s + ?`, key), extend)
 
 		switch i {
