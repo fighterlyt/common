@@ -235,6 +235,11 @@ func (m *client) buildSummarizeDayParams(slotValue string, ownerID string, amoun
 
 	for i, extend := range extendValue {
 		key := fmt.Sprintf(`value_%d`, i+1)
+
+		if extend.IsZero() {
+			continue
+		}
+
 		updates[key] = gorm.Expr(fmt.Sprintf(`%s + ?`, key), extend)
 
 		switch i {
