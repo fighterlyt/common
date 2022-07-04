@@ -94,7 +94,7 @@ func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue .
 	return m.summarize(ownerID, amount, 1, extendValue...)
 }
 
-func (m *client) SummarizeFirstUpdate(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+func (m *client) SummarizeOptimism(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
 	return m.summarizeFirstUpdate(ownerID, amount, 1, extendValue...)
 }
 
@@ -135,7 +135,7 @@ func (m *client) RevertSummarize(ownerID string, amount decimal.Decimal, extendV
 	return m.summarize(ownerID, amount.Neg(), -1, extendValue2...)
 }
 
-func (m *client) RevertSummarizeFirstUpdate(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+func (m *client) RevertSummarizeOptimism(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
 	var extendValue2 []decimal.Decimal
 	for _, d := range extendValue {
 		extendValue2 = append(extendValue2, d.Neg())
@@ -280,7 +280,7 @@ func (m *client) summarizeDay(date int64, ownerID string, amount decimal.Decimal
 	}).Create(&data).Error
 }
 
-func (m client) SummarizeDayFirstUpdate(date int64, ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+func (m client) SummarizeDayOptimism(date int64, ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
 	data, updates, err := m.buildSummarizeDayParams(fmt.Sprintf(`%d`, date), ownerID, amount, 1, extendValue...)
 	if err != nil {
 		return errors.Wrap(err, "构建汇总数据失败")
