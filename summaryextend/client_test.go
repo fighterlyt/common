@@ -75,12 +75,15 @@ func Test_client_GetSummarySummary(t *testing.T) {
 
 func TestClient_SummarizeDayFirstUpdate(t *testing.T) {
 	TestDayClient(t)
-	require.NoError(t, dayClient.SummarizeDayFirstUpdate(1, `1`, decimal.New(1, 0), decimal.New(2, 0), decimal.New(3, 0), decimal.New(4, 0)))
+	require.NoError(t, dayClient.SummarizeDayOptimism(1, `1`, decimal.New(1, 0), decimal.New(2, 0), decimal.New(3, 0), decimal.New(4, 0)))
 }
 
 func TestClient_SummarizeFirstUpdate(t *testing.T) {
 	TestDayClient(t)
 
 	helpers.SetTimeZone(helpers.GetBeiJin())
-	require.NoError(t, dayClient.SummarizeFirstUpdate(`1`, decimal.New(1, 0), decimal.New(2, 0), decimal.New(3, 0), decimal.New(4, 0)))
+	require.NoError(t, dayClient.SummarizeOptimism(`1`, decimal.New(1, 0), decimal.New(2, 0), decimal.New(3, 0), decimal.New(4, 0)))
+
+	helpers.SetTimeZone(helpers.GetBeiJin())
+	require.NoError(t, dayClient.SummarizeOptimism(`2`, decimal.New(10, 0), decimal.New(20, 0), decimal.New(30, 0), decimal.New(40, 0)))
 }
