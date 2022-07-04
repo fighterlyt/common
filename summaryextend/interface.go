@@ -21,6 +21,10 @@ type Client interface {
 	GetSummaryExclude(excludeOwnerID []string, from, to int64, selects ...string) (records []Summary, err error)
 
 	SummarizeDayFirstUpdate(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
+
+	SummarizeFirstUpdate(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error
+
+	RevertSummarizeFirstUpdate(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error
 }
 
 // Summary 记录抽象

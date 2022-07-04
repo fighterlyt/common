@@ -94,6 +94,34 @@ func (m *client) Summarize(ownerID string, amount decimal.Decimal, extendValue .
 	return m.summarize(ownerID, amount, 1, extendValue...)
 }
 
+func (m *client) SummarizeFirstUpdate(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	return m.summarizeFirstUpdate(ownerID, amount, 1, extendValue...)
+}
+
+func (m *client) summarizeFirstUpdate(ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) error {
+	slotValue, err := m.getSlotValue(ownerID)
+	if err != nil {
+		return errors.Wrap(err, `计算slotValue错误`)
+	}
+
+	data, updates, err := m.buildSummarizeDayParams(slotValue, ownerID, amount, times, extendValue...)
+	if err != nil {
+		return errors.Wrap(err, "构建汇总数据失败")
+	}
+
+	db := m.db.Session(&gorm.Session{}).Where("ownerID=? and slotValue=?", ownerID, slotValue).Updates(updates)
+
+	if err = db.Error; err != nil {
+		return errors.Wrap(err, "更新失败")
+	}
+
+	if db.RowsAffected > 0 { // 更新到，则返回
+		return nil
+	}
+
+	return m.db.Session(&gorm.Session{}).Create(data).Error
+}
+
 func (m *client) SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
 	return m.summarize(ownerID, amount, 0, extendValue...)
 }
@@ -105,6 +133,15 @@ func (m *client) RevertSummarize(ownerID string, amount decimal.Decimal, extendV
 	}
 
 	return m.summarize(ownerID, amount.Neg(), -1, extendValue2...)
+}
+
+func (m *client) RevertSummarizeFirstUpdate(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	var extendValue2 []decimal.Decimal
+	for _, d := range extendValue {
+		extendValue2 = append(extendValue2, d.Neg())
+	}
+
+	return m.summarizeFirstUpdate(ownerID, amount.Neg(), -1, extendValue2...)
 }
 
 func (m *client) summarize(ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) error {
@@ -249,7 +286,7 @@ func (m client) SummarizeDayFirstUpdate(date int64, ownerID string, amount decim
 		return errors.Wrap(err, "构建汇总数据失败")
 	}
 
-	db := m.db.Session(&gorm.Session{}).Where(" slotValue=? and slotValue=?", ownerID, date).Updates(updates)
+	db := m.db.Session(&gorm.Session{}).Where("ownerID=? and slotValue=?", ownerID, date).Updates(updates)
 
 	if err = db.Error; err != nil {
 		return errors.Wrap(err, "更新失败")
