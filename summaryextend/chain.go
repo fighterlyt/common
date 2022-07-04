@@ -37,6 +37,14 @@ func Chain(clients ...Client) (client Client, err error) {
 
 type chainClients []Client
 
+func (c chainClients) RevertSummarizeFirstUpdate(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	return nil
+}
+
+func (c chainClients) SummarizeFirstUpdate(ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	return nil
+}
+
 func (c chainClients) SummarizeDayFirstUpdate(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error {
 	return nil
 }
