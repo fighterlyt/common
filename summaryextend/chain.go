@@ -37,6 +37,10 @@ func Chain(clients ...Client) (client Client, err error) {
 
 type chainClients []Client
 
+func (c chainClients) SummarizeDayFirstUpdate(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error {
+	return nil
+}
+
 func (c chainClients) SummarizeNotAddTimes(ownerID string, amount decimal.Decimal, extend ...decimal.Decimal) error {
 	var (
 		err, singleErr error

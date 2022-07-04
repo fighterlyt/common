@@ -19,6 +19,8 @@ type Client interface {
 	// GetSummarySummary 获取汇总的汇总
 	GetSummarySummary(ownerIDs []string, from, to int64) (record Summary, err error)
 	GetSummaryExclude(excludeOwnerID []string, from, to int64, selects ...string) (records []Summary, err error)
+
+	SummarizeDayFirstUpdate(date int64, ownerID string, amount decimal.Decimal, other ...decimal.Decimal) error
 }
 
 // Summary 记录抽象

@@ -71,3 +71,8 @@ func Test_client_GetSummarySummary(t *testing.T) {
 	require.NoError(t, err)
 	t.Log(fmt.Sprintf("%+v", record))
 }
+
+func TestClient_SummarizeDayFirstUpdate(t *testing.T) {
+	TestDayClient(t)
+	require.NoError(t, dayClient.SummarizeDay(1, `1`, decimal.New(1, 0), decimal.New(2, 0), decimal.New(3, 0), decimal.New(4, 0)))
+}

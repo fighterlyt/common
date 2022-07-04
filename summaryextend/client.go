@@ -2,6 +2,7 @@ package summaryextend
 
 import (
 	"fmt"
+	"github.com/youthlin/t"
 
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
@@ -184,11 +185,8 @@ func (m *client) RevertSummarizeDay(date int64, ownerID string, amount decimal.D
 	return m.summarizeDay(date, ownerID, amount.Neg(), -1, extendValue2...)
 }
 
-func (m *client) summarizeDay(date int64, ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) error {
-	// 写入或者更新
-	slotValue := date
-
-	data := newSummary(m.slot, ownerID, amount, fmt.Sprintf(`%d`, slotValue))
+func (m *client) buildSummarizeDayParams(slotValue string, ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) (*Detail, map[string]interface{}, error) {
+	data := newSummary(m.slot, ownerID, amount, slotValue)
 
 	updates := map[string]interface{}{
 		"value": gorm.Expr(`value + ?`, amount),
@@ -224,8 +222,17 @@ func (m *client) summarizeDay(date int64, ownerID string, amount decimal.Decimal
 		case 9:
 			data.Value10 = extend
 		default:
-			return fmt.Errorf(`最多支持10个扩展数据`)
+			return nil, nil, fmt.Errorf(`最多支持10个扩展数据`)
 		}
+	}
+
+	return data, updates, nil
+}
+
+func (m *client) summarizeDay(date int64, ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) error {
+	data, updates, err := m.buildSummarizeDayParams(fmt.Sprintf(`%d`, date), ownerID, amount, times, extendValue...)
+	if err != nil {
+		return errors.Wrap(err, t.T("构建汇总数据失败"))
 	}
 
 	db := m.db.Session(&gorm.Session{})
@@ -234,6 +241,25 @@ func (m *client) summarizeDay(date int64, ownerID string, amount decimal.Decimal
 		Columns:   []clause.Column{{Name: `ownerID`}, {Name: `slotValue`}},
 		DoUpdates: clause.Assignments(updates),
 	}).Create(&data).Error
+}
+
+func (m client) SummarizeDayFirstUpdate(date int64, ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
+	data, updates, err := m.buildSummarizeDayParams(fmt.Sprintf(`%d`, date), ownerID, amount, 1, extendValue...)
+	if err != nil {
+		return errors.Wrap(err, "构建汇总数据失败")
+	}
+
+	db := m.db.Session(&gorm.Session{}).Where(" slotValue=? and slotValue=?", ownerID, date).Updates(updates)
+
+	if err = db.Error; err != nil {
+		return errors.Wrap(err, "更新失败")
+	}
+
+	if db.RowsAffected > 0 { // 更新到，则返回
+		return nil
+	}
+
+	return m.db.Session(&gorm.Session{}).Create(data).Error
 }
 
 func (m *client) SummarizeDay(date int64, ownerID string, amount decimal.Decimal, extendValue ...decimal.Decimal) error {
