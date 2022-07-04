@@ -74,5 +74,5 @@ func Test_client_GetSummarySummary(t *testing.T) {
 
 func TestClient_SummarizeDayFirstUpdate(t *testing.T) {
 	TestDayClient(t)
-	require.NoError(t, dayClient.SummarizeDay(1, `1`, decimal.New(1, 0), decimal.New(2, 0), decimal.New(3, 0), decimal.New(4, 0)))
+	require.NoError(t, dayClient.SummarizeDayFirstUpdate(1, `1`, decimal.New(1, 0), decimal.New(2, 0), decimal.New(3, 0), decimal.New(4, 0)))
 }
