@@ -2,6 +2,7 @@ package summaryextend
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/shopspring/decimal"
 )
@@ -59,6 +60,34 @@ func newSummary(slot Slot, ownerID string, value decimal.Decimal, slotValue stri
 		SlotValue: slotValue,
 		Times:     1,
 	}
+}
+func (s *Detail) SetExtendValue(index int, value decimal.Decimal) error {
+	switch index {
+	case 0:
+		s.Value1 = value
+	case 1:
+		s.Value2 = value
+	case 2:
+		s.Value3 = value
+	case 3:
+		s.Value4 = value
+	case 4:
+		s.Value5 = value
+	case 5:
+		s.Value6 = value
+	case 6:
+		s.Value7 = value
+	case 7:
+		s.Value8 = value
+	case 8:
+		s.Value9 = value
+	case 9:
+		s.Value10 = value
+	default:
+		return fmt.Errorf(`最多支持10个扩展数据`)
+	}
+
+	return nil
 }
 
 func (s *Detail) UnmarshalBinary(data []byte) error {

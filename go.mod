@@ -15,7 +15,7 @@ require (
 	github.com/ethereum/go-ethereum v1.10.15
 	github.com/fighterlyt/gormlogger v0.0.0-20210729161641-ae2b6a621523
 	github.com/fighterlyt/gotron-sdk v0.0.0-20220523163203-b4d07114ac63
-	github.com/fighterlyt/log v0.0.0-20220414113815-39a59b857bab
+	github.com/fighterlyt/log v0.0.0-20220608163017-fe71664f4f01
 	github.com/fighterlyt/redislock v0.0.0-20211230111618-e4960a5341be
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v8 v8.11.5
@@ -134,5 +134,6 @@ require (
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gorm.io/hints v1.1.0 // indirect
 	k8s.io/apimachinery v0.0.0-20191123233150-4c4803ed55e3 // indirect
 )

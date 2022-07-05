@@ -2,7 +2,9 @@ package summaryextend
 
 import (
 	"fmt"
+
 	"github.com/youthlin/t"
+	"gorm.io/hints"
 
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
@@ -175,29 +177,8 @@ func (m *client) summarize(ownerID string, amount decimal.Decimal, times int, ex
 
 		updates[key] = gorm.Expr(fmt.Sprintf(`%s + ?`, key), extend)
 
-		switch i {
-		case 0:
-			data.Value1 = extend
-		case 1:
-			data.Value2 = extend
-		case 2:
-			data.Value3 = extend
-		case 3:
-			data.Value4 = extend
-		case 4:
-			data.Value5 = extend
-		case 5:
-			data.Value6 = extend
-		case 6:
-			data.Value7 = extend
-		case 7:
-			data.Value8 = extend
-		case 8:
-			data.Value9 = extend
-		case 9:
-			data.Value10 = extend
-		default:
-			return fmt.Errorf(`最多支持10个扩展数据`)
+		if err = data.SetExtendValue(i, extend); err != nil {
+			return err
 		}
 	}
 
@@ -222,10 +203,10 @@ func (m *client) RevertSummarizeDay(date int64, ownerID string, amount decimal.D
 	return m.summarizeDay(date, ownerID, amount.Neg(), -1, extendValue2...)
 }
 
-func (m *client) buildSummarizeDayParams(slotValue string, ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) (*Detail, map[string]interface{}, error) {
-	data := newSummary(m.slot, ownerID, amount, slotValue)
+func (m *client) buildSummarizeDayParams(slotValue, ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) (detail *Detail, updates map[string]interface{}, err error) { //nolint:lll
+	detail = newSummary(m.slot, ownerID, amount, slotValue)
 
-	updates := map[string]interface{}{
+	updates = map[string]interface{}{
 		"value": gorm.Expr(`value + ?`, amount),
 	}
 
@@ -237,33 +218,12 @@ func (m *client) buildSummarizeDayParams(slotValue string, ownerID string, amoun
 		key := fmt.Sprintf(`value_%d`, i+1)
 		updates[key] = gorm.Expr(fmt.Sprintf(`%s + ?`, key), extend)
 
-		switch i {
-		case 0:
-			data.Value1 = extend
-		case 1:
-			data.Value2 = extend
-		case 2:
-			data.Value3 = extend
-		case 3:
-			data.Value4 = extend
-		case 4:
-			data.Value5 = extend
-		case 5:
-			data.Value6 = extend
-		case 6:
-			data.Value7 = extend
-		case 7:
-			data.Value8 = extend
-		case 8:
-			data.Value9 = extend
-		case 9:
-			data.Value10 = extend
-		default:
-			return nil, nil, fmt.Errorf(`最多支持10个扩展数据`)
+		if err = detail.SetExtendValue(i, extend); err != nil {
+			return nil, nil, err
 		}
 	}
 
-	return data, updates, nil
+	return detail, updates, nil
 }
 
 func (m *client) summarizeDay(date int64, ownerID string, amount decimal.Decimal, times int, extendValue ...decimal.Decimal) error {
@@ -418,7 +378,7 @@ func (m client) getSlotValueByRange(from, to int64) (scope helpers.Scope, err er
 		}
 
 		return func(db *gorm.DB) *gorm.DB {
-			return db.Where(`slotValue in (?)`, result)
+			return db.Clauses(hints.ForceIndex(`slotValue`)).Where(`slotValue in (?)`, result)
 		}, nil
 	case SlotMonth:
 		if from >= to {
@@ -426,7 +386,8 @@ func (m client) getSlotValueByRange(from, to int64) (scope helpers.Scope, err er
 		}
 
 		return func(db *gorm.DB) *gorm.DB {
-			return db.Where(`slotValue >= ? and slotValue <= ?`, fmt.Sprintf(`%d`, helpers.GetMonthByTime(from)), fmt.Sprintf(`%d`, helpers.GetMonthByTime(to))) //nolint:lll
+			return db.Clauses(hints.ForceIndex(`slotValue`)).
+				Where(`slotValue >= ? and slotValue <= ?`, fmt.Sprintf(`%d`, helpers.GetMonthByTime(from)), fmt.Sprintf(`%d`, helpers.GetMonthByTime(to))) //nolint:lll
 		}, nil
 	case SlotWhole:
 		return nil, nil
@@ -461,7 +422,19 @@ func (m client) GetSummarySummary(ownerIDs []string, from, to int64) (record Sum
 		return nil, errors.Wrap(err, `构建时间查询`)
 	}
 
-	if err = query.Select("sum(value) as value,sum(value_1) as value_1,sum(value_2) as value_2,sum(value_3) as value_3,sum(value_4) as value_4,sum(value_5) as value_5,sum(value_6) as value_6,sum(value_7) as value_7,sum(value_8) as value_8,sum(value_9) as value_9,sum(value_10) as value_10,sum(times) as times").Find(&data).Error; err != nil {
+	if err = query.Select(
+		`sum(value) as value,` +
+			`sum(value_1) as value_1,` +
+			`sum(value_2) as value_2,` +
+			`sum(value_3) as value_3,` +
+			`sum(value_4) as value_4,` +
+			`sum(value_5) as value_5,` +
+			`sum(value_6) as value_6,` +
+			`sum(value_7) as value_7,` +
+			`sum(value_8) as value_8,` +
+			`sum(value_9) as value_9,` +
+			`sum(value_10) as value_10,` +
+			`sum(times) as times`).Find(&data).Error; err != nil {
 		return nil, errors.Wrap(err, `数据库操作`)
 	}
 

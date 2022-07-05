@@ -1,11 +1,11 @@
 package summaryextend
 
 import (
-	"fmt"
-	"gitlab.com/nova_dubai/common/helpers"
 	"sync"
 	"testing"
 	"time"
+
+	"gitlab.com/nova_dubai/common/helpers"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
@@ -58,19 +58,45 @@ func BenchmarkClient_Summarize(b *testing.B) {
 
 func TestClient_Get(t *testing.T) {
 	TestHistoryClient(t)
+
 	now := time.Now().Unix()
-	records, err := historyClient.GetSummary(nil, now, now+1)
+
+	var (
+		records []Summary
+	)
+
+	records, err = historyClient.GetSummary(nil, now, now+1)
 
 	require.NoError(t, err)
 	t.Log(records)
 }
 
-func Test_client_GetSummarySummary(t *testing.T) {
-	TestHistoryClient(t)
-	record, err := historyClient.GetSummarySummary(nil, 0, 0)
+func TestClient_GetDay(t *testing.T) {
+	TestDayClient(t)
+
+	now := time.Now().Unix()
+
+	var (
+		records []Summary
+	)
+
+	records, err = dayClient.GetSummary(nil, now, now+1)
 
 	require.NoError(t, err)
-	t.Log(fmt.Sprintf("%+v", record))
+	t.Log(records)
+}
+func Test_client_GetSummarySummary(t *testing.T) {
+	TestHistoryClient(t)
+
+	var (
+		record Summary
+	)
+
+	record, err = historyClient.GetSummarySummary(nil, 0, 0)
+
+	require.NoError(t, err)
+
+	t.Logf("%+v", record)
 }
 
 func TestClient_SummarizeDayFirstUpdate(t *testing.T) {
