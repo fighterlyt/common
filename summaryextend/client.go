@@ -3,12 +3,10 @@ package summaryextend
 import (
 	"fmt"
 
-	"github.com/youthlin/t"
-	"gorm.io/hints"
-
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
+	"github.com/youthlin/t"
 	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -378,7 +376,7 @@ func (m client) getSlotValueByRange(from, to int64) (scope helpers.Scope, err er
 		}
 
 		return func(db *gorm.DB) *gorm.DB {
-			return db.Clauses(hints.ForceIndex(`slotValue`)).Where(`slotValue in (?)`, result)
+			return db.Where(`slotValue in (?)`, result)
 		}, nil
 	case SlotMonth:
 		if from >= to {
@@ -386,8 +384,7 @@ func (m client) getSlotValueByRange(from, to int64) (scope helpers.Scope, err er
 		}
 
 		return func(db *gorm.DB) *gorm.DB {
-			return db.Clauses(hints.ForceIndex(`slotValue`)).
-				Where(`slotValue >= ? and slotValue <= ?`, fmt.Sprintf(`%d`, helpers.GetMonthByTime(from)), fmt.Sprintf(`%d`, helpers.GetMonthByTime(to))) //nolint:lll
+			return db.Where(`slotValue >= ? and slotValue <= ?`, fmt.Sprintf(`%d`, helpers.GetMonthByTime(from)), fmt.Sprintf(`%d`, helpers.GetMonthByTime(to))) //nolint:lll
 		}, nil
 	case SlotWhole:
 		return nil, nil
