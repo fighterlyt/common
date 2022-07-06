@@ -52,14 +52,14 @@ func newAutoAppendSliceData(capacity int) *autoAppendSliceData {
 	}
 }
 
-func (a *autoAppendSliceData) get(index int) interface{} {
+func (a *autoAppendSliceData) get(index int64) interface{} {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 
 	return a.data[index]
 }
 
-func (a *autoAppendSliceData) set(index int, data interface{}) error {
+func (a *autoAppendSliceData) set(index int64, data interface{}) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
@@ -74,7 +74,7 @@ func (a *autoAppendSliceData) set(index int, data interface{}) error {
 返回值:
 *	interface{}	interface{} 对应的值
 */
-func (a *AutoAppendSlice) GetElement(elementID int) (interface{}, error) {
+func (a *AutoAppendSlice) GetElement(elementID int64) (interface{}, error) {
 	a.mutex.RLock()
 	defer a.mutex.RUnlock()
 
@@ -83,11 +83,12 @@ func (a *AutoAppendSlice) GetElement(elementID int) (interface{}, error) {
 	return a.elements[firstIndex].get(secondIndex), nil
 }
 
-func (a *AutoAppendSlice) getIndexAndAutoAppend(elementID int, isRLock bool) (firstIndex, secondIndex int) {
-	firstIndex = (elementID - a.offset - 1) / a.elementCapacity  // 一级slice的下标
-	secondIndex = (elementID - a.offset - 1) % a.elementCapacity // 二级slice的下标
+func (a *AutoAppendSlice) getIndexAndAutoAppend(elementID int64, isRLock bool) (firstIndex, secondIndex int64) {
+	var realIndex = elementID - int64(a.offset-1)
+	firstIndex = realIndex / int64(a.elementCapacity)  // 一级slice的下标
+	secondIndex = realIndex % int64(a.elementCapacity) // 二级slice的下标
 
-	var distance = firstIndex + 1 - len(a.elements)
+	var distance = int(firstIndex) + 1 - len(a.elements)
 
 	if distance == 0 {
 		return firstIndex, secondIndex
@@ -117,7 +118,7 @@ func (a *AutoAppendSlice) getIndexAndAutoAppend(elementID int, isRLock bool) (fi
 返回值:
 *	error    	error      	错误
 */
-func (a *AutoAppendSlice) SetElement(elementID int, data interface{}) error {
+func (a *AutoAppendSlice) SetElement(elementID int64, data interface{}) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
