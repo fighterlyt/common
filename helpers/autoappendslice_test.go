@@ -50,7 +50,7 @@ func TestAutoAppendSlice_SetElement1(t *testing.T) {
 	for i := 1; i <= 100000; i++ {
 		wg.Add(1)
 		go func(index int) {
-			err = a.SetElement(10000+index, fmt.Sprintf("%d", index))
+			err = a.SetElement(int64(10000+index), fmt.Sprintf("%d", index))
 			require.NoError(t, err)
 
 			wg.Done()
@@ -60,7 +60,7 @@ func TestAutoAppendSlice_SetElement1(t *testing.T) {
 	for i := 1; i <= 100000; i++ {
 		wg.Add(1)
 		go func(index int) {
-			_, err = a.GetElement(10000 + index)
+			_, err = a.GetElement(int64(10000 + index))
 			require.NoError(t, err)
 			wg.Done()
 			// t.Log(index, ":", result)
