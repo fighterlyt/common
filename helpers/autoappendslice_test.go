@@ -1,14 +1,17 @@
 package helpers
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/require"
+	"sync"
 	"testing"
 )
 
 var a *AutoAppendSlice
 
 func TestNewAutoAppendSlice(t *testing.T) {
-	a = NewAutoAppendSlice(10000, 10000)
+	a, err = NewAutoAppendSlice(10000, 10000)
+	require.NoError(t, err)
 }
 
 func TestAutoAppendSlice_GetElement(t *testing.T) {
@@ -38,5 +41,31 @@ func TestAutoAppendSlice_SetElement(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Log(result)
+}
 
+func TestAutoAppendSlice_SetElement1(t *testing.T) {
+	TestNewAutoAppendSlice(t)
+	wg := sync.WaitGroup{}
+
+	for i := 1; i <= 100000; i++ {
+		wg.Add(1)
+		go func(index int) {
+			err = a.SetElement(10000+index, fmt.Sprintf("%d", index))
+			require.NoError(t, err)
+
+			wg.Done()
+		}(i)
+	}
+
+	for i := 1; i <= 100000; i++ {
+		wg.Add(1)
+		go func(index int) {
+			_, err = a.GetElement(10000 + index)
+			require.NoError(t, err)
+			wg.Done()
+			// t.Log(index, ":", result)
+		}(i)
+	}
+
+	wg.Wait()
 }

@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"github.com/pkg/errors"
 	"sync"
 )
 
@@ -10,15 +11,23 @@ var (
 
 // AutoAppendSlice 自动扩容的slice,为了避免数据量过大导致的扩容问题，在创建的时候，创建一定的容量，一旦超过这个容量，BitSlice会自动创建一个一级slice
 type AutoAppendSlice struct {
-	mutex           *sync.Mutex
+	mutex           *sync.RWMutex
 	elements        []*autoAppendSliceData
 	offset          int // 偏移量
 	elementCapacity int // 每个二级slice的容量
 }
 
-func NewAutoAppendSlice(offset int, capacity int) *AutoAppendSlice {
+func NewAutoAppendSlice(offset, capacity int) (*AutoAppendSlice, error) {
+	if offset < 0 {
+		return nil, errors.New("偏移量必须大于0")
+	}
+
+	if capacity <= 0 {
+		return nil, errors.New("二位数组容量必须大于0")
+	}
+
 	bitSlice := &AutoAppendSlice{
-		mutex:           &sync.Mutex{},
+		mutex:           &sync.RWMutex{},
 		elements:        make([]*autoAppendSliceData, defaultCapacity),
 		offset:          offset,
 		elementCapacity: capacity,
@@ -28,24 +37,24 @@ func NewAutoAppendSlice(offset int, capacity int) *AutoAppendSlice {
 		bitSlice.elements[i] = newAutoAppendSliceData(capacity)
 	}
 
-	return bitSlice
+	return bitSlice, nil
 }
 
 type autoAppendSliceData struct {
-	mutex *sync.Mutex
+	mutex *sync.RWMutex
 	data  []interface{}
 }
 
 func newAutoAppendSliceData(capacity int) *autoAppendSliceData {
 	return &autoAppendSliceData{
-		mutex: &sync.Mutex{},
+		mutex: &sync.RWMutex{},
 		data:  make([]interface{}, capacity),
 	}
 }
 
 func (a *autoAppendSliceData) get(index int) interface{} {
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
 	return a.data[index]
 }
@@ -66,24 +75,36 @@ func (a *autoAppendSliceData) set(index int, data interface{}) error {
 *	interface{}	interface{} 对应的值
 */
 func (a *AutoAppendSlice) GetElement(elementID int) (interface{}, error) {
-	firstIndex, secondIndex := a.getIndex(elementID)
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
-	a.mutex.Lock()
-	defer a.mutex.Unlock()
+	firstIndex, secondIndex := a.getIndexAndAutoAppend(elementID, true)
 
 	return a.elements[firstIndex].get(secondIndex), nil
 }
 
-func (a *AutoAppendSlice) getIndex(elementID int) (firstIndex, secondIndex int) {
+func (a *AutoAppendSlice) getIndexAndAutoAppend(elementID int, isRLock bool) (firstIndex, secondIndex int) {
 	firstIndex = (elementID - a.offset - 1) / a.elementCapacity  // 一级slice的下标
 	secondIndex = (elementID - a.offset - 1) % a.elementCapacity // 二级slice的下标
 
 	var distance = firstIndex + 1 - len(a.elements)
 
-	if distance > 0 {
-		for i := 0; i < distance; i++ {
-			a.elements = append(a.elements, newAutoAppendSliceData(a.elementCapacity))
-		}
+	if distance == 0 {
+		return firstIndex, secondIndex
+	}
+
+	if isRLock {
+		a.mutex.RUnlock()
+
+		a.mutex.Lock()
+		defer func() {
+			a.mutex.Unlock()
+			a.mutex.RLock()
+		}()
+	}
+
+	for i := 0; i < distance; i++ {
+		a.elements = append(a.elements, newAutoAppendSliceData(a.elementCapacity))
 	}
 
 	return firstIndex, secondIndex
@@ -97,10 +118,10 @@ func (a *AutoAppendSlice) getIndex(elementID int) (firstIndex, secondIndex int) 
 *	error    	error      	错误
 */
 func (a *AutoAppendSlice) SetElement(elementID int, data interface{}) error {
-	firstIndex, secondIndex := a.getIndex(elementID)
-
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+
+	firstIndex, secondIndex := a.getIndexAndAutoAppend(elementID, false)
 
 	return a.elements[firstIndex].set(secondIndex, data)
 }
