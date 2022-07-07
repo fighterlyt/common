@@ -1,6 +1,8 @@
 package dict
 
-import "sync"
+import (
+	"sync"
+)
 
 type Map[K comparable, V any] struct {
 	entries map[K]V
@@ -35,7 +37,26 @@ func (m *Map[K, V]) Add(key K, value V) {
 }
 
 func (m *Map[K, V]) Exist(key K) bool {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+
 	_, exist := m.entries[key]
 
 	return exist
+}
+
+func (m *Map[K, V]) Get(key K) V {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+
+	return m.entries[key]
+}
+
+func (m *Map[K, V]) GetWithExist(key K) (v V, exist bool) {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+
+	v, exist = m.entries[key]
+
+	return v, exist
 }
