@@ -35,13 +35,13 @@ func SetOssToHost(to string) {
 // OssFilePath 存储到oss的文件路径
 type OssFilePath string
 
-/*MarshalJSON 序列化方法
+/*MarshalText 序列化方法
 参数:
 返回值:
 *	[]byte	[]byte	序列化后的数据
 *	error 	error 	错误
 */
-func (o OssFilePath) MarshalJSON() ([]byte, error) {
+func (o OssFilePath) MarshalText() ([]byte, error) {
 	if !isSetFromHost {
 		return nil, errors.New("请先设置待替换域名")
 	}
