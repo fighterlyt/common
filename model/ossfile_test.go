@@ -79,9 +79,6 @@ func TestMain(m *testing.M) {
 		panic(`自动生成数据库表失败` + err.Error())
 	}
 
-	SetOssFromHost(testFromHost)
-	SetOssToHost(testToHost)
-
 	os.Exit(m.Run())
 }
 
@@ -128,7 +125,29 @@ func TestOssFileRedisGet(t *testing.T) {
 	fmt.Println("oss路径:", record.Link)
 }
 
-func TestOssFilePath_MarshalJSON(t *testing.T) {
+func TestOssFilePath_MarshalJSON_notSet(t *testing.T) {
+	_, err := testOssFilePath.MarshalJSON()
+	require.Error(t, err)
+}
+
+func TestOssFilePath_MarshalJSON_OnlyFrom(t *testing.T) {
+	SetOssFromHost(testFromHost)
+
+	_, err := testOssFilePath.MarshalJSON()
+	require.Error(t, err)
+}
+
+func TestOssFilePath_MarshalJSON_OnlyTo(t *testing.T) {
+	SetOssToHost(testToHost)
+
+	_, err := testOssFilePath.MarshalJSON()
+	require.Error(t, err)
+}
+
+func TestOssFilePath_MarshalJSON_setAll(t *testing.T) {
+	SetOssFromHost(testFromHost)
+	SetOssToHost(testToHost)
+
 	result, err := testOssFilePath.MarshalJSON()
 	require.NoError(t, err)
 
@@ -137,21 +156,13 @@ func TestOssFilePath_MarshalJSON(t *testing.T) {
 	}
 
 	fmt.Println(string(result))
+}
 
-	// from设置为空
+func TestOssFilePath_MarshalJSON_setAllEmpty(t *testing.T) {
 	SetOssFromHost("")
-	result, err = testOssFilePath.MarshalJSON()
-	require.NoError(t, err)
-
-	if string(result) != string(testOssFilePath) {
-		panic("替换失败")
-	}
-
-	fmt.Println(string(result))
-
-	// from设置为空
 	SetOssToHost("")
-	result, err = testOssFilePath.MarshalJSON()
+
+	result, err := testOssFilePath.MarshalJSON()
 	require.NoError(t, err)
 
 	if string(result) != string(testOssFilePath) {
