@@ -126,21 +126,21 @@ func TestOssFileRedisGet(t *testing.T) {
 }
 
 func TestOssFilePath_MarshalJSON_notSet(t *testing.T) {
-	_, err := testOssFilePath.MarshalJSON()
+	_, err := testOssFilePath.MarshalText()
 	require.Error(t, err)
 }
 
 func TestOssFilePath_MarshalJSON_OnlyFrom(t *testing.T) {
 	SetOssFromHost(testFromHost)
 
-	_, err := testOssFilePath.MarshalJSON()
+	_, err := testOssFilePath.MarshalText()
 	require.Error(t, err)
 }
 
 func TestOssFilePath_MarshalJSON_OnlyTo(t *testing.T) {
 	SetOssToHost(testToHost)
 
-	_, err := testOssFilePath.MarshalJSON()
+	_, err := testOssFilePath.MarshalText()
 	require.Error(t, err)
 }
 
@@ -148,7 +148,7 @@ func TestOssFilePath_MarshalJSON_setAll(t *testing.T) {
 	SetOssFromHost(testFromHost)
 	SetOssToHost(testToHost)
 
-	result, err := testOssFilePath.MarshalJSON()
+	result, err := testOssFilePath.MarshalText()
 	require.NoError(t, err)
 
 	if string(result) != resultPath {
@@ -162,7 +162,7 @@ func TestOssFilePath_MarshalJSON_setAllEmpty(t *testing.T) {
 	SetOssFromHost("")
 	SetOssToHost("")
 
-	result, err := testOssFilePath.MarshalJSON()
+	result, err := testOssFilePath.MarshalText()
 	require.NoError(t, err)
 
 	if string(result) != string(testOssFilePath) {
