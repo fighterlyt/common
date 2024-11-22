@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/fighterlyt/common/helpers"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -90,7 +89,7 @@ func (a ListArgument) ScopeGeneric(db *gorm.DB, spec ScopeSpec) *gorm.DB {
 
 	if spec.Limit {
 		if a.Limit <= 0 {
-			db = db.Limit(math.MaxInt32)
+			db = db.Limit(1<<31 - 1)
 		} else {
 			db = db.Limit(a.Limit)
 		}
@@ -139,7 +138,7 @@ func (a ListArgument) OffSetAndLimit(db *gorm.DB) *gorm.DB {
 	db = db.Offset(a.Start)
 
 	if a.Limit <= 0 {
-		db = db.Limit(math.MaxInt32)
+		db = db.Limit(1<<31 - 1)
 	} else {
 		db = db.Limit(a.Limit)
 	}
