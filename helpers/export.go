@@ -67,7 +67,7 @@ func CreateXLSFile(headers map[string]int, headerOrders []string, title string, 
 
 	sheet1 := `Sheet1`
 	// Create a new sheet.
-	index := f.NewSheet(sheet1)
+	index, _ := f.NewSheet(sheet1)
 	style, _ := f.NewStyle(&excelize.Style{Alignment: &excelize.Alignment{
 		Horizontal: "center",
 	}})
