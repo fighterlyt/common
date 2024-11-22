@@ -1,8 +1,8 @@
 package tronbalance
 
 import (
+	"github.com/fighterlyt/common/durablemetrics"
 	"github.com/fighterlyt/log"
-	"gitlab.com/nova_dubai/common/durablemetrics"
 )
 
 type metrics struct {

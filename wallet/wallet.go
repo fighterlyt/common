@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"time"
 
-	"gitlab.com/nova_dubai/common/helpers"
+	"github.com/fighterlyt/common/helpers"
 
+	"github.com/fighterlyt/common/model"
 	"github.com/fighterlyt/gormlogger"
 	"github.com/fighterlyt/redislock"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/model"
 	"gorm.io/gorm"
 )
 

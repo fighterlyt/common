@@ -3,12 +3,12 @@ package free_test
 import (
 	"testing"
 
+	"github.com/fighterlyt/common/cryptocurrency/tron/free"
 	"github.com/fighterlyt/gotron-sdk/pkg/client"
 	"github.com/fighterlyt/log"
 	"github.com/fighterlyt/redislock"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/nova_dubai/common/cryptocurrency/tron/free"
 	"gorm.io/gorm"
 )
 

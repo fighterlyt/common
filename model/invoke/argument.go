@@ -7,14 +7,15 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/fighterlyt/common/helpers"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/vmihailenco/msgpack"
-	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 )
 
-/*ProcessArgument 处理gin 句柄的公共逻辑，包括JSON反序列化和验证
+/*
+ProcessArgument 处理gin 句柄的公共逻辑，包括JSON反序列化和验证
 参数:
 *	ctx     	*gin.Context	gin上下文
 *	argument	Query       	参数
@@ -154,7 +155,8 @@ func NewListArgument(query Query) (argument *ListArgument, err error) {
 	return &ListArgument{Query: query}, nil
 }
 
-/*IsPointer 判断是否为指针
+/*
+IsPointer 判断是否为指针
 参数:
 *	data    	interface{}	数据
 *	allowNil	bool       	是否允许为空指针

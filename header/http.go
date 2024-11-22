@@ -1,10 +1,11 @@
 package header
 
 import (
+	"strings"
+
+	"github.com/fighterlyt/common/model/invoke"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/model/invoke"
-	"strings"
 )
 
 func (s service) http() {

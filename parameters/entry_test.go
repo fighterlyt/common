@@ -1,7 +1,7 @@
 package parameters
 
 import (
-	"gitlab.com/nova_dubai/common/helpers"
+	"github.com/fighterlyt/common/helpers"
 
 	"os"
 	"testing"

@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fighterlyt/common/sms"
 	"github.com/fighterlyt/log"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/nova_dubai/common/sms"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

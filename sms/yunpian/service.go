@@ -14,11 +14,11 @@ import (
 
 	stderror "errors"
 
+	"github.com/fighterlyt/common/helpers"
+	"github.com/fighterlyt/common/sms"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/helpers"
-	"gitlab.com/nova_dubai/common/sms"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
@@ -46,7 +46,8 @@ type Service struct {
 	retryCheckTimes    int              // 重试查单次数
 }
 
-/*NewService 新建服务
+/*
+NewService 新建服务
 参数:
 *	apiKey  	        string       	    api Key
 *	timeout 	        time.Duration	    超时
@@ -234,7 +235,8 @@ type sendResponse struct {
 	Sid    int64   `json:"sid"`
 }
 
-/*Validate 校验 错误码 https://www.yunpian.com/official/document/sms/zh_CN/returnvalue_common
+/*
+Validate 校验 错误码 https://www.yunpian.com/official/document/sms/zh_CN/returnvalue_common
 参数:
 返回值:
 *	error	error	返回值1

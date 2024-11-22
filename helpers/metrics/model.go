@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/fighterlyt/common/helpers"
+	"github.com/fighterlyt/common/model"
 	"github.com/fighterlyt/log"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -12,8 +14,6 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
 	"github.com/shirou/gopsutil/process"
-	"gitlab.com/nova_dubai/common/helpers"
-	"gitlab.com/nova_dubai/common/model"
 )
 
 var (

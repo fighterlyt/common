@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fighterlyt/common/telegram"
 	"github.com/fighterlyt/log"
-	"gitlab.com/nova_dubai/common/telegram"
 	"go.uber.org/zap"
 )
 
@@ -20,7 +20,8 @@ func SetTeleGramClient(client telegram.Telegram) {
 	telegramClient = client
 }
 
-/*EnsureGo 并发函数，确保在返回前已经开始执行
+/*
+EnsureGo 并发函数，确保在返回前已经开始执行
 参数:
 *	functions	...func()
 返回值:
@@ -37,7 +38,8 @@ func EnsureGo(logger log.Logger, functions ...func()) {
 	wg.Wait()
 }
 
-/*recoverRun 恢复panic 协程 并打印日志
+/*
+recoverRun 恢复panic 协程 并打印日志
 参数:
 *	logger  	log.Logger     	日志器
 *	wg      	*sync.WaitGroup	 并发等待

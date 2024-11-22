@@ -1,8 +1,8 @@
 package free
 
 import (
+	"github.com/fighterlyt/common/helpers"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 )
 
@@ -82,7 +82,8 @@ type FailOperation struct {
 	Freeze bool            `gorm:"column:freeze;comment:是否是冻结"`
 }
 
-/*NewFailOperation 新建操作失败记录
+/*
+NewFailOperation 新建操作失败记录
 参数:
 *	from          	string         	质押来源地址
 *	to            	string         	质押收益地址

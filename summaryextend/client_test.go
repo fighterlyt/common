@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.com/nova_dubai/common/helpers"
+	"github.com/fighterlyt/common/helpers"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"

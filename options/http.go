@@ -6,9 +6,9 @@ import (
 	"github.com/youthlin/t"
 	"go.uber.org/zap"
 
+	"github.com/fighterlyt/common/model/invoke"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/model/invoke"
 )
 
 func (s service) http() {

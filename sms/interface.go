@@ -1,9 +1,9 @@
 package sms
 
 import (
+	"github.com/fighterlyt/common/model"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/model"
 )
 
 type Service interface {

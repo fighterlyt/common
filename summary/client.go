@@ -3,10 +3,10 @@ package summary
 import (
 	"fmt"
 
+	"github.com/fighterlyt/common/helpers"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -82,7 +82,8 @@ func NewClient(tableName string, slot Slot, logger log.Logger, db *gorm.DB) (res
 	}, nil
 }
 
-/*Summarize 汇总
+/*
+Summarize 汇总
 参数:
 *	ownerID	int64          	所有者
 *	amount 	decimal.Decimal	值

@@ -3,11 +3,11 @@ package summaryextend
 import (
 	"fmt"
 
+	"github.com/fighterlyt/common/helpers"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"github.com/youthlin/t"
-	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -19,10 +19,24 @@ type client struct {
 	model     Detail     // model
 	logger    log.Logger // 日志器
 	db        *gorm.DB   // db
+	bigInt    bool
+}
+
+func (m *client) SetBigInt(on bool) {
+	m.bigInt = on
+}
+
+func (m client) newData() Summary {
+	if m.bigInt {
+		return &DetailWithBigInt{}
+	}
+
+	return &Detail{}
 }
 
 func (m client) GetSummaryByDate(date int, ownerID int64) (records Summary, err error) {
-	data := &Detail{}
+	data := m.newData()
+
 	if err = m.db.Session(&gorm.Session{}).Where("ownerID = ? and slotValue = ?", ownerID, date).First(data).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -83,7 +97,8 @@ func NewClient(tableName string, slot Slot, logger log.Logger, db *gorm.DB) (res
 	}, nil
 }
 
-/*Summarize 汇总
+/*
+Summarize 汇总
 参数:
 *	ownerID	string          所有者
 *	amount 	decimal.Decimal	值
@@ -416,9 +431,7 @@ func (m client) GetSummarySummary(ownerIDs []string, from, to int64) (record Sum
 		query = query.Where(`ownerID in ?`, ownerIDs)
 	}
 
-	var (
-		data Detail
-	)
+	data := m.newData()
 
 	if query, err = m.buildScopeByRange(from, to, query); err != nil {
 		return nil, errors.Wrap(err, `构建时间查询`)
@@ -436,11 +449,11 @@ func (m client) GetSummarySummary(ownerIDs []string, from, to int64) (record Sum
 			`sum(value_8) as value_8,` +
 			`sum(value_9) as value_9,` +
 			`sum(value_10) as value_10,` +
-			`sum(times) as times`).Find(&data).Error; err != nil {
+			`sum(times) as times`).Find(data).Error; err != nil {
 		return nil, errors.Wrap(err, `数据库操作`)
 	}
 
-	return &data, nil
+	return data, nil
 }
 
 func (m client) GetSummaryExclude(excludeOwnerID []string, from, to int64, selects ...string) (records []Summary, err error) {
@@ -450,7 +463,9 @@ func (m client) GetSummaryExclude(excludeOwnerID []string, from, to int64, selec
 	}
 
 	var (
-		data []*Detail
+		data       []*Detail
+		bigIntData []*DetailWithBigInt
+		length     int
 	)
 
 	if query, err = m.buildScopeByRange(from, to, query); err != nil {
@@ -461,14 +476,28 @@ func (m client) GetSummaryExclude(excludeOwnerID []string, from, to int64, selec
 		query = query.Select(item)
 	}
 
-	if err = query.Find(&data).Error; err != nil {
+	if m.bigInt {
+		err = query.Find(&bigIntData).Error
+		length = len(bigIntData)
+	} else {
+		err = query.Find(&data).Error
+		length = len(data)
+	}
+
+	if err != nil {
 		return nil, errors.Wrap(err, `数据库操作`)
 	}
 
-	records = make([]Summary, 0, len(data))
+	records = make([]Summary, 0, length)
 
-	for i := range data {
-		records = append(records, data[i])
+	if m.bigInt {
+		for i := range bigIntData {
+			records = append(records, bigIntData[i])
+		}
+	} else {
+		for i := range data {
+			records = append(records, data[i])
+		}
 	}
 
 	return records, nil

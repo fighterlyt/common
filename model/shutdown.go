@@ -3,8 +3,8 @@ package model
 import (
 	"net/http"
 
+	"github.com/fighterlyt/common/model/invoke"
 	"github.com/gin-gonic/gin"
-	"gitlab.com/nova_dubai/common/model/invoke"
 	"go.uber.org/atomic"
 )
 
@@ -20,7 +20,8 @@ type GinShutdown struct {
 	*shutdown
 }
 
-/*NewGinShutdown 新建
+/*
+NewGinShutdown 新建
 参数:
 返回值:
 *	*GinShutdown	*GinShutdown	数据
@@ -31,7 +32,8 @@ func NewGinShutdown() *GinShutdown {
 	}
 }
 
-/*Process 处理
+/*
+Process 处理
 参数:
 *	ctx	*gin.Context	上下文
 返回值:
@@ -56,7 +58,8 @@ type shutdown struct {
 	closed  bool
 }
 
-/*NewShutdown 新建控制器
+/*
+NewShutdown 新建控制器
 参数:
 返回值:
 *	*shutdown	*shutdown	返回值1
@@ -67,7 +70,8 @@ func NewShutdown() *shutdown {
 	}
 }
 
-/*Close 关闭
+/*
+Close 关闭
 参数:
 返回值:
 */
@@ -75,7 +79,8 @@ func (s *shutdown) Close() {
 	s.closed = true
 }
 
-/*Add 添加计数
+/*
+Add 添加计数
 参数:
 *	count	int64	参数1
 返回值:
@@ -84,7 +89,8 @@ func (s *shutdown) Add(count int64) {
 	s.counter.Add(count)
 }
 
-/*IsClosed 是否已经关闭
+/*
+IsClosed 是否已经关闭
 参数:
 返回值:
 *	bool	bool	返回值1

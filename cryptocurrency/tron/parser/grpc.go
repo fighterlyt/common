@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/fighterlyt/common/cryptocurrency"
+	"github.com/fighterlyt/common/model"
 	"github.com/fighterlyt/gotron-sdk/pkg/client"
 	"github.com/fighterlyt/gotron-sdk/pkg/common"
 	"github.com/fighterlyt/gotron-sdk/pkg/proto/api"
@@ -13,11 +15,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/cryptocurrency"
-	"gitlab.com/nova_dubai/common/model"
 	"go.uber.org/multierr"
 
-	"gitlab.com/nova_dubai/common/helpers"
+	"github.com/fighterlyt/common/helpers"
 	"go.uber.org/zap"
 )
 
@@ -39,7 +39,8 @@ type grpcParser struct {
 	includeTRX bool                       // 是否包含TRX
 }
 
-/*NewGRPCTronScanParser grpc解析器
+/*
+NewGRPCTronScanParser grpc解析器
 参数:
 *	concern 					cryptocurrency.Concern			关心账号
 *	grpcClient  				*client.GrpcClient		        波场grpc客户端
@@ -63,7 +64,8 @@ func (g *grpcParser) IncludeTRX(include bool) {
 	g.includeTRX = include
 }
 
-/*IsBlockConfirmed 区块是否被确认
+/*
+IsBlockConfirmed 区块是否被确认
 参数:
 *	ctx        	context.Context		上下文
 *	blockNumber	int64				区块号
@@ -75,7 +77,8 @@ func (g grpcParser) IsBlockConfirmed(_ context.Context, _ int64) (confirmed bool
 	return true, nil
 }
 
-/*Parse 区块解析
+/*
+Parse 区块解析
 参数:
 *	ctx        	context.Context		上下文
 *	blockNumber	int64				区块号
@@ -133,7 +136,8 @@ func getContract(tx *api.TransactionExtention) *core.Transaction_Contract {
 	return nil
 }
 
-/*ParseTX  解析交易
+/*
+ParseTX  解析交易
 参数:
 *	_          	context.Context                  	上下文
 *	tx         	*api.TransactionExtention        	交易

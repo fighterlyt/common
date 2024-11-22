@@ -6,14 +6,14 @@ import (
 	"os"
 	"time"
 
-	"gitlab.com/nova_dubai/common/twofactor"
+	"github.com/fighterlyt/common/twofactor"
 
+	"github.com/fighterlyt/common/helpers"
+	"github.com/fighterlyt/common/model"
 	"github.com/fighterlyt/log"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/helpers"
-	"gitlab.com/nova_dubai/common/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -56,7 +56,8 @@ func (s *service) Name() string {
 	return name
 }
 
-/*NewService 新建服务
+/*
+NewService 新建服务
 参数:
 *	db           	*gorm.DB     	数据库
 *	client       	*redis.Client	redis
@@ -101,7 +102,8 @@ func (s *service) GetParameters(keys ...string) (parameters map[string]*Paramete
 	return s.parameter.GetParameters(keys...)
 }
 
-/*Modify 修改参数
+/*
+Modify 修改参数
 参数:
 *	keyValue	map[string]string	key->value map
 *	userID  	int64               用户ID
@@ -128,7 +130,8 @@ func (s *service) Modify(keyValue map[string]string, userID int64) error {
 	return nil
 }
 
-/*AddParameters 添加参数
+/*
+AddParameters 添加参数
 参数:
 *	parameters	...*Parameter	参数
 返回值:
@@ -148,7 +151,8 @@ func (s *service) AddParameters(parameters ...*Parameter) error {
 	return nil
 }
 
-/*GetHistory 获取历史
+/*
+GetHistory 获取历史
 参数:
 *	key      	string   	key
 *	start    	int      	开始位置，0开始
@@ -161,7 +165,8 @@ func (s *service) GetHistory(key string, startTime, endTime int64, start, limit 
 	return s.history.Get(key, startTime, endTime, start, limit)
 }
 
-/*Create 创建参数
+/*
+Create 创建参数
 参数:
 *	parameter	*Parameter	参数
 返回值:
@@ -171,7 +176,8 @@ func (s *service) Create(parameter *Parameter) error {
 	return s.parameter.Save(parameter)
 }
 
-/*init 初始化
+/*
+init 初始化
 参数:
 返回值:
 *	error	error	错误
@@ -190,7 +196,8 @@ func (s *service) init() error {
 	return nil
 }
 
-/*dbInit 数据库初始化
+/*
+dbInit 数据库初始化
 参数:
 返回值:
 *	error	error	错误
@@ -207,7 +214,8 @@ func (s *service) dbInit() error {
 	return nil
 }
 
-/*loadConfig 加载配置文件
+/*
+loadConfig 加载配置文件
 参数:
 返回值:
 *	error	error	返回值1

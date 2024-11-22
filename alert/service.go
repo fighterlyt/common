@@ -1,8 +1,8 @@
 package alert
 
 import (
+	"github.com/fighterlyt/common/telegram"
 	"github.com/fighterlyt/log"
-	"gitlab.com/nova_dubai/common/telegram"
 	"go.uber.org/zap"
 )
 
@@ -16,7 +16,8 @@ type telegramService struct {
 	logger  log.Logger
 }
 
-/*NewTelegramService 新建基于telegram的服务
+/*
+NewTelegramService 新建基于telegram的服务
 参数:
 *	service         	telegram.Telegram	telegram服务
 *	logger          	log.Logger       	日志器

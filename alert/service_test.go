@@ -3,9 +3,9 @@ package alert
 import (
 	"testing"
 
+	"github.com/fighterlyt/common/telegram"
 	"github.com/fighterlyt/log"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/nova_dubai/common/telegram"
 )
 
 var (

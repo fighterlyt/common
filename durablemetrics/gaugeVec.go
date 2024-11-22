@@ -4,11 +4,11 @@ import (
 	"context"
 	"strings"
 
+	"github.com/fighterlyt/common/helpers"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"gitlab.com/nova_dubai/common/helpers"
 )
 
 type GaugeVec struct {

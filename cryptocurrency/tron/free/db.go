@@ -1,9 +1,9 @@
 package free
 
 import (
+	"github.com/fighterlyt/common/helpers"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/helpers"
 )
 
 var (
@@ -11,7 +11,8 @@ var (
 	modelFail   = &FailOperation{}
 )
 
-/*CreateRecord 创建记录
+/*
+CreateRecord 创建记录
 参数:
 *	to    	string         	质押收益地址
 *	txID  	string         	质押交易Hash
@@ -32,7 +33,8 @@ func (s service) CreateRecord(to, txID string, amount decimal.Decimal) (record *
 	return record, nil
 }
 
-/*UpdateUnfreezeInfo 更新解冻信息
+/*
+UpdateUnfreezeInfo 更新解冻信息
 参数:
 *	txID       	    string      	解冻交易ID
 *	unfreeTime 	    helpers.Time	解冻时间
@@ -40,6 +42,7 @@ func (s service) CreateRecord(to, txID string, amount decimal.Decimal) (record *
 返回值:
 *	error      	    error       	错误
 重点:
+
 	由于解冻是批量解冻，所有符合条件(冻结72小时)的都被解冻
 */
 func (s service) UpdateUnfreezeInfo(txID string, unfreeTime, freezeTimeMax helpers.Time) error {
@@ -69,7 +72,8 @@ func (s service) findRecords(filter GetRecordFilter, needAllCount bool) (totalCo
 	return totalCount, records, nil
 }
 
-/*CreateFailRecord 创建操作鼠标记录
+/*
+CreateFailRecord 创建操作鼠标记录
 参数:
 *	to    	string         	收益方
 *	errMsg	string         	错误信息

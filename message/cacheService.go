@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fighterlyt/cache"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/cache"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +23,8 @@ type cacheService struct {
 	client  cache.Client
 }
 
-/*NewCacheService 新建缓存服务
+/*
+NewCacheService 新建缓存服务
 参数:
 *	db     	*gorm.DB        db
 *	logger 	log.Logger   	日志器
@@ -80,7 +81,8 @@ func NewCacheService(db *gorm.DB, logger log.Logger, manager cache.Manager) (res
 	}, nil
 }
 
-/*Get 获取指定分类的消息，基于缓存
+/*
+Get 获取指定分类的消息，基于缓存
 参数:
 *	key    	string  	分类
 返回值:

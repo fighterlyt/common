@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/fighterlyt/common/localdb"
 	"github.com/fighterlyt/log"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/nova_dubai/common/localdb"
 )
 
 var (

@@ -3,9 +3,9 @@ package parameters
 import (
 	"fmt"
 
+	"github.com/fighterlyt/common/model/invoke"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/model/invoke"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +20,8 @@ func (s *service) httpGroupInfo(ctx *gin.Context) {
 	invoke.ReturnSuccess(ctx, pageGroupInfo)
 }
 
-/*setParameters 设置业务参数
+/*
+setParameters 设置业务参数
 参数:
 *	ctx	*gin.Context	gin
 返回值:

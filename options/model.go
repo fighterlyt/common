@@ -5,8 +5,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/fighterlyt/common/model"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/model"
 )
 
 type item struct {

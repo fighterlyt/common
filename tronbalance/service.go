@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fighterlyt/common/helpers"
+	"github.com/fighterlyt/common/model"
 	"github.com/fighterlyt/gotron-sdk/pkg/client"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/helpers"
-	"gitlab.com/nova_dubai/common/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

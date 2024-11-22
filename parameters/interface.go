@@ -3,10 +3,10 @@ package parameters
 import (
 	"context"
 
+	"github.com/fighterlyt/common/twofactor"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/twofactor"
 
-	"gitlab.com/nova_dubai/common/model"
+	"github.com/fighterlyt/common/model"
 )
 
 var (

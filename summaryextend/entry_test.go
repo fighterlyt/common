@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fighterlyt/common/helpers"
 	"github.com/fighterlyt/gormlogger"
-	"gitlab.com/nova_dubai/common/helpers"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/mysql"
 

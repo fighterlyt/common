@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fighterlyt/cache"
+	"github.com/fighterlyt/common/helpers"
 	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/nova_dubai/cache"
-	"gitlab.com/nova_dubai/common/helpers"
 	"go.uber.org/zap/zapcore"
 )
 

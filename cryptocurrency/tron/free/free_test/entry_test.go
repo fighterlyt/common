@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fighterlyt/common/cryptocurrency/tron/free"
 	"github.com/fighterlyt/gotron-sdk/pkg/client"
 	"github.com/fighterlyt/log"
 	"github.com/fighterlyt/redislock"
 	"github.com/go-redis/redis/v8"
-	"gitlab.com/nova_dubai/common/cryptocurrency/tron/free"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/driver/mysql"

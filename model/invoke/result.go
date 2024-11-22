@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/fighterlyt/common/helpers"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/helpers"
 )
 
 var (
@@ -34,7 +34,8 @@ type ListResult struct {
 	Rows  interface{} `json:"rows"`  // 返回值
 }
 
-/*NewListResult 新建表格返回值
+/*
+NewListResult 新建表格返回值
 参数:
 *	count  	int64      	总数量
 *	records	interface{}	记录
@@ -75,7 +76,8 @@ func NewSuccessResult(msg string, data interface{}) *Result {
 	return NewResult(Success, msg, data, ``)
 }
 
-/*NewResult 构造返回结构
+/*
+NewResult 构造返回结构
 参数:
 *	code       	StatCode   	错误码
 *	msg        	string     	描述

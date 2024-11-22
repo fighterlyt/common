@@ -3,8 +3,8 @@ package trace
 import (
 	"context"
 
+	"github.com/fighterlyt/common/helpers"
 	"github.com/gin-gonic/gin"
-	"gitlab.com/nova_dubai/common/helpers"
 )
 
 type F11[T any, V any] struct {

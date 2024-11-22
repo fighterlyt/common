@@ -2,9 +2,9 @@ package badger
 
 import (
 	"github.com/dgraph-io/badger/v3"
+	"github.com/fighterlyt/common/localdb"
 	"github.com/fighterlyt/log"
 	"github.com/pkg/errors"
-	"gitlab.com/nova_dubai/common/localdb"
 	"go.uber.org/zap"
 )
 
@@ -14,7 +14,8 @@ type Service struct {
 	logger log.Logger
 }
 
-/*NewService 新建服务
+/*
+NewService 新建服务
 参数:
 *	filePath	string    	路径
 *	logger  	log.Logger  日志器

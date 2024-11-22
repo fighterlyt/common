@@ -1,7 +1,7 @@
 package header
 
 import (
-	"gitlab.com/nova_dubai/common/helpers"
+	"github.com/fighterlyt/common/helpers"
 )
 
 type service struct {

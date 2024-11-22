@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fighterlyt/common/helpers"
 	"github.com/fighterlyt/gotron-sdk/pkg/client"
 	"github.com/fighterlyt/gotron-sdk/pkg/free"
 	"github.com/fighterlyt/gotron-sdk/pkg/proto/core"
@@ -11,7 +12,6 @@ import (
 	"github.com/fighterlyt/redislock"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/helpers"
 	"gorm.io/gorm"
 )
 
@@ -93,7 +93,8 @@ func (s service) validate() error {
 	return nil
 }
 
-/*SetUp 设置
+/*
+SetUp 设置
 参数:
 *	from      	string	执行质押TRX的地址
 *	privateKey	string	from对应的私钥
@@ -119,7 +120,8 @@ func (s *service) SetUp(from, privateKey string) error {
 	return nil
 }
 
-/*Freeze 冻结
+/*
+Freeze 冻结
 参数:
 *	to       	string          收益方
 *	trxAmount	decimal.Decimal	冻结TRX 金额
@@ -150,7 +152,8 @@ func (s service) Freeze(to string, trxAmount decimal.Decimal) error {
 	return nil
 }
 
-/*FreezeForTransfer 用于TRC20的Transfer质押，质押足够的TRX
+/*
+FreezeForTransfer 用于TRC20的Transfer质押，质押足够的TRX
 参数:
 *	to   	string	参数1
 返回值:
@@ -160,7 +163,8 @@ func (s service) FreezeForTransfer(to string) error {
 	return s.Freeze(to, decimal.New(TRXForSingleEnergy, 0))
 }
 
-/*UnFreeze 解冻
+/*
+UnFreeze 解冻
 参数:
 *	to   	string	收益地址
 返回值:
@@ -202,7 +206,8 @@ func (s service) UnFreeze(to string) error {
 	return s.UpdateUnfreezeInfo(txID, now, helpers.Time(time.Unix(now.Unix(), 0).Add(time.Hour*-72).Unix()))
 }
 
-/*GetRecords 获取冻结记录
+/*
+GetRecords 获取冻结记录
 参数:
 *	filter      	GetRecordFilter	过滤器
 *	needAllCount	bool           	是否需要全部计数

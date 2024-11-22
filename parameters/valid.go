@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fighterlyt/common/helpers"
 	"github.com/shopspring/decimal"
-	"gitlab.com/nova_dubai/common/helpers"
 
 	"github.com/fighterlyt/log"
 	"go.uber.org/zap"
@@ -151,7 +151,8 @@ var (
 	}
 )
 
-/*Regex 使用正则表达式验证
+/*
+Regex 使用正则表达式验证
 参数:
 *	regexExpr       *regexp.Regexp                              正则表达式
 返回值:
@@ -168,7 +169,8 @@ func Regex(regexExpr *regexp.Regexp) func(i interface{}, o interface{}) bool {
 	}
 }
 
-/*Delimiter 生成一个由delimiter分隔，每个部分内容为content,共有count个content
+/*
+Delimiter 生成一个由delimiter分隔，每个部分内容为content,共有count个content
 参数:
 *	content       	string        	内容
 *	Delimiter     	string        	分隔符

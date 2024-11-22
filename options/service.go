@@ -1,8 +1,8 @@
 package options
 
 import (
-	"gitlab.com/nova_dubai/common/helpers"
-	"gitlab.com/nova_dubai/common/model"
+	"github.com/fighterlyt/common/helpers"
+	"github.com/fighterlyt/common/model"
 )
 
 type service struct {

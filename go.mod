@@ -1,4 +1,4 @@
-module gitlab.com/nova_dubai/common
+module github.com/fighterlyt/common
 
 go 1.18
 
@@ -13,6 +13,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/elastic/go-elasticsearch/v7 v7.17.0
 	github.com/ethereum/go-ethereum v1.10.15
+	github.com/fighterlyt/cache v0.0.0-20241122150330-9ccc95b6db29
 	github.com/fighterlyt/gormlogger v0.0.0-20210729161641-ae2b6a621523
 	github.com/fighterlyt/gotron-sdk v0.0.0-20220523163203-b4d07114ac63
 	github.com/fighterlyt/log v0.0.0-20220608163017-fe71664f4f01
@@ -33,7 +34,6 @@ require (
 	github.com/vmihailenco/msgpack v4.0.4+incompatible
 	github.com/xuri/excelize/v2 v2.6.0
 	github.com/youthlin/t v0.0.5
-	gitlab.com/nova_dubai/cache v0.0.0-20210824010034-1c70f17b8fe4
 	go.mongodb.org/mongo-driver v1.9.1
 	go.uber.org/atomic v1.9.0
 	go.uber.org/multierr v1.8.0
@@ -134,6 +134,5 @@ require (
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	gorm.io/hints v1.1.0 // indirect
 	k8s.io/apimachinery v0.0.0-20191123233150-4c4803ed55e3 // indirect
 )
